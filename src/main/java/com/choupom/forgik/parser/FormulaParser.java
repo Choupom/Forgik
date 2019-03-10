@@ -8,8 +8,9 @@ package com.choupom.forgik.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.choupom.forgik.formula.BoundVariable;
 import com.choupom.forgik.formula.Formula;
-import com.choupom.forgik.formula.Variable;
+import com.choupom.forgik.formula.FreeVariable;
 
 public class FormulaParser {
 
@@ -27,8 +28,9 @@ public class FormulaParser {
 			Token token = TokenInfo.parseCharacter(chars[i]);
 			if (token != null) {
 				if (variableStart != -1) {
-					String variable = new String(chars, variableStart, i - variableStart);
-					tokens.add(new TokenInfo(Token.FORMULA, new Variable(variable)));
+					String variableName = new String(chars, variableStart, i - variableStart);
+					Formula variable = createVariable(variableName);
+					tokens.add(new TokenInfo(Token.FORMULA, variable));
 					variableStart = -1;
 				}
 				if (token != Token.WHITESPACE) {
@@ -40,12 +42,21 @@ public class FormulaParser {
 		}
 
 		if (variableStart != -1) {
-			String variable = new String(chars, variableStart, chars.length - variableStart);
-			tokens.add(new TokenInfo(Token.FORMULA, new Variable(variable)));
+			String variableName = new String(chars, variableStart, chars.length - variableStart);
+			Formula variable = createVariable(variableName);
+			tokens.add(new TokenInfo(Token.FORMULA, variable));
 		}
 
 		tokens.add(new TokenInfo(Token.EOF));
 		return tokens.toArray(new TokenInfo[tokens.size()]);
+	}
+
+	private static Formula createVariable(String variableName) {
+		if (Character.isLowerCase(variableName.charAt(0))) {
+			return new BoundVariable(variableName);
+		} else {
+			return new FreeVariable(variableName);
+		}
 	}
 
 	private static Formula createFormula(TokenInfo[] tokens) {

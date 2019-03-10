@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.FreeVariable;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.formula.Negation;
-import com.choupom.forgik.formula.Variable;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.rule.DeductionRulebook;
 import com.choupom.forgik.rule.Rulebook;
@@ -106,8 +106,8 @@ public class Main {
 					}
 					Negation negation = (Negation) lastAssumption.goal;
 					// entries.add(new Entry(negation.getOperand(), new Variable("F"), negation));
-					entries.add(new Entry(negation.getOperand(), new Variable("A"), new Variable("A")));
-					entries.add(new Entry(negation.getOperand(), new Variable("-A"), new Variable("-A")));
+					entries.add(new Entry(negation.getOperand(), new FreeVariable("A"), new FreeVariable("A")));
+					entries.add(new Entry(negation.getOperand(), new FreeVariable("-A"), new FreeVariable("-A")));
 				} else if (line.equals("G")) {
 					SuggestionReverse[] suggestions = FormulaSuggesterReverse.suggestFromRulebook(lastAssumption.goal,
 							rulebook);

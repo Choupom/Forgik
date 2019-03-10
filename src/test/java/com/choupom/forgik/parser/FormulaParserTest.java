@@ -21,7 +21,7 @@ public class FormulaParserTest {
 
 	@Test
 	public void testSimple() {
-		String string = "--(p v q) > (r ^ -s)";
+		String string = "--(p v q) > (A ^ -B)";
 		Formula formula = FormulaParser.parse(string);
 		Assert.assertEquals(string, formula.toString());
 	}

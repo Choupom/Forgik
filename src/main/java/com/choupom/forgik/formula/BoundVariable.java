@@ -8,11 +8,14 @@ package com.choupom.forgik.formula;
 import java.util.List;
 import java.util.Map;
 
-public class Variable extends Formula {
+public class BoundVariable extends Formula {
 
 	private final String name;
 
-	public Variable(String name) {
+	public BoundVariable(String name) {
+		if (!Character.isLowerCase(name.charAt(0))) {
+			throw new IllegalArgumentException();
+		}
 		this.name = name;
 	}
 
@@ -32,35 +35,26 @@ public class Variable extends Formula {
 
 	@Override
 	public boolean checkEquals(Formula formula) {
-		if (!(formula instanceof Variable)) {
+		if (!(formula instanceof BoundVariable)) {
 			return false;
 		}
 
-		Variable variable = (Variable) formula;
+		BoundVariable variable = (BoundVariable) formula;
 		return this.name.equals(variable.name);
 	}
 
 	@Override
 	public boolean identify(Formula formula, Map<String, Formula> map) {
-		Formula mappedFormula = map.get(this.name);
-		if (mappedFormula == null) {
-			map.put(this.name, formula);
-			return true;
-		} else {
-			return mappedFormula.checkEquals(formula);
+		if (!(formula instanceof BoundVariable)) {
+			return false;
 		}
+
+		BoundVariable variable = (BoundVariable) formula;
+		return this.name.equals(variable.name);
 	}
 
 	@Override
 	public Formula apply(Map<String, Formula> map, List<String> leftover) {
-		Formula formula = map.get(this.name);
-		if (formula != null) {
-			return formula;
-		} else {
-			if (leftover != null) {
-				leftover.add(this.name);
-			}
-			return new Variable(this.name);
-		}
+		return this;
 	}
 }
