@@ -7,6 +7,7 @@ package com.choupom.forgik.formula;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Disjunction extends Formula {
 
@@ -47,7 +48,12 @@ public class Disjunction extends Formula {
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, Formula> map) {
+	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+		if (formula instanceof FreeVariable) {
+			FreeVariable variable = (FreeVariable) formula;
+			return variable.identify(this, map);
+		}
+
 		if (!(formula instanceof Disjunction)) {
 			return false;
 		}
@@ -57,9 +63,14 @@ public class Disjunction extends Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, List<String> leftover) {
+	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
 		Formula newOperand1 = this.operand1.apply(map, leftover);
 		Formula newOperand2 = this.operand2.apply(map, leftover);
 		return new Disjunction(newOperand1, newOperand2);
+	}
+
+	@Override
+	public boolean containsFreeVariable(String variableName) {
+		return (this.operand1.containsFreeVariable(variableName) || this.operand2.containsFreeVariable(variableName));
 	}
 }

@@ -6,7 +6,9 @@
 package com.choupom.forgik.suggester;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.rule.Rule;
@@ -47,7 +49,7 @@ public class FormulaSuggester {
 	}
 
 	private static void makeSuggestion(Formula[] formulas, Rule rule, List<Suggestion> suggestions) {
-		List<String> leftover = new ArrayList<>();
+		Set<String> leftover = new HashSet<>();
 		Formula result = rule.apply(formulas, leftover);
 		if (result != null) {
 			Suggestion suggestion = new Suggestion(rule, result, leftover);

@@ -5,17 +5,18 @@
  */
 package com.choupom.forgik.suggester;
 
-import java.util.List;
+import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.rule.Rule;
 
 public class Suggestion {
-	public Rule rule;
-	public Formula formula;
-	public String[] leftover;
 
-	public Suggestion(Rule rule, Formula formula, List<String> leftover) {
+	private final Rule rule;
+	private final Formula formula;
+	private final String[] leftover;
+
+	public Suggestion(Rule rule, Formula formula, Set<String> leftover) {
 		this.rule = rule;
 		this.formula = formula;
 		this.leftover = leftover.toArray(new String[leftover.size()]);

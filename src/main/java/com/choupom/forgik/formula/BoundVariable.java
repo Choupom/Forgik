@@ -7,6 +7,7 @@ package com.choupom.forgik.formula;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BoundVariable extends Formula {
 
@@ -44,7 +45,12 @@ public class BoundVariable extends Formula {
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, Formula> map) {
+	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+		if (formula instanceof FreeVariable) {
+			FreeVariable variable = (FreeVariable) formula;
+			return variable.identify(this, map);
+		}
+
 		if (!(formula instanceof BoundVariable)) {
 			return false;
 		}
@@ -54,7 +60,12 @@ public class BoundVariable extends Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, List<String> leftover) {
+	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
 		return this;
+	}
+
+	@Override
+	public boolean containsFreeVariable(String variableName) {
+		return false;
 	}
 }

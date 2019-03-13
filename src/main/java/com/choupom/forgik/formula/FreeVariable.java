@@ -5,8 +5,10 @@
  */
 package com.choupom.forgik.formula;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FreeVariable extends Formula {
 
@@ -44,18 +46,21 @@ public class FreeVariable extends Formula {
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, Formula> map) {
-		Formula mappedFormula = map.get(this.name);
-		if (mappedFormula == null) {
-			map.put(this.name, formula);
-			return true;
-		} else {
-			return mappedFormula.checkEquals(formula);
+	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+		if (formula instanceof FreeVariable) {
+			FreeVariable variable = (FreeVariable) formula;
+			if (variable.name.equals(this.name)) {
+				return true;
+			}
+			addToMap(variable.name, this, map);
 		}
+
+		addToMap(this.name, formula, map);
+		return true;
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, List<String> leftover) {
+	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
 		Formula formula = map.get(this.name);
 		if (formula != null) {
 			return formula;
@@ -65,5 +70,19 @@ public class FreeVariable extends Formula {
 			}
 			return this;
 		}
+	}
+
+	@Override
+	public boolean containsFreeVariable(String variableName) {
+		return this.name.equals(variableName);
+	}
+
+	private static void addToMap(String name, Formula formula, Map<String, List<Formula>> map) {
+		List<Formula> list = map.get(name);
+		if (list == null) {
+			list = new ArrayList<>();
+			map.put(name, list);
+		}
+		list.add(formula);
 	}
 }

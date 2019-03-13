@@ -8,6 +8,7 @@ package com.choupom.forgik.rule;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 
@@ -39,27 +40,60 @@ public class Rule {
 		return (numFormulas == this.antecedents.length);
 	}
 
-	public Formula apply(Formula[] formulas, List<String> leftover) {
-		Map<String, Formula> map = new HashMap<>();
+	public Formula apply(Formula[] formulas, Set<String> leftover) {
+		Map<String, List<Formula>> map = new HashMap<>();
 		for (int i = 0; i < this.antecedents.length; i++) {
 			if (!this.antecedents[i].identify(formulas[i], map)) {
 				return null;
 			}
 		}
 
-		return this.consequent.apply(map, leftover);
+		Map<String, Formula> simpleMap = getSimpleMap(map);
+
+		return this.consequent.apply(simpleMap, leftover);
 	}
 
-	public Formula[] applyReverse(Formula formula) {
-		Map<String, Formula> map = new HashMap<>();
+	public Formula[] applyReverse(Formula formula, Set<String> leftover) {
+		Map<String, List<Formula>> map = new HashMap<>();
 		if (!this.consequent.identify(formula, map)) {
 			return null;
 		}
 
+		Map<String, Formula> simpleMap = getSimpleMap(map);
+
 		Formula[] formulas = new Formula[this.antecedents.length];
 		for (int i = 0; i < this.antecedents.length; i++) {
-			formulas[i] = this.antecedents[i].apply(map, null);
+			formulas[i] = this.antecedents[i].apply(simpleMap, leftover);
 		}
 		return formulas;
+	}
+
+	private static Map<String, Formula> getSimpleMap(Map<String, List<Formula>> map) {
+		Map<String, Formula> simpleMap = new HashMap<>();
+		for (Map.Entry<String, List<Formula>> mapping : map.entrySet()) {
+			List<Formula> list = mapping.getValue();
+			if (list.size() > 0) {
+				if (!checkAllEquals(list)) {
+					return null;
+				}
+				simpleMap.put(mapping.getKey(), list.get(0));
+			}
+		}
+		return simpleMap;
+	}
+
+	private static boolean checkAllEquals(List<Formula> formulas) {
+		if (formulas.size() < 2) {
+			return true;
+		}
+
+		Formula reference = formulas.get(0);
+		for (int i = 1; i < formulas.size(); i++) {
+			if (!formulas.get(i).checkEquals(reference)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

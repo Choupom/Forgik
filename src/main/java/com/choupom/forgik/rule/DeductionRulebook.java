@@ -14,19 +14,19 @@ public class DeductionRulebook extends Rulebook {
 	}
 
 	private DeductionRulebook() {
-		addRule2("A", "B", "A ^ B"); // conjunction introduction
-		addRule1("A ^ B", "A"); // conjunction elimination (1)
-		addRule1("A ^ B", "B"); // conjunction elimination (2)
-		addRule1("A", "A v B"); // disjunction introduction (1)
-		addRule1("A", "B v A"); // disjunction introduction (2)
-		addRule3("A v B", "A > C", "B > C", "C"); // disjunction elimination
-		// addRule1("F", "A"); // ex falso quodlibet
-		addRule2("-A", "A", "B"); // ex falso quodlibet
-		addRule2("(A > B)", "A", "B"); // modus ponens
-		// addRule2("-A", "A", "F"); // modus ponens (special case)
-		addRule1("--A", "A"); // double negation elimination
+		addRule2("X", "Y", "X ^ Y"); // conjunction introduction
+		addRule1("X ^ Y", "X"); // conjunction elimination (1)
+		addRule1("X ^ Y", "Y"); // conjunction elimination (2)
+		addRule1("X", "X v Y"); // disjunction introduction (1)
+		addRule1("X", "Y v X"); // disjunction introduction (2)
+		addRule3("X v Y", "X > Z", "Y > Z", "Z"); // disjunction elimination
+		// addRule1("F", "X"); // ex falso quodlibet
+		addRule2("X", "-X", "Y"); // ex falso quodlibet
+		addRule2("(X > Y)", "X", "Y"); // modus ponens
+		// addRule2("-X", "X", "F"); // modus ponens (special case)
+		addRule1("--X", "X"); // double negation elimination
 
-		// addRule0("A v -A"); // law of excluded middle
-		// addRule0("-A v A"); // law of excluded middle
+		// addRule0("X v -X"); // law of excluded middle
+		// addRule0("-X v X"); // law of excluded middle
 	}
 }

@@ -7,6 +7,7 @@ package com.choupom.forgik.formula;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Negation extends Formula {
 
@@ -41,7 +42,12 @@ public class Negation extends Formula {
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, Formula> map) {
+	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+		if (formula instanceof FreeVariable) {
+			FreeVariable variable = (FreeVariable) formula;
+			return variable.identify(this, map);
+		}
+
 		if (!(formula instanceof Negation)) {
 			return false;
 		}
@@ -51,8 +57,13 @@ public class Negation extends Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, List<String> leftover) {
+	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
 		Formula newOperand = this.operand.apply(map, leftover);
 		return new Negation(newOperand);
+	}
+
+	@Override
+	public boolean containsFreeVariable(String variableName) {
+		return this.operand.containsFreeVariable(variableName);
 	}
 }

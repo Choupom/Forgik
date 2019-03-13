@@ -6,7 +6,9 @@
 package com.choupom.forgik.suggester;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.rule.Rule;
@@ -17,9 +19,10 @@ public class FormulaSuggesterReverse {
 	public static SuggestionReverse[] suggestFromRulebook(Formula formula, Rulebook rulebook) {
 		List<SuggestionReverse> suggestions = new ArrayList<>();
 		for (Rule rule : rulebook.getRules()) {
-			Formula[] result = rule.applyReverse(formula);
+			Set<String> leftover = new HashSet<>();
+			Formula[] result = rule.applyReverse(formula, leftover);
 			if (result != null) {
-				SuggestionReverse suggestion = new SuggestionReverse(rule, result);
+				SuggestionReverse suggestion = new SuggestionReverse(rule, result, leftover);
 				suggestions.add(suggestion);
 			}
 		}
