@@ -32,13 +32,21 @@ public class Main {
 
 	public static void main(String[] args) {
 		Formula formula = FormulaParser.parse(MAIN_FORMULA);
-		Implication implication = (Implication) formula;
 
-		List<Formula> antecedentsList = new ArrayList<>();
-		getConjuctions(implication.getOperand1(), antecedentsList);
+		Formula[] antecedents;
+		Formula consequent;
+		if (formula instanceof Implication) {
+			Implication implication = (Implication) formula;
 
-		Formula[] antecedents = antecedentsList.toArray(new Formula[antecedentsList.size()]);
-		Formula consequent = implication.getOperand2();
+			List<Formula> antecedentsList = new ArrayList<>();
+			getConjuctions(implication.getOperand1(), antecedentsList);
+
+			antecedents = antecedentsList.toArray(new Formula[antecedentsList.size()]);
+			consequent = implication.getOperand2();
+		} else {
+			antecedents = new Formula[0];
+			consequent = formula;
+		}
 
 		Proof proof = new Proof(antecedents, consequent);
 		ProofIO io = new StandardProofIO();
