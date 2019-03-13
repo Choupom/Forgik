@@ -7,12 +7,13 @@ package com.choupom.forgik;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import com.choupom.forgik.formula.Conjunction;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.parser.FormulaParser;
+import com.choupom.forgik.proof.Proof;
+import com.choupom.forgik.proof.ProofIO;
 import com.choupom.forgik.rule.DeductionRulebook;
 import com.choupom.forgik.rule.Rulebook;
 
@@ -39,13 +40,10 @@ public class Main {
 		Formula[] antecedents = antecedentsList.toArray(new Formula[antecedentsList.size()]);
 		Formula consequent = implication.getOperand2();
 
-		Rulebook rulebook = DeductionRulebook.getInstance();
-
 		Proof proof = new Proof(antecedents, consequent);
-
-		try (Scanner input = new Scanner(System.in)) {
-			proof.prove(input, rulebook);
-		}
+		ProofIO io = new StandardProofIO();
+		Rulebook rulebook = DeductionRulebook.getInstance();
+		proof.prove(io, rulebook);
 	}
 
 	private static void getConjuctions(Formula formula, List<Formula> list) {
