@@ -143,37 +143,19 @@ public class Proof {
 			return;
 		}
 
-		Formula[] subproofAntecedents = new Formula[this.state.entries.size() + 1];
-		for (int i = 0; i < this.state.entries.size(); i++) {
-			subproofAntecedents[i] = this.state.entries.get(i);
-		}
 		Negation negation = (Negation) this.state.goal;
-		subproofAntecedents[this.state.entries.size()] = negation.getOperand();
-		Formula subproofConsequent = createUniqueVariable();
+		Formula extraEntry = negation.getOperand();
 
-		Proof subproof = new Proof(subproofAntecedents, subproofConsequent);
-		Identification subproofResult = subproof.prove(io, rulebook);
-		if (subproofResult == null) {
+		Formula[] goals = new Formula[2];
+		goals[0] = createUniqueVariable();
+		goals[1] = new Negation(goals[0]);
+
+		ProofState newState = proveSubproofs(this.state, extraEntry, goals, io, rulebook);
+		if (newState == null) {
 			return;
 		}
 
-		ProofState newState = updateState(this.state, subproofResult.getMap());
-
-		subproofAntecedents = new Formula[newState.entries.size() + 1];
-		for (int i = 0; i < newState.entries.size(); i++) {
-			subproofAntecedents[i] = newState.entries.get(i);
-		}
-		negation = (Negation) newState.goal;
-		subproofAntecedents[newState.entries.size()] = negation.getOperand();
-		subproofConsequent = new Negation(subproofResult.getFormula());
-
-		subproof = new Proof(subproofAntecedents, subproofConsequent);
-		subproofResult = subproof.prove(io, rulebook);
-		if (subproofResult == null) {
-			return;
-		}
-
-		this.state = updateState(newState, subproofResult.getMap());
+		this.state = newState;
 		this.state.entries.add(this.state.goal);
 	}
 
@@ -200,32 +182,58 @@ public class Proof {
 		for (String name : suggestion.getLeftover()) {
 			map.put(name, createUniqueVariable());
 		}
-
-		ProofState newState = this.state;
-
-		boolean proved = true;
-		for (Formula formula : suggestion.getFormulas()) {
-			Formula[] subproofAntecedents = new Formula[newState.entries.size()];
-			for (int i = 0; i < newState.entries.size(); i++) {
-				subproofAntecedents[i] = newState.entries.get(i);
-			}
-			Formula subproofConsequent = formula.apply(map, null).apply(newState.map, null);
-
-			Proof subproof = new Proof(subproofAntecedents, subproofConsequent);
-			Identification subproofResult = subproof.prove(io, rulebook);
-			if (subproofResult == null) {
-				proved = false;
-				break;
-			}
-
-			newState = updateState(newState, subproofResult.getMap());
+		Formula[] rawSuggestionGoals = suggestion.getFormulas();
+		Formula[] suggestionGoals = new Formula[rawSuggestionGoals.length];
+		for (int i = 0; i < suggestionGoals.length; i++) {
+			suggestionGoals[i] = rawSuggestionGoals[i].apply(map, null);
 		}
-		if (!proved) {
+
+		ProofState newState = proveSubproofs(this.state, null, suggestionGoals, io, rulebook);
+		if (newState == null) {
 			return;
 		}
 
 		this.state = newState;
 		this.state.entries.add(this.state.goal);
+	}
+
+	private ProofState proveSubproofs(ProofState state, Formula extraEntry, Formula[] goals, ProofIO io,
+			Rulebook rulebook) {
+		while (true) {
+			int subproofId = io.requestSubproof(goals);
+			if (subproofId == -1) {
+				return null;
+			}
+
+			Formula[] subproofAntecedents = concatFormulas(state.entries, extraEntry);
+			Formula subproofConsequent = goals[subproofId];
+
+			Proof subproof = new Proof(subproofAntecedents, subproofConsequent);
+			Identification subproofResult = subproof.prove(io, rulebook);
+			if (subproofResult == null) {
+				continue;
+			}
+
+			Map<String, Formula> subproofMap = subproofResult.getMap();
+			ProofState newState = updateState(state, subproofMap);
+
+			if (goals.length < 2) {
+				return newState;
+			}
+
+			Formula[] newGoals = new Formula[goals.length - 1];
+			int j = 0;
+			for (int i = 0; i < goals.length; i++) {
+				if (i != subproofId) {
+					newGoals[j++] = goals[i].apply(subproofMap, null);
+				}
+			}
+			Formula newExtraEntry = null;
+			if (extraEntry != null) {
+				newExtraEntry = extraEntry.apply(subproofMap, null);
+			}
+			return proveSubproofs(newState, newExtraEntry, newGoals, io, rulebook);
+		}
 	}
 
 	private static FreeVariable createUniqueVariable() {
@@ -253,5 +261,23 @@ public class Proof {
 		newState.map.putAll(map);
 
 		return newState;
+	}
+
+	private static Formula[] concatFormulas(List<Formula> formulas, Formula extraFormula) {
+		int numFormulas = formulas.size();
+		if (extraFormula != null) {
+			numFormulas++;
+		}
+
+		Formula[] concat = new Formula[numFormulas];
+		for (int i = 0; i < formulas.size(); i++) {
+			concat[i] = formulas.get(i);
+		}
+
+		if (extraFormula != null) {
+			concat[formulas.size()] = extraFormula;
+		}
+
+		return concat;
 	}
 }

@@ -27,11 +27,19 @@ public class StandardProofIO implements ProofIO {
 		System.out.println("...");
 		System.out.println("[GOAL] " + goal + "?");
 
+		// System.out.println("What do you want to do?");
+		// System.out.println("{Q} Cancel this proof");
+		// System.out.println("{<} Complete this proof");
+		// System.out.println("{>} Make an assumption");
+		// System.out.println("{-} Assume the negation");
+		// System.out.println("{G} Suggest rules");
 		return getDecision();
 	}
 
 	@Override
 	public int requestIdentification(Formula[] identifications) {
+		System.out.println("What did you prove?");
+
 		int i = 0;
 		for (Formula identification : identifications) {
 			System.out.println("{" + (i++) + "} " + identification);
@@ -42,6 +50,8 @@ public class StandardProofIO implements ProofIO {
 
 	@Override
 	public int requestSuggestion(Formula[][] suggestions) {
+		System.out.println("Which rule do you want to use?");
+
 		for (int i = 0; i < suggestions.length; i++) {
 			System.out.print("{" + i + "}");
 			for (Formula formula : suggestions[i]) {
@@ -51,6 +61,21 @@ public class StandardProofIO implements ProofIO {
 		}
 
 		return getIndex(0, suggestions.length - 1);
+	}
+
+	@Override
+	public int requestSubproof(Formula[] goals) {
+		if (goals.length == 1) {
+			return 0;
+		}
+
+		System.out.println("What do you want to prove first?");
+
+		for (int i = 0; i < goals.length; i++) {
+			System.out.println("{" + i + "} " + goals[i]);
+		}
+
+		return getIndex(0, goals.length - 1);
 	}
 
 	private Decision getDecision() {

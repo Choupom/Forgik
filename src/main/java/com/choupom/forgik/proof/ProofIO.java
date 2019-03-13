@@ -32,4 +32,6 @@ public interface ProofIO {
 	int requestIdentification(Formula[] identifications);
 
 	int requestSuggestion(Formula[][] suggestions);
+
+	int requestSubproof(Formula[] goals);
 }
