@@ -199,7 +199,8 @@ public class Proof {
 	private ProofState proveSubproofs(ProofState state, Formula extraEntry, Formula[] goals, ProofIO io,
 			Rulebook rulebook) {
 		while (true) {
-			int subproofId = io.requestSubproof(goals);
+			Formula[] ioEntries = state.entries.toArray(new Formula[state.entries.size()]);
+			int subproofId = io.requestSubproof(ioEntries, extraEntry, goals);
 			if (subproofId == -1) {
 				return null;
 			}

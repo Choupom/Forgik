@@ -33,5 +33,5 @@ public interface ProofIO {
 
 	int requestSuggestion(Formula[][] suggestions);
 
-	int requestSubproof(Formula[] goals);
+	int requestSubproof(Formula[] entries, Formula extraEntry, Formula[] goals);
 }

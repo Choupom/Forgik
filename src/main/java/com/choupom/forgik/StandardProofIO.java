@@ -64,14 +64,22 @@ public class StandardProofIO implements ProofIO {
 	}
 
 	@Override
-	public int requestSubproof(Formula[] goals) {
-		if (goals.length == 1) {
+	public int requestSubproof(Formula[] entries, Formula extraEntry, Formula[] goals) {
+		if (goals.length < 2) {
 			return 0;
+		}
+
+		int i = 0;
+		for (Formula entry : entries) {
+			System.out.println("[" + (i++) + "] " + entry);
+		}
+		if (extraEntry != null) {
+			System.out.println("[" + (i++) + "] " + extraEntry);
 		}
 
 		System.out.println("What do you want to prove first?");
 
-		for (int i = 0; i < goals.length; i++) {
+		for (i = 0; i < goals.length; i++) {
 			System.out.println("{" + i + "} " + goals[i]);
 		}
 
