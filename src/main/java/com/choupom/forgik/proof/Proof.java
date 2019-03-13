@@ -30,6 +30,8 @@ public class Proof {
 		public Map<String, Formula> map;
 	}
 
+	private static final boolean AUTO_PROVE = true;
+
 	private static int UniqueVariableCounter = 0;
 
 	private ProofState state;
@@ -48,6 +50,10 @@ public class Proof {
 
 	public Identification prove(ProofIO io, Rulebook rulebook) {
 		while (true) {
+			if (AUTO_PROVE && checkProved()) {
+				return new Identification(this.state.goal, this.state.map);
+			}
+
 			Formula[] ioEntries = this.state.entries.toArray(new Formula[this.state.entries.size()]);
 			Decision decision = io.requestDecision(ioEntries, this.state.goal);
 
@@ -69,14 +75,7 @@ public class Proof {
 	}
 
 	private Identification completeProof(ProofIO io) {
-		boolean proved = false;
-		for (Formula entry : this.state.entries) {
-			if (entry.checkEquals(this.state.goal)) {
-				proved = true;
-				break;
-			}
-		}
-		if (proved) {
+		if (checkProved()) {
 			return new Identification(this.state.goal, this.state.map);
 		}
 
@@ -234,6 +233,15 @@ public class Proof {
 			}
 			return proveSubproofs(newState, newExtraEntry, newGoals, io, rulebook);
 		}
+	}
+
+	private boolean checkProved() {
+		for (Formula entry : this.state.entries) {
+			if (entry.checkEquals(this.state.goal)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static FreeVariable createUniqueVariable() {
