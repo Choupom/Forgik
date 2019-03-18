@@ -73,11 +73,12 @@ public class ConsoleProver {
 		} else if (decision == Decision.ASSUME_NEGATION) {
 			prover.proveByContradiction(goalId);
 		} else if (decision == Decision.SUGGEST_RULE) {
-			Suggestion[] suggestions = getSuggestedRules(consequent, rulebook);
+			Suggestion[] suggestions = FormulaSuggester.suggestFromRulebook(consequent, rulebook);
 
 			int suggestionId = io.requestSuggestion(suggestions);
 			if (suggestionId != -1) {
-				prover.proveByRule(goalId, suggestions[suggestionId]);
+				Suggestion suggestion = suggestions[suggestionId];
+				prover.proveByRule(goalId, suggestion.getRule());
 			}
 		}
 
@@ -99,9 +100,5 @@ public class ConsoleProver {
 			identifications[i] = FormulaIdentifier.identify(antecedents[i], consequent);
 		}
 		return identifications;
-	}
-
-	public static Suggestion[] getSuggestedRules(Formula consequent, Rulebook rulebook) {
-		return FormulaSuggester.suggestFromRulebook(consequent, rulebook);
 	}
 }

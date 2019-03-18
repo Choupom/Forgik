@@ -6,14 +6,16 @@
 package com.choupom.forgik.prover;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.FreeVariable;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.formula.Negation;
 import com.choupom.forgik.identifier.Identification;
-import com.choupom.forgik.suggester.Suggestion;
+import com.choupom.forgik.rule.Rule;
 
 public class Prover {
 
@@ -115,18 +117,27 @@ public class Prover {
 		this.proof = new Proof(subproofAntecedents, subproofConsequents, this.proof, consequentId);
 	}
 
-	public void proveByRule(int consequentId, Suggestion suggestion) {
-		Map<String, Formula> map = new HashMap<>();
-		for (String name : suggestion.getLeftover()) {
-			map.put(name, createUniqueVariable());
-		}
-		Formula[] suggestionFormulas = suggestion.getFormulas();
-		Formula[] proofAntecedents = new Formula[suggestionFormulas.length];
-		for (int i = 0; i < proofAntecedents.length; i++) {
-			proofAntecedents[i] = suggestionFormulas[i].apply(map, null);
+	public void proveByRule(int consequentId, Rule rule) {
+		Formula consequent = this.proof.consequents[consequentId];
+
+		Set<String> leftover = new HashSet<>();
+		Formula[] ruleAntecedents = rule.apply(consequent, leftover);
+		if (ruleAntecedents == null) {
+			System.out.println("Given rule can not be applied to the consequent");
+			return;
 		}
 
-		this.proof = new Proof(this.proof.antecedents, proofAntecedents, this.proof, consequentId);
+		Map<String, Formula> leftoverMap = new HashMap<>();
+		for (String ruleVariable : leftover) {
+			leftoverMap.put(ruleVariable, createUniqueVariable());
+		}
+
+		Formula[] proofConsequents = new Formula[ruleAntecedents.length];
+		for (int i = 0; i < proofConsequents.length; i++) {
+			proofConsequents[i] = ruleAntecedents[i].apply(leftoverMap, null);
+		}
+
+		this.proof = new Proof(this.proof.antecedents, proofConsequents, this.proof, consequentId);
 	}
 
 	private void completeConsequent(int consequentId, Map<String, Formula> map) {
