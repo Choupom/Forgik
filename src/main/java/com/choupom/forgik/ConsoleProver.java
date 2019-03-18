@@ -7,11 +7,10 @@ package com.choupom.forgik;
 
 import java.util.HashMap;
 
+import com.choupom.forgik.ConsoleProverIO.Decision;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
-import com.choupom.forgik.proof.ProofIO;
-import com.choupom.forgik.proof.ProofIO.Decision;
 import com.choupom.forgik.proof.ProofInfo;
 import com.choupom.forgik.proof.Prover;
 import com.choupom.forgik.rule.Rulebook;
@@ -26,7 +25,7 @@ public class ConsoleProver {
 
 	public static void prove(Formula[] antecedents, Formula consequents[], Rulebook rulebook) {
 		Prover prover = new Prover(antecedents, consequents);
-		ProofIO io = new StandardProofIO();
+		ConsoleProverIO io = new ConsoleProverIO();
 
 		while (true) {
 			ProofInfo proofInfo = prover.getProofInfo();

@@ -9,18 +9,34 @@ import java.util.Scanner;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.Identification;
-import com.choupom.forgik.proof.ProofIO;
 import com.choupom.forgik.suggester.Suggestion;
 
-public class StandardProofIO implements ProofIO {
+public class ConsoleProverIO {
+
+	enum Decision {
+
+		/** Cancel the ongoing proof */
+		CANCEL_PROOF,
+
+		/** Complete the ongoing proof (the goal has been proved) */
+		COMPLETE_PROOF,
+
+		/** Make an assumption in order to prove the goal (which should be an implication or free variable) */
+		ASSUME,
+
+		/** Assume the negation of the goal in order to prove that it is absurd */
+		ASSUME_NEGATION,
+
+		/** Suggest rules in order to prove the goal */
+		SUGGEST_RULE
+	}
 
 	private final Scanner input;
 
-	public StandardProofIO() {
+	public ConsoleProverIO() {
 		this.input = new Scanner(System.in);
 	}
 
-	@Override
 	public Decision requestDecision(Formula[] entries, Formula goal) {
 		int i = 0;
 		for (Formula entry : entries) {
@@ -38,7 +54,6 @@ public class StandardProofIO implements ProofIO {
 		return getDecision();
 	}
 
-	@Override
 	public int requestIdentification(Identification[] identifications) {
 		System.out.println("What did you prove?");
 
@@ -60,7 +75,6 @@ public class StandardProofIO implements ProofIO {
 		}
 	}
 
-	@Override
 	public int requestSuggestion(Suggestion[] suggestions) {
 		System.out.println("Which rule do you want to use?");
 
@@ -75,7 +89,6 @@ public class StandardProofIO implements ProofIO {
 		return getIndex(0, suggestions.length - 1);
 	}
 
-	@Override
 	public int requestSubproof(Formula[] entries, Formula[] goals, boolean[] completedGoals) {
 		int numUncompletedGoals = 0;
 		int firstUncompletedGoal = -1;
