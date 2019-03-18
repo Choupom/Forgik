@@ -5,7 +5,7 @@
  */
 package com.choupom.forgik.parser;
 
-public enum Token {
+enum Token {
 
 	FORMULA, LEFT_PARENTHESIS, RIGHT_PARENTHESIS, CONJUNCTION, DISJUNCTION, IMPLICATION, NEGATION, WHITESPACE, EOF
 }

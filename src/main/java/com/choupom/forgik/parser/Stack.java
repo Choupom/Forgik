@@ -11,7 +11,7 @@ import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.formula.Negation;
 
-public class Stack {
+class Stack {
 
 	private final TokenInfo[] array;
 	private int size;

@@ -7,7 +7,7 @@ package com.choupom.forgik.parser;
 
 import com.choupom.forgik.formula.Formula;
 
-public class TokenInfo {
+class TokenInfo {
 
 	private final Token token;
 	private final Formula formula;
