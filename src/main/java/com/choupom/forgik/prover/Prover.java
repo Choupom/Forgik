@@ -39,11 +39,12 @@ public class Prover {
 		}
 	}
 
-	private static int UniqueVariableCounter = 0;
+	private int uniqueVariableCounter;
 
 	private Proof proof;
 
-	public Prover(Formula[] antecedents, Formula consequents[]) {
+	public Prover(Formula[] antecedents, Formula[] consequents) {
+		this.uniqueVariableCounter = 0;
 		this.proof = new Proof(antecedents, consequents, null, -1);
 	}
 
@@ -182,13 +183,13 @@ public class Prover {
 		}
 	}
 
-	private static FreeVariable createUniqueVariable() {
-		// TODO: do something smarter: don't use a static and re-use names which are not used anymore
-		if (UniqueVariableCounter >= 26) {
+	private FreeVariable createUniqueVariable() {
+		// TODO: re-use names which are not used anymore
+		if (this.uniqueVariableCounter >= 26) {
 			throw new IllegalStateException();
 		}
-		char name = (char) ('A' + UniqueVariableCounter);
-		UniqueVariableCounter++;
+		char name = (char) ('A' + this.uniqueVariableCounter);
+		this.uniqueVariableCounter++;
 		return new FreeVariable(Character.toString(name));
 	}
 }
