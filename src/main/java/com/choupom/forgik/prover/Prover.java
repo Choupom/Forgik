@@ -14,7 +14,6 @@ import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.FreeVariable;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.formula.Negation;
-import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.rule.Rule;
 
 public class Prover {
@@ -59,8 +58,18 @@ public class Prover {
 		this.proof = this.proof.parent;
 	}
 
-	public void completeConsequent(int consequentId, Identification identification) {
-		completeConsequent(consequentId, identification.getMap());
+	public void completeConsequent(int consequentId, int antecedentId, Map<String, Formula> map) {
+		Formula consequent = this.proof.consequents[consequentId];
+		Formula antecedent = this.proof.antecedents[antecedentId];
+
+		Formula mappedConsequent = consequent.apply(map, null);
+		Formula mappedAntecedent = antecedent.apply(map, null);
+		if (!mappedConsequent.checkEquals(mappedAntecedent)) {
+			System.out.println("Antecedent does not match the consequent when applying the given map");
+			return;
+		}
+
+		completeConsequent(consequentId, map);
 	}
 
 	public void proveImplication(int consequentId) {

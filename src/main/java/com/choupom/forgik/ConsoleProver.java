@@ -6,6 +6,7 @@
 package com.choupom.forgik;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.choupom.forgik.ConsoleProverIO.Decision;
 import com.choupom.forgik.formula.Formula;
@@ -57,15 +58,20 @@ public class ConsoleProver {
 		if (decision == Decision.CANCEL_PROOF) {
 			prover.cancelProof();
 		} else if (decision == Decision.COMPLETE_PROOF) {
-			if (checkProved(antecedents, consequent)) {
-				Identification identification = new Identification(consequent, new HashMap<String, Formula>());
-				prover.completeConsequent(goalId, identification);
+			int antecedentId = checkProved(antecedents, consequent);
+			if (antecedentId != -1) {
+				Map<String, Formula> map = new HashMap<String, Formula>();
+				prover.completeConsequent(goalId, antecedentId, map);
 			} else {
-				Identification[] identifications = getIdentifications(antecedents, consequent);
+				Identification[] identifications = new Identification[antecedents.length];
+				for (int i = 0; i < identifications.length; i++) {
+					identifications[i] = FormulaIdentifier.identify(antecedents[i], consequent);
+				}
 
-				int antecedentId = io.requestIdentification(identifications);
+				antecedentId = io.requestIdentification(identifications);
 				if (antecedentId != -1) {
-					prover.completeConsequent(goalId, identifications[antecedentId]);
+					Identification identification = identifications[antecedentId];
+					prover.completeConsequent(goalId, antecedentId, identification.getMap());
 				}
 			}
 		} else if (decision == Decision.ASSUME) {
@@ -85,20 +91,12 @@ public class ConsoleProver {
 		return true;
 	}
 
-	private static boolean checkProved(Formula[] antecedents, Formula consequent) {
-		for (Formula antecedent : antecedents) {
-			if (antecedent.checkEquals(consequent)) {
-				return true;
+	private static int checkProved(Formula[] antecedents, Formula consequent) {
+		for (int i = 0; i < antecedents.length; i++) {
+			if (antecedents[i].checkEquals(consequent)) {
+				return i;
 			}
 		}
-		return false;
-	}
-
-	public static Identification[] getIdentifications(Formula[] antecedents, Formula consequent) {
-		Identification[] identifications = new Identification[antecedents.length];
-		for (int i = 0; i < identifications.length; i++) {
-			identifications[i] = FormulaIdentifier.identify(antecedents[i], consequent);
-		}
-		return identifications;
+		return -1;
 	}
 }
