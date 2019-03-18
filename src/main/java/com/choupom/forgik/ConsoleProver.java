@@ -14,7 +14,7 @@ import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
-import com.choupom.forgik.rule.Rulebook;
+import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.suggester.FormulaSuggester;
 import com.choupom.forgik.suggester.Suggestion;
 
@@ -24,18 +24,18 @@ public class ConsoleProver {
 		// private constructor
 	}
 
-	public static void prove(Formula[] antecedents, Formula[] consequents, Rulebook rulebook) {
+	public static void prove(Formula[] antecedents, Formula[] consequents, Rule[] rules) {
 		Prover prover = new Prover(antecedents, consequents);
 		ConsoleProverIO io = new ConsoleProverIO();
 
 		while (true) {
-			if (!proveStep(prover, io, rulebook)) {
+			if (!proveStep(prover, io, rules)) {
 				break;
 			}
 		}
 	}
 
-	public static boolean proveStep(Prover prover, ConsoleProverIO io, Rulebook rulebook) {
+	public static boolean proveStep(Prover prover, ConsoleProverIO io, Rule[] rules) {
 		ProofInfo proofInfo = prover.getProofInfo();
 		if (proofInfo == null) {
 			return false;
@@ -79,7 +79,7 @@ public class ConsoleProver {
 		} else if (decision == Decision.ASSUME_NEGATION) {
 			prover.proveByContradiction(consequentId);
 		} else if (decision == Decision.SUGGEST_RULE) {
-			Suggestion[] suggestions = FormulaSuggester.suggestFromRulebook(consequent, rulebook);
+			Suggestion[] suggestions = FormulaSuggester.suggest(consequent, rules);
 
 			int suggestionId = io.requestSuggestion(suggestions);
 			if (suggestionId != -1) {

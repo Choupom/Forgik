@@ -12,13 +12,12 @@ import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.rule.Rule;
-import com.choupom.forgik.rule.Rulebook;
 
 public class FormulaSuggester {
 
-	public static Suggestion[] suggestFromRulebook(Formula formula, Rulebook rulebook) {
+	public static Suggestion[] suggest(Formula formula, Rule[] rules) {
 		List<Suggestion> suggestions = new ArrayList<>();
-		for (Rule rule : rulebook.getRules()) {
+		for (Rule rule : rules) {
 			Set<String> leftover = new HashSet<>();
 			Formula[] result = rule.apply(formula, leftover);
 			if (result != null) {

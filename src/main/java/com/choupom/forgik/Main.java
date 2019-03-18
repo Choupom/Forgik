@@ -13,7 +13,7 @@ import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.rule.DeductionRulebook;
-import com.choupom.forgik.rule.Rulebook;
+import com.choupom.forgik.rule.Rule;
 
 public class Main {
 
@@ -49,9 +49,9 @@ public class Main {
 			consequents = new Formula[] { formula };
 		}
 
-		Rulebook rulebook = DeductionRulebook.getInstance();
+		Rule[] rules = DeductionRulebook.getRules();
 
-		ConsoleProver.prove(antecedents, consequents, rulebook);
+		ConsoleProver.prove(antecedents, consequents, rules);
 	}
 
 	private static void getConjuctions(Formula formula, List<Formula> list) {

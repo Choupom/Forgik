@@ -11,15 +11,20 @@ import java.util.Map;
 import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.parser.FormulaParser;
 
 public class Rule {
 
 	private final Formula[] antecedents; // "premises"
 	private final Formula consequent; // "conclusion"
 
-	public Rule(Formula[] antecedents, Formula consequent) {
-		this.antecedents = antecedents.clone();
-		this.consequent = consequent;
+	public Rule(String consequentStr, String... antecedentsStr) {
+		this.antecedents = new Formula[antecedentsStr.length];
+		for (int i = 0; i < antecedentsStr.length; i++) {
+			this.antecedents[i] = FormulaParser.parse(antecedentsStr[i]);
+		}
+
+		this.consequent = FormulaParser.parse(consequentStr);
 	}
 
 	@Override

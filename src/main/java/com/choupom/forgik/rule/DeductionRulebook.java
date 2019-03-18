@@ -5,28 +5,30 @@
  */
 package com.choupom.forgik.rule;
 
-public class DeductionRulebook extends Rulebook {
+public class DeductionRulebook {
 
-	public static final DeductionRulebook RULEBOOK = new DeductionRulebook();
+	public static Rule[] getRules() {
+		RulesBuilder rulebook = new RulesBuilder();
 
-	public static DeductionRulebook getInstance() {
-		return RULEBOOK;
-	}
+		rulebook.addRule("X ^ Y", "X", "Y"); // conjunction introduction
+		rulebook.addRule("X", "X ^ Y"); // conjunction elimination (1)
+		rulebook.addRule("Y", "X ^ Y"); // conjunction elimination (2)
+		rulebook.addRule("X v Y", "X"); // disjunction introduction (1)
+		rulebook.addRule("Y v X", "X"); // disjunction introduction (2)
+		rulebook.addRule("Z", "X v Y", "X > Z", "Y > Z"); // disjunction elimination
+		rulebook.addRule("Y", "X", "-X"); // ex falso quodlibet
+		rulebook.addRule("Y", "(X > Y)", "X"); // modus ponens
+		rulebook.addRule("X", "--X"); // double negation elimination
 
-	private DeductionRulebook() {
-		addRule2("X", "Y", "X ^ Y"); // conjunction introduction
-		addRule1("X ^ Y", "X"); // conjunction elimination (1)
-		addRule1("X ^ Y", "Y"); // conjunction elimination (2)
-		addRule1("X", "X v Y"); // disjunction introduction (1)
-		addRule1("X", "Y v X"); // disjunction introduction (2)
-		addRule3("X v Y", "X > Z", "Y > Z", "Z"); // disjunction elimination
-		// addRule1("F", "X"); // ex falso quodlibet
-		addRule2("X", "-X", "Y"); // ex falso quodlibet
-		addRule2("(X > Y)", "X", "Y"); // modus ponens
-		// addRule2("-X", "X", "F"); // modus ponens (special case)
-		addRule1("--X", "X"); // double negation elimination
+		// NOTE:
+		// these two rules:
+		// * rulebook.addRule("X", "F"); // ex falso quodlibet
+		// * rulebook.addRule("F", "-X", "X"); // modus ponens (special case)
+		// have been replaced by this rule:
+		// * rulebook.addRule("Y", "X", "-X"); // ex falso quodlibet
+		// by doing so we never need to use F
+		// and the user does not have to know that -X is X > F
 
-		// addRule0("X v -X"); // law of excluded middle
-		// addRule0("-X v X"); // law of excluded middle
+		return rulebook.build();
 	}
 }
