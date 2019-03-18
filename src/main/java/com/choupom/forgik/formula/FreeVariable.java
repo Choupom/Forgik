@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FreeVariable extends Formula {
+public class FreeVariable implements Formula {
 
 	private final String name;
 
@@ -31,8 +31,8 @@ public class FreeVariable extends Formula {
 	}
 
 	@Override
-	protected boolean isStringEmbraced() {
-		return false;
+	public String toStringNested() {
+		return toString();
 	}
 
 	@Override

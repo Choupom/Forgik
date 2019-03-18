@@ -9,23 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Formula {
+public interface Formula {
 
-	protected String toStringNested() {
-		if (isStringEmbraced()) {
-			return "(" + toString() + ")";
-		} else {
-			return toString();
-		}
-	}
+	String toStringNested();
 
-	protected abstract boolean isStringEmbraced();
+	boolean checkEquals(Formula formula);
 
-	public abstract boolean checkEquals(Formula formula);
+	boolean identify(Formula formula, Map<String, List<Formula>> map);
 
-	public abstract boolean identify(Formula formula, Map<String, List<Formula>> map);
+	Formula apply(Map<String, Formula> map);
 
-	public abstract Formula apply(Map<String, Formula> map);
-
-	public abstract void getFreeVariables(Set<String> variables);
+	void getFreeVariables(Set<String> variables);
 }

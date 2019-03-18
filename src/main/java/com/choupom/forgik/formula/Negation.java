@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Negation extends Formula {
+public class Negation implements Formula {
 
 	private final Formula operand;
 
@@ -27,8 +27,8 @@ public class Negation extends Formula {
 	}
 
 	@Override
-	protected boolean isStringEmbraced() {
-		return false;
+	public String toStringNested() {
+		return toString();
 	}
 
 	@Override

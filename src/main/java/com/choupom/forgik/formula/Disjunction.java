@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Disjunction extends Formula {
+public class Disjunction implements Formula {
 
 	private final Formula operand1;
 	private final Formula operand2;
@@ -33,8 +33,8 @@ public class Disjunction extends Formula {
 	}
 
 	@Override
-	protected boolean isStringEmbraced() {
-		return true;
+	public String toStringNested() {
+		return "(" + toString() + ")";
 	}
 
 	@Override

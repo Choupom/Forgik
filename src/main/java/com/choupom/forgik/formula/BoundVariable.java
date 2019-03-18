@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BoundVariable extends Formula {
+public class BoundVariable implements Formula {
 
 	private final String name;
 
@@ -30,8 +30,8 @@ public class BoundVariable extends Formula {
 	}
 
 	@Override
-	protected boolean isStringEmbraced() {
-		return false;
+	public String toStringNested() {
+		return toString();
 	}
 
 	@Override
