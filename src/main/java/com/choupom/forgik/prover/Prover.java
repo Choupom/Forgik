@@ -3,7 +3,7 @@
  *
  * Copyright 2019 Andy Poudret. All rights reserved.
  */
-package com.choupom.forgik.proof;
+package com.choupom.forgik.prover;
 
 import java.util.HashMap;
 import java.util.Map;
