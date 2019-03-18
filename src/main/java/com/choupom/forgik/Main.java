@@ -12,8 +12,6 @@ import com.choupom.forgik.formula.Conjunction;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.parser.FormulaParser;
-import com.choupom.forgik.proof.Proof;
-import com.choupom.forgik.proof.ProofIO;
 import com.choupom.forgik.rule.DeductionRulebook;
 import com.choupom.forgik.rule.Rulebook;
 
@@ -34,24 +32,26 @@ public class Main {
 		Formula formula = FormulaParser.parse(MAIN_FORMULA);
 
 		Formula[] antecedents;
-		Formula consequent;
+		Formula[] consequents;
 		if (formula instanceof Implication) {
 			Implication implication = (Implication) formula;
 
 			List<Formula> antecedentsList = new ArrayList<>();
 			getConjuctions(implication.getOperand1(), antecedentsList);
 
+			List<Formula> consequentsList = new ArrayList<>();
+			getConjuctions(implication.getOperand2(), consequentsList);
+
 			antecedents = antecedentsList.toArray(new Formula[antecedentsList.size()]);
-			consequent = implication.getOperand2();
+			consequents = consequentsList.toArray(new Formula[consequentsList.size()]);
 		} else {
 			antecedents = new Formula[0];
-			consequent = formula;
+			consequents = new Formula[] { formula };
 		}
 
-		Proof proof = new Proof(antecedents, consequent);
-		ProofIO io = new StandardProofIO();
 		Rulebook rulebook = DeductionRulebook.getInstance();
-		proof.prove(io, rulebook);
+
+		ConsoleProver.prove(antecedents, consequents, rulebook);
 	}
 
 	private static void getConjuctions(Formula formula, List<Formula> list) {

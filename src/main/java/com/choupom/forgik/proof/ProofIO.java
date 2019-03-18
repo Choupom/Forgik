@@ -6,6 +6,8 @@
 package com.choupom.forgik.proof;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.identifier.Identification;
+import com.choupom.forgik.suggester.SuggestionReverse;
 
 public interface ProofIO {
 
@@ -29,9 +31,9 @@ public interface ProofIO {
 
 	Decision requestDecision(Formula[] entries, Formula goal);
 
-	int requestIdentification(Formula[] identifications);
+	int requestIdentification(Identification[] identifications);
 
-	int requestSuggestion(Formula[][] suggestions);
+	int requestSuggestion(SuggestionReverse[] suggestions);
 
-	int requestSubproof(Formula[] entries, Formula extraEntry, Formula[] goals);
+	int requestSubproof(Formula[] entries, Formula[] goals, boolean[] completedGoals);
 }

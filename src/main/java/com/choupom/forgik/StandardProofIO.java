@@ -8,7 +8,9 @@ package com.choupom.forgik;
 import java.util.Scanner;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.proof.ProofIO;
+import com.choupom.forgik.suggester.SuggestionReverse;
 
 public class StandardProofIO implements ProofIO {
 
@@ -37,24 +39,34 @@ public class StandardProofIO implements ProofIO {
 	}
 
 	@Override
-	public int requestIdentification(Formula[] identifications) {
+	public int requestIdentification(Identification[] identifications) {
 		System.out.println("What did you prove?");
 
-		int i = 0;
-		for (Formula identification : identifications) {
-			System.out.println("{" + (i++) + "} " + identification);
+		for (int i = 0; i < identifications.length; i++) {
+			Identification identification = identifications[i];
+			if (identification != null) {
+				System.out.println("{" + i + "} " + identification.getFormula());
+			}
 		}
 
-		return getIndex(0, identifications.length - 1);
+		while (true) {
+			int index = getIndex(0, identifications.length - 1);
+			if (index == -1) {
+				return -1;
+			} else if (identifications[index] == null) {
+				System.out.println("Invalid index");
+			}
+			return index;
+		}
 	}
 
 	@Override
-	public int requestSuggestion(Formula[][] suggestions) {
+	public int requestSuggestion(SuggestionReverse[] suggestions) {
 		System.out.println("Which rule do you want to use?");
 
 		for (int i = 0; i < suggestions.length; i++) {
 			System.out.print("{" + i + "}");
-			for (Formula formula : suggestions[i]) {
+			for (Formula formula : suggestions[i].getFormulas()) {
 				System.out.print(" [" + formula + "]");
 			}
 			System.out.println();
@@ -64,26 +76,41 @@ public class StandardProofIO implements ProofIO {
 	}
 
 	@Override
-	public int requestSubproof(Formula[] entries, Formula extraEntry, Formula[] goals) {
-		if (goals.length < 2) {
-			return 0;
+	public int requestSubproof(Formula[] entries, Formula[] goals, boolean[] completedGoals) {
+		int numUncompletedGoals = 0;
+		int firstUncompletedGoal = -1;
+		for (int i = 0; i < completedGoals.length; i++) {
+			if (!completedGoals[i]) {
+				numUncompletedGoals++;
+				firstUncompletedGoal = i;
+			}
+		}
+		if (numUncompletedGoals < 2) {
+			return firstUncompletedGoal;
 		}
 
 		int i = 0;
 		for (Formula entry : entries) {
 			System.out.println("[" + (i++) + "] " + entry);
 		}
-		if (extraEntry != null) {
-			System.out.println("[" + (i++) + "] " + extraEntry);
-		}
 
 		System.out.println("What do you want to prove first?");
 
 		for (i = 0; i < goals.length; i++) {
-			System.out.println("{" + i + "} " + goals[i]);
+			if (!completedGoals[i]) {
+				System.out.println("{" + i + "} " + goals[i]);
+			}
 		}
 
-		return getIndex(0, goals.length - 1);
+		while (true) {
+			int index = getIndex(0, goals.length - 1);
+			if (index == -1) {
+				return -1;
+			} else if (completedGoals[index]) {
+				System.out.println("Invalid index");
+			}
+			return index;
+		}
 	}
 
 	private Decision getDecision() {
