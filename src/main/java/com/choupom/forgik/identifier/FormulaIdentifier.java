@@ -6,8 +6,10 @@
 package com.choupom.forgik.identifier;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 
@@ -34,18 +36,21 @@ public class FormulaIdentifier {
 			}
 
 			Formula substitute = map.get(latestVariable).get(0);
-			if (substitute.containsFreeVariable(latestVariable)) {
+
+			Set<String> freeVariables = new HashSet<>();
+			substitute.getFreeVariables(freeVariables);
+			if (freeVariables.contains(latestVariable)) {
 				return null;
 			}
 
 			Map<String, Formula> newMap = new HashMap<>();
 			newMap.put(latestVariable, substitute);
 
-			formula1 = formula1.apply(newMap, null);
-			formula2 = formula2.apply(newMap, null);
+			formula1 = formula1.apply(newMap);
+			formula2 = formula2.apply(newMap);
 			for (Map.Entry<String, Formula> entry : identificationMap.entrySet()) {
 				String variable = entry.getKey();
-				Formula newFormula = entry.getValue().apply(newMap, null);
+				Formula newFormula = entry.getValue().apply(newMap);
 				identificationMap.put(variable, newFormula);
 			}
 			identificationMap.put(latestVariable, substitute);

@@ -57,13 +57,13 @@ public class Negation extends Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
-		Formula newOperand = this.operand.apply(map, leftover);
+	public Formula apply(Map<String, Formula> map) {
+		Formula newOperand = this.operand.apply(map);
 		return new Negation(newOperand);
 	}
 
 	@Override
-	public boolean containsFreeVariable(String variableName) {
-		return this.operand.containsFreeVariable(variableName);
+	public void getFreeVariables(Set<String> variables) {
+		this.operand.getFreeVariables(variables);
 	}
 }

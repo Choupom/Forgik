@@ -63,14 +63,15 @@ public class Implication extends Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
-		Formula newOperand1 = this.operand1.apply(map, leftover);
-		Formula newOperand2 = this.operand2.apply(map, leftover);
+	public Formula apply(Map<String, Formula> map) {
+		Formula newOperand1 = this.operand1.apply(map);
+		Formula newOperand2 = this.operand2.apply(map);
 		return new Implication(newOperand1, newOperand2);
 	}
 
 	@Override
-	public boolean containsFreeVariable(String variableName) {
-		return (this.operand1.containsFreeVariable(variableName) || this.operand2.containsFreeVariable(variableName));
+	public void getFreeVariables(Set<String> variables) {
+		this.operand1.getFreeVariables(variables);
+		this.operand2.getFreeVariables(variables);
 	}
 }

@@ -25,7 +25,7 @@ public abstract class Formula {
 
 	public abstract boolean identify(Formula formula, Map<String, List<Formula>> map);
 
-	public abstract Formula apply(Map<String, Formula> map, Set<String> leftover);
+	public abstract Formula apply(Map<String, Formula> map);
 
-	public abstract boolean containsFreeVariable(String variableName);
+	public abstract void getFreeVariables(Set<String> variables);
 }

@@ -5,8 +5,6 @@
  */
 package com.choupom.forgik.suggester;
 
-import java.util.Set;
-
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.rule.Rule;
 
@@ -14,12 +12,10 @@ public class Suggestion {
 
 	private final Rule rule;
 	private final Formula[] formulas;
-	private final String[] leftover;
 
-	public Suggestion(Rule rule, Formula[] formulas, Set<String> leftover) {
+	public Suggestion(Rule rule, Formula[] formulas) {
 		this.rule = rule;
 		this.formulas = formulas.clone();
-		this.leftover = leftover.toArray(new String[leftover.size()]);
 	}
 
 	public Rule getRule() {
@@ -28,9 +24,5 @@ public class Suggestion {
 
 	public Formula[] getFormulas() {
 		return this.formulas;
-	}
-
-	public String[] getLeftover() {
-		return this.leftover;
 	}
 }

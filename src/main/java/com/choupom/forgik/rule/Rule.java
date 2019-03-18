@@ -41,9 +41,9 @@ public class Rule {
 		return stringBuilder.toString();
 	}
 
-	public Formula[] apply(Formula formula, Set<String> leftover) {
+	public Formula[] apply(Formula consequent, Set<String> leftover) {
 		Map<String, List<Formula>> map = new HashMap<>();
-		if (!this.consequent.identify(formula, map)) {
+		if (!this.consequent.identify(consequent, map)) {
 			return null;
 		}
 
@@ -56,11 +56,19 @@ public class Rule {
 			simpleMap.put(mapping.getKey(), list.get(0));
 		}
 
-		Formula[] formulas = new Formula[this.antecedents.length];
-		for (int i = 0; i < this.antecedents.length; i++) {
-			formulas[i] = this.antecedents[i].apply(simpleMap, leftover);
+		if (leftover != null) {
+			for (Formula ruleAntecedent : this.antecedents) {
+				ruleAntecedent.getFreeVariables(leftover);
+			}
+			leftover.removeAll(simpleMap.keySet());
 		}
-		return formulas;
+
+		Formula[] antecedents = new Formula[this.antecedents.length];
+		for (int i = 0; i < this.antecedents.length; i++) {
+			antecedents[i] = this.antecedents[i].apply(simpleMap);
+		}
+
+		return antecedents;
 	}
 
 	private static boolean checkAllEquals(List<Formula> formulas) {

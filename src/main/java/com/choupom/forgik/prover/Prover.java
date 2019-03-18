@@ -63,8 +63,8 @@ public class Prover {
 		Formula consequent = this.proof.consequents[consequentId];
 		Formula antecedent = this.proof.antecedents[antecedentId];
 
-		Formula mappedConsequent = consequent.apply(map, null);
-		Formula mappedAntecedent = antecedent.apply(map, null);
+		Formula mappedConsequent = consequent.apply(map);
+		Formula mappedAntecedent = antecedent.apply(map);
 		if (!mappedConsequent.checkEquals(mappedAntecedent)) {
 			System.out.println("Antecedent does not match the consequent when applying the given map");
 			return;
@@ -144,7 +144,7 @@ public class Prover {
 
 		Formula[] proofConsequents = new Formula[ruleAntecedents.length];
 		for (int i = 0; i < proofConsequents.length; i++) {
-			proofConsequents[i] = ruleAntecedents[i].apply(leftoverMap, null);
+			proofConsequents[i] = ruleAntecedents[i].apply(leftoverMap);
 		}
 
 		this.proof = new Proof(this.proof.antecedents, proofConsequents, this.proof, consequentId);
@@ -175,11 +175,11 @@ public class Prover {
 		proofInfo.map.putAll(map);
 
 		for (int i = 0; i < proofInfo.antecedents.length; i++) {
-			proofInfo.antecedents[i] = proofInfo.antecedents[i].apply(map, null);
+			proofInfo.antecedents[i] = proofInfo.antecedents[i].apply(map);
 		}
 
 		for (int i = 0; i < proofInfo.consequents.length; i++) {
-			proofInfo.consequents[i] = proofInfo.consequents[i].apply(map, null);
+			proofInfo.consequents[i] = proofInfo.consequents[i].apply(map);
 		}
 	}
 

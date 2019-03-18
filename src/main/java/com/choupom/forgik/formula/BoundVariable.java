@@ -60,12 +60,12 @@ public class BoundVariable extends Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
+	public Formula apply(Map<String, Formula> map) {
 		return this;
 	}
 
 	@Override
-	public boolean containsFreeVariable(String variableName) {
-		return false;
+	public void getFreeVariables(Set<String> variables) {
+		// do nothing
 	}
 }

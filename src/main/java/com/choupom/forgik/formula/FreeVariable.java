@@ -60,21 +60,18 @@ public class FreeVariable extends Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map, Set<String> leftover) {
+	public Formula apply(Map<String, Formula> map) {
 		Formula formula = map.get(this.name);
 		if (formula != null) {
 			return formula;
 		} else {
-			if (leftover != null) {
-				leftover.add(this.name);
-			}
 			return this;
 		}
 	}
 
 	@Override
-	public boolean containsFreeVariable(String variableName) {
-		return this.name.equals(variableName);
+	public void getFreeVariables(Set<String> variables) {
+		variables.add(this.name);
 	}
 
 	private static void addToMap(String name, Formula formula, Map<String, List<Formula>> map) {
