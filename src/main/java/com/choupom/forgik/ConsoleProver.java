@@ -45,13 +45,13 @@ public class ConsoleProver {
 		Formula[] consequents = proofInfo.getConsequents();
 		boolean[] completedConsequents = proofInfo.getCompletedConsequents();
 
-		int goalId = io.requestSubproof(antecedents, consequents, completedConsequents);
-		if (goalId == -1) {
+		int consequentId = io.requestSubproof(antecedents, consequents, completedConsequents);
+		if (consequentId == -1) {
 			prover.cancelProof();
 			return true;
 		}
 
-		Formula consequent = consequents[goalId];
+		Formula consequent = consequents[consequentId];
 
 		Decision decision = io.requestDecision(antecedents, consequent);
 
@@ -61,7 +61,7 @@ public class ConsoleProver {
 			int antecedentId = checkProved(antecedents, consequent);
 			if (antecedentId != -1) {
 				Map<String, Formula> map = new HashMap<String, Formula>();
-				prover.completeConsequent(goalId, antecedentId, map);
+				prover.completeConsequent(consequentId, antecedentId, map);
 			} else {
 				Identification[] identifications = new Identification[antecedents.length];
 				for (int i = 0; i < identifications.length; i++) {
@@ -71,20 +71,20 @@ public class ConsoleProver {
 				antecedentId = io.requestIdentification(identifications);
 				if (antecedentId != -1) {
 					Identification identification = identifications[antecedentId];
-					prover.completeConsequent(goalId, antecedentId, identification.getMap());
+					prover.completeConsequent(consequentId, antecedentId, identification.getMap());
 				}
 			}
 		} else if (decision == Decision.ASSUME) {
-			prover.proveImplication(goalId);
+			prover.proveImplication(consequentId);
 		} else if (decision == Decision.ASSUME_NEGATION) {
-			prover.proveByContradiction(goalId);
+			prover.proveByContradiction(consequentId);
 		} else if (decision == Decision.SUGGEST_RULE) {
 			Suggestion[] suggestions = FormulaSuggester.suggestFromRulebook(consequent, rulebook);
 
 			int suggestionId = io.requestSuggestion(suggestions);
 			if (suggestionId != -1) {
 				Suggestion suggestion = suggestions[suggestionId];
-				prover.proveByRule(goalId, suggestion.getRule());
+				prover.proveByRule(consequentId, suggestion.getRule());
 			}
 		}
 

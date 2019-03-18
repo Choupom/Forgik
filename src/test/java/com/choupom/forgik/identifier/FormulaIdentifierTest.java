@@ -40,6 +40,10 @@ public class FormulaIdentifierTest {
 			Assert.assertNull(result);
 		} else {
 			Assert.assertEquals(stringR, result.getFormula().toString());
+			Formula mapped1 = formula1.apply(result.getMap(), null);
+			Formula mapped2 = formula2.apply(result.getMap(), null);
+			Assert.assertTrue(mapped1.checkEquals(mapped2));
+			Assert.assertTrue(mapped2.checkEquals(mapped1));
 		}
 	}
 }

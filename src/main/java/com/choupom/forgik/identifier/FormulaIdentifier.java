@@ -38,10 +38,16 @@ public class FormulaIdentifier {
 				return null;
 			}
 
-			Map<String, Formula> simpleMap = new HashMap<>();
-			simpleMap.put(latestVariable, substitute);
-			formula1 = formula1.apply(simpleMap, null);
-			formula2 = formula2.apply(simpleMap, null);
+			Map<String, Formula> newMap = new HashMap<>();
+			newMap.put(latestVariable, substitute);
+
+			formula1 = formula1.apply(newMap, null);
+			formula2 = formula2.apply(newMap, null);
+			for (Map.Entry<String, Formula> entry : identificationMap.entrySet()) {
+				String variable = entry.getKey();
+				Formula newFormula = entry.getValue().apply(newMap, null);
+				identificationMap.put(variable, newFormula);
+			}
 			identificationMap.put(latestVariable, substitute);
 		}
 	}
