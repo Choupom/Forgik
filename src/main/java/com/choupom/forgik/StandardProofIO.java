@@ -10,7 +10,7 @@ import java.util.Scanner;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.proof.ProofIO;
-import com.choupom.forgik.suggester.SuggestionReverse;
+import com.choupom.forgik.suggester.Suggestion;
 
 public class StandardProofIO implements ProofIO {
 
@@ -61,7 +61,7 @@ public class StandardProofIO implements ProofIO {
 	}
 
 	@Override
-	public int requestSuggestion(SuggestionReverse[] suggestions) {
+	public int requestSuggestion(Suggestion[] suggestions) {
 		System.out.println("Which rule do you want to use?");
 
 		for (int i = 0; i < suggestions.length; i++) {

@@ -14,18 +14,18 @@ import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rule.Rulebook;
 
-public class FormulaSuggesterReverse {
+public class FormulaSuggester {
 
-	public static SuggestionReverse[] suggestFromRulebook(Formula formula, Rulebook rulebook) {
-		List<SuggestionReverse> suggestions = new ArrayList<>();
+	public static Suggestion[] suggestFromRulebook(Formula formula, Rulebook rulebook) {
+		List<Suggestion> suggestions = new ArrayList<>();
 		for (Rule rule : rulebook.getRules()) {
 			Set<String> leftover = new HashSet<>();
-			Formula[] result = rule.applyReverse(formula, leftover);
+			Formula[] result = rule.apply(formula, leftover);
 			if (result != null) {
-				SuggestionReverse suggestion = new SuggestionReverse(rule, result, leftover);
+				Suggestion suggestion = new Suggestion(rule, result, leftover);
 				suggestions.add(suggestion);
 			}
 		}
-		return suggestions.toArray(new SuggestionReverse[suggestions.size()]);
+		return suggestions.toArray(new Suggestion[suggestions.size()]);
 	}
 }

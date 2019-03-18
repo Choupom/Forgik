@@ -13,7 +13,7 @@ import com.choupom.forgik.formula.FreeVariable;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.formula.Negation;
 import com.choupom.forgik.identifier.Identification;
-import com.choupom.forgik.suggester.SuggestionReverse;
+import com.choupom.forgik.suggester.Suggestion;
 
 public class Prover {
 
@@ -115,7 +115,7 @@ public class Prover {
 		this.proof = new Proof(subproofAntecedents, subproofConsequents, this.proof, consequentId);
 	}
 
-	public void proveByRule(int consequentId, SuggestionReverse suggestion) {
+	public void proveByRule(int consequentId, Suggestion suggestion) {
 		Map<String, Formula> map = new HashMap<>();
 		for (String name : suggestion.getLeftover()) {
 			map.put(name, createUniqueVariable());

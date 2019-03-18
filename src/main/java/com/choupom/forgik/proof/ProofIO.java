@@ -7,7 +7,7 @@ package com.choupom.forgik.proof;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.Identification;
-import com.choupom.forgik.suggester.SuggestionReverse;
+import com.choupom.forgik.suggester.Suggestion;
 
 public interface ProofIO {
 
@@ -33,7 +33,7 @@ public interface ProofIO {
 
 	int requestIdentification(Identification[] identifications);
 
-	int requestSuggestion(SuggestionReverse[] suggestions);
+	int requestSuggestion(Suggestion[] suggestions);
 
 	int requestSubproof(Formula[] entries, Formula[] goals, boolean[] completedGoals);
 }

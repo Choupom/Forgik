@@ -15,8 +15,8 @@ import com.choupom.forgik.proof.ProofIO.Decision;
 import com.choupom.forgik.proof.ProofInfo;
 import com.choupom.forgik.proof.Prover;
 import com.choupom.forgik.rule.Rulebook;
-import com.choupom.forgik.suggester.FormulaSuggesterReverse;
-import com.choupom.forgik.suggester.SuggestionReverse;
+import com.choupom.forgik.suggester.FormulaSuggester;
+import com.choupom.forgik.suggester.Suggestion;
 
 public class ConsoleProver {
 
@@ -64,7 +64,7 @@ public class ConsoleProver {
 			} else if (decision == Decision.ASSUME_NEGATION) {
 				prover.proveByContradiction(goalId);
 			} else if (decision == Decision.SUGGEST_RULE) {
-				SuggestionReverse[] suggestions = getSuggestedRules(consequent, rulebook);
+				Suggestion[] suggestions = getSuggestedRules(consequent, rulebook);
 
 				int suggestionId = io.requestSuggestion(suggestions);
 				if (suggestionId != -1) {
@@ -91,7 +91,7 @@ public class ConsoleProver {
 		return identifications;
 	}
 
-	public static SuggestionReverse[] getSuggestedRules(Formula consequent, Rulebook rulebook) {
-		return FormulaSuggesterReverse.suggestFromRulebook(consequent, rulebook);
+	public static Suggestion[] getSuggestedRules(Formula consequent, Rulebook rulebook) {
+		return FormulaSuggester.suggestFromRulebook(consequent, rulebook);
 	}
 }

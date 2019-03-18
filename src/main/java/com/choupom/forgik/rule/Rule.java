@@ -36,50 +36,26 @@ public class Rule {
 		return stringBuilder.toString();
 	}
 
-	public boolean mayApply(int numFormulas) {
-		return (numFormulas == this.antecedents.length);
-	}
-
-	public Formula apply(Formula[] formulas, Set<String> leftover) {
-		Map<String, List<Formula>> map = new HashMap<>();
-		for (int i = 0; i < this.antecedents.length; i++) {
-			if (!this.antecedents[i].identify(formulas[i], map)) {
-				return null;
-			}
-		}
-
-		Map<String, Formula> simpleMap = getSimpleMap(map);
-
-		return this.consequent.apply(simpleMap, leftover);
-	}
-
-	public Formula[] applyReverse(Formula formula, Set<String> leftover) {
+	public Formula[] apply(Formula formula, Set<String> leftover) {
 		Map<String, List<Formula>> map = new HashMap<>();
 		if (!this.consequent.identify(formula, map)) {
 			return null;
 		}
 
-		Map<String, Formula> simpleMap = getSimpleMap(map);
+		Map<String, Formula> simpleMap = new HashMap<>();
+		for (Map.Entry<String, List<Formula>> mapping : map.entrySet()) {
+			List<Formula> list = mapping.getValue();
+			if (!checkAllEquals(list)) {
+				return null;
+			}
+			simpleMap.put(mapping.getKey(), list.get(0));
+		}
 
 		Formula[] formulas = new Formula[this.antecedents.length];
 		for (int i = 0; i < this.antecedents.length; i++) {
 			formulas[i] = this.antecedents[i].apply(simpleMap, leftover);
 		}
 		return formulas;
-	}
-
-	private static Map<String, Formula> getSimpleMap(Map<String, List<Formula>> map) {
-		Map<String, Formula> simpleMap = new HashMap<>();
-		for (Map.Entry<String, List<Formula>> mapping : map.entrySet()) {
-			List<Formula> list = mapping.getValue();
-			if (list.size() > 0) {
-				if (!checkAllEquals(list)) {
-					return null;
-				}
-				simpleMap.put(mapping.getKey(), list.get(0));
-			}
-		}
-		return simpleMap;
 	}
 
 	private static boolean checkAllEquals(List<Formula> formulas) {

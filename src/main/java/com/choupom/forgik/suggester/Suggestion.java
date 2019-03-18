@@ -10,13 +10,13 @@ import java.util.Set;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.rule.Rule;
 
-public class SuggestionReverse {
+public class Suggestion {
 
 	private final Rule rule;
 	private final Formula[] formulas;
 	private final String[] leftover;
 
-	public SuggestionReverse(Rule rule, Formula[] formulas, Set<String> leftover) {
+	public Suggestion(Rule rule, Formula[] formulas, Set<String> leftover) {
 		this.rule = rule;
 		this.formulas = formulas.clone();
 		this.leftover = leftover.toArray(new String[leftover.size()]);
