@@ -3,7 +3,7 @@
  *
  * Copyright 2019 Andy Poudret. All rights reserved.
  */
-package com.choupom.forgik;
+package com.choupom.forgik.console;
 
 import java.util.Scanner;
 

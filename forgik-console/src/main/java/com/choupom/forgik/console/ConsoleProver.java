@@ -3,12 +3,12 @@
  *
  * Copyright 2019 Andy Poudret. All rights reserved.
  */
-package com.choupom.forgik;
+package com.choupom.forgik.console;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.choupom.forgik.ConsoleProverIO.Decision;
+import com.choupom.forgik.console.ConsoleProverIO.Decision;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;

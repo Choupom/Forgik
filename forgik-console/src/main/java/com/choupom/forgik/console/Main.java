@@ -3,7 +3,7 @@
  *
  * Copyright 2019 Andy Poudret. All rights reserved.
  */
-package com.choupom.forgik;
+package com.choupom.forgik.console;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +19,15 @@ public class Main {
 
 	// private static final String MAIN_FORMULA = "((p > q) ^ (q > r)) > (p > r)";
 	// private static final String MAIN_FORMULA = "p > ((p v p) ^ p)";
-
-	private static final String MAIN_FORMULA = "p > --p";
+	// private static final String MAIN_FORMULA = "p > --p";
+	// private static final String MAIN_FORMULA = "-(p > q) > --p";
+	private static final String MAIN_FORMULA = "-(p > q) > (p ^ -q)";
+	// private static final String MAIN_FORMULA = "(p > q) > -(p ^ -q)";
 	// private static final String MAIN_FORMULA = "(p v (p ^ p)) > p";
 	// private static final String MAIN_FORMULA = "((p v q) ^ -p) > q";
 	// private static final String MAIN_FORMULA = "((p > q) ^ -q) > -p";
-	// private static final String MAIN_FORMULA = "-(p > q) > --p";
-	// private static final String MAIN_FORMULA = "-(p > q) > (p ^ -q)";
-	// private static final String MAIN_FORMULA = "(p > q) > -(p ^ -q)";
+	// private static final String MAIN_FORMULA = "p v -p";
+	// private static final String MAIN_FORMULA = "-p > (p > q)";
 
 	public static void main(String[] args) {
 		Formula formula = FormulaParser.parse(MAIN_FORMULA);
