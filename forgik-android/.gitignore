@@ -1,0 +1,8 @@
+/.gradle
+/.idea
+/Application/build/
+/Application/Application.iml
+/build/
+/gradle/
+/forgik-android.iml
+/local.properties

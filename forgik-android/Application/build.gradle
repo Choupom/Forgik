@@ -1,0 +1,53 @@
+/*
+ * Gradle
+ *
+ * Copyright 2019 Andy Poudret. All rights reserved.
+ */
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.2'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+repositories {
+    google()
+    jcenter()
+}
+
+dependencies {
+    implementation 'com.google.firebase:firebase-appindexing:10.0.0'
+}
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "28.0.3"
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 26
+        versionCode 10000
+        versionName "1.0.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    sourceSets {
+        main {
+            java.srcDirs = ["src/main/java"]
+            res.srcDirs = ["src/main/resources"]
+        }
+    }
+    productFlavors {
+    }
+    variantFilter { variant ->
+        if (variant.buildType.name.equals("release")) {
+            variant.setIgnore(true);
+        }
+    }
+}
