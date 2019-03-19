@@ -33,12 +33,12 @@ public class ProverTest {
 		prover.proveImplication(0);
 		prover.proveByRule(0, RULE_EFQ);
 		prover.completeConsequent(0, 2, createSimpleMap("B", "p"));
-		prover.completeConsequent(1, 1, new HashMap<>());
+		prover.completeConsequent(1, 1, new HashMap<String, Formula>());
 
 		prover.proveByContradiction(1);
 		prover.completeConsequent(1, 0, createSimpleMap("C", "p > q"));
 		prover.proveImplication(0);
-		prover.completeConsequent(0, 1, new HashMap<>());
+		prover.completeConsequent(0, 1, new HashMap<String, Formula>());
 
 		Assert.assertNull(prover.getProofInfo());
 	}
