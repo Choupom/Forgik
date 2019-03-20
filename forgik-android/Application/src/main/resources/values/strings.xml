@@ -6,4 +6,7 @@
 -->
 <resources>
     <string name="app_name">Forgik</string>
+    <string name="prove_implication">Prove implication</string>
+    <string name="prove_by_contradiction">Prove by contradiction</string>
+    <string name="cancel_proof">Cancel proof</string>
 </resources>

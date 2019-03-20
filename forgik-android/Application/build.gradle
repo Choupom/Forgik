@@ -9,7 +9,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.5.0'
     }
 }
 
@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     implementation 'com.google.firebase:firebase-appindexing:10.0.0'
+    implementation files('libs/forgik.jar')
 }
 
 android {

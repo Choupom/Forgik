@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	XML
+
+	Copyright 2019 Andy Poudret. All rights reserved.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <ScrollView android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                android:background="#EEEEEE">
+                <TableRow android:id="@+id/consequents_table"/>
+            </TableLayout>
+
+            <Space android:layout_width="match_parent"
+                android:layout_height="5dp"/>
+
+            <TableLayout android:id="@+id/antecedents_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#EEEEEE"/>
+
+            <Space android:layout_width="match_parent"
+                android:layout_height="10dp"/>
+
+            <Button android:id="@+id/prove_implication_button"
+                android:text="@string/prove_implication"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24dp"/>
+
+            <Button android:id="@+id/prove_by_contradiction_button"
+                android:text="@string/prove_by_contradiction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24dp"/>
+
+            <LinearLayout android:id="@+id/rules_table"
+                android:orientation="vertical"
+                android:showDividers="middle"
+                android:divider="@layout/rule_divider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <Space android:layout_width="match_parent"
+        android:layout_height="5dp"/>
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="bottom">
+        <Button android:id="@+id/cancel_proof_button"
+            android:text="@string/cancel_proof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:textSize="24dp"/>
+    </LinearLayout>
+</LinearLayout>
