@@ -73,6 +73,11 @@ public class Prover {
 		completeConsequent(consequentId, map);
 	}
 
+	public boolean canProveImplication(int consequentId) {
+		Formula consequent = this.proof.consequents[consequentId];
+		return (consequent instanceof Implication || consequent instanceof FreeVariable);
+	}
+
 	public void proveImplication(int consequentId) {
 		Formula consequent = this.proof.consequents[consequentId];
 
@@ -102,6 +107,11 @@ public class Prover {
 		subproofConsequents[0] = implication.getOperand2();
 
 		this.proof = new Proof(subproofAntecedents, subproofConsequents, this.proof, consequentId);
+	}
+
+	public boolean canProveByContradiction(int consequentId) {
+		Formula consequent = this.proof.consequents[consequentId];
+		return (consequent instanceof Negation);
 	}
 
 	public void proveByContradiction(int consequentId) {
