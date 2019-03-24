@@ -7,11 +7,15 @@ package com.choupom.forgik.rule;
 
 public class DeductionRulebook {
 
+	private DeductionRulebook() {
+		// private constructor
+	}
+
 	public static Rule[] getRules() {
 		RulesBuilder rulebook = new RulesBuilder();
 
 		rulebook.addRule("X ^ Y", "X", "Y"); // conjunction introduction
-		rulebook.addRule("X", "X ^ Y"); // conjunction elimination (1)
+		rulebook.addRule("Y", "Y ^ X"); // conjunction elimination (1)
 		rulebook.addRule("Y", "X ^ Y"); // conjunction elimination (2)
 		rulebook.addRule("X v Y", "X"); // disjunction introduction (1)
 		rulebook.addRule("Y v X", "X"); // disjunction introduction (2)
