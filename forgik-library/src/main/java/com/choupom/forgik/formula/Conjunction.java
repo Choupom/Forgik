@@ -29,7 +29,8 @@ public class Conjunction implements Formula {
 
 	@Override
 	public String toString() {
-		return this.operand1.toStringNested() + " ^ " + this.operand2.toStringNested();
+		String operatorStr = FormulaSettings.getConjunctionString();
+		return this.operand1.toStringNested() + " " + operatorStr + " " + this.operand2.toStringNested();
 	}
 
 	@Override

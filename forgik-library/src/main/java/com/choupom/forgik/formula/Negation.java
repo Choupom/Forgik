@@ -23,7 +23,8 @@ public class Negation implements Formula {
 
 	@Override
 	public String toString() {
-		return "-" + this.operand.toStringNested();
+		String operatorStr = FormulaSettings.getNegationString();
+		return operatorStr + this.operand.toStringNested();
 	}
 
 	@Override
