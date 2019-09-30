@@ -5,6 +5,7 @@
  */
 package com.choupom.forgik.prover;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,14 +15,24 @@ import org.junit.Test;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.rule.Rule;
+import com.choupom.forgik.rule.RuleParser;
 
 public class ProverTest {
 
 	private static final Formula[] ANTECEDENTS = new Formula[] { FormulaParser.parse("-(p > q)") };
 	private static final Formula[] CONSEQUENTS = new Formula[] { FormulaParser.parse("p"), FormulaParser.parse("-q") };
 
-	private static final Rule RULE_DOUBLE_NEG_ELIMINATION = new Rule("X", "--X");
-	private static final Rule RULE_EFQ = new Rule("Y", "X", "-X");
+	private static final Rule RULE_DOUBLE_NEG_ELIMINATION;
+	private static final Rule RULE_EFQ;
+
+	static {
+		try {
+			RULE_DOUBLE_NEG_ELIMINATION = RuleParser.parseRule("double_neg_elim");
+			RULE_EFQ = RuleParser.parseRule("efq");
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	@Test
 	public void testEasy() {

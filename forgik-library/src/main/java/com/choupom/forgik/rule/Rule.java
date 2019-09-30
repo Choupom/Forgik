@@ -15,10 +15,13 @@ import com.choupom.forgik.parser.FormulaParser;
 
 public class Rule {
 
+	private final String name;
 	private final Formula[] antecedents; // "premises"
 	private final Formula consequent; // "conclusion"
 
-	public Rule(String consequentStr, String... antecedentsStr) {
+	public Rule(String name, String[] antecedentsStr, String consequentStr) {
+		this.name = name;
+
 		this.antecedents = new Formula[antecedentsStr.length];
 		for (int i = 0; i < antecedentsStr.length; i++) {
 			this.antecedents[i] = FormulaParser.parse(antecedentsStr[i]);
@@ -27,9 +30,15 @@ public class Rule {
 		this.consequent = FormulaParser.parse(consequentStr);
 	}
 
+	public String getName() {
+		return this.name;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(this.name);
+		stringBuilder.append(": ");
 		for (int i = 0; i < this.antecedents.length; i++) {
 			if (i != 0) {
 				stringBuilder.append(" ; ");

@@ -1,0 +1,6 @@
+{
+	"name": ">i",
+	"assumptions": ["X"],
+	"antecedents": ["Y"],
+	"consequent": "X > Y"
+}

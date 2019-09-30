@@ -23,11 +23,12 @@ import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
-import com.choupom.forgik.rule.DeductionRulebook;
 import com.choupom.forgik.rule.Rule;
+import com.choupom.forgik.rule.RulebookParser;
 import com.choupom.forgik.suggester.FormulaSuggester;
 import com.choupom.forgik.suggester.Suggestion;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -35,6 +36,8 @@ import java.util.logging.Logger;
 public class MainActivity extends Activity {
 
     private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
+
+    private static final String RULEBOOK = "deduction";
 
     private static final String CONJUNCTION_STRING = "\u2227";
     private static final String DISJUNCTION_STRING = "\u2228";
@@ -45,14 +48,14 @@ public class MainActivity extends Activity {
     private final Prover prover;
     private int selectedConsequentId;
 
-    public MainActivity() {
+    public MainActivity() throws IOException {
         FormulaSettings.setOperatorsStrings(CONJUNCTION_STRING, DISJUNCTION_STRING, IMPLICATION_STRING, NEGATION_STRING);
 
         Challenge[] challenges = Challenges.getChallenges();
         int challengeId = new Random().nextInt(challenges.length);
         Challenge challenge = challenges[challengeId];
 
-        this.rules = DeductionRulebook.getRules();
+        this.rules = RulebookParser.parseRulebook(RULEBOOK);
         this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
     }
 

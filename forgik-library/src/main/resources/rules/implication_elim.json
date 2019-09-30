@@ -1,0 +1,5 @@
+{
+	"name": ">e",
+	"antecedents": ["X > Y", "X"],
+	"consequent": "Y"
+}

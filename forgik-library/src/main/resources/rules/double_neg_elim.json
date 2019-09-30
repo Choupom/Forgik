@@ -1,0 +1,5 @@
+{
+	"name": "--e",
+	"antecedents": ["--X"],
+	"consequent": "X"
+}

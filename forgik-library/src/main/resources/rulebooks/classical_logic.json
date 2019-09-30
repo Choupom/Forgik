@@ -1,0 +1,9 @@
+{
+	"name": "Classical logic",
+	"rules": [
+		"conjunction_elim_1", "conjunction_elim_2", "conjunction_intro",
+		"disjunction_elim", "disjunction_intro_1", "disjunction_intro_2",
+		"implication_elim", "implication_intro", "double_neg_elim",
+		"efq", "raa"
+	]
+}

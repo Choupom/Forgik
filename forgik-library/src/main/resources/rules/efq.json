@@ -1,0 +1,5 @@
+{
+	"name": "EFQ",
+	"antecedents": ["X", "-X"],
+	"consequent": "Y"
+}

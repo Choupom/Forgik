@@ -5,6 +5,7 @@
  */
 package com.choupom.forgik.console;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +13,12 @@ import com.choupom.forgik.formula.Conjunction;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.parser.FormulaParser;
-import com.choupom.forgik.rule.DeductionRulebook;
 import com.choupom.forgik.rule.Rule;
+import com.choupom.forgik.rulebook.RulebookParser;
 
 public class Main {
+
+	private static final String RULEBOOK = "classical_logic";
 
 	// private static final String MAIN_FORMULA = "((p > q) ^ (q > r)) > (p > r)";
 	// private static final String MAIN_FORMULA = "p > ((p v p) ^ p)";
@@ -29,7 +32,7 @@ public class Main {
 	// private static final String MAIN_FORMULA = "p v -p";
 	// private static final String MAIN_FORMULA = "-p > (p > q)";
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Formula formula = FormulaParser.parse(MAIN_FORMULA);
 
 		Formula[] antecedents;
@@ -50,7 +53,7 @@ public class Main {
 			consequents = new Formula[] { formula };
 		}
 
-		Rule[] rules = DeductionRulebook.getRules();
+		Rule[] rules = RulebookParser.parseRulebook(RULEBOOK).getRules();
 
 		ConsoleProver.prove(antecedents, consequents, rules);
 	}

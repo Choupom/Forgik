@@ -1,0 +1,5 @@
+{
+	"name": "^e1",
+	"antecedents": ["X ^ Y"],
+	"consequent": "X"
+}

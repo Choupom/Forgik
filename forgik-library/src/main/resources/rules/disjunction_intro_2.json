@@ -1,0 +1,5 @@
+{
+	"name": "vi2",
+	"antecedents": ["X"],
+	"consequent": "Y v X"
+}
