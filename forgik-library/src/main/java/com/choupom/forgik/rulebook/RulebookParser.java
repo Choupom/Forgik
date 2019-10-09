@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rule.RuleParser;
-import com.choupom.utils.InputStreamUtils;
+import com.choupom.forgik.utils.InputStreamUtils;
 
 public class RulebookParser {
 

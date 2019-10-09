@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.Identification;
-import com.choupom.forgik.suggester.Suggestion;
+import com.choupom.forgik.rule.Rule;
 
 public class ConsoleProverIO {
 
@@ -20,12 +20,6 @@ public class ConsoleProverIO {
 
 		/** Complete the ongoing proof (the goal has been proved) */
 		COMPLETE_PROOF,
-
-		/** Make an assumption in order to prove the goal (which should be an implication or free variable) */
-		ASSUME,
-
-		/** Assume the negation of the goal in order to prove that it is absurd */
-		ASSUME_NEGATION,
 
 		/** Suggest rules in order to prove the goal */
 		SUGGEST_RULE
@@ -48,8 +42,6 @@ public class ConsoleProverIO {
 		// System.out.println("What do you want to do?");
 		// System.out.println("{Q} Cancel this proof");
 		// System.out.println("{<} Complete this proof");
-		// System.out.println("{>} Make an assumption");
-		// System.out.println("{-} Assume the negation");
 		// System.out.println("{G} Suggest rules");
 		return getDecision();
 	}
@@ -75,18 +67,14 @@ public class ConsoleProverIO {
 		}
 	}
 
-	public int requestSuggestion(Suggestion[] suggestions) {
+	public int requestSuggestion(Rule[] rules) {
 		System.out.println("Which rule do you want to use?");
 
-		for (int i = 0; i < suggestions.length; i++) {
-			System.out.print("{" + i + "}");
-			for (Formula formula : suggestions[i].getFormulas()) {
-				System.out.print(" [" + formula + "]");
-			}
-			System.out.println();
+		for (int i = 0; i < rules.length; i++) {
+			System.out.println("{" + i + "} " + rules[i].getName());
 		}
 
-		return getIndex(0, suggestions.length - 1);
+		return getIndex(0, rules.length - 1);
 	}
 
 	public int requestSubproof(Formula[] entries, Formula[] goals, boolean[] completedGoals) {
@@ -131,10 +119,6 @@ public class ConsoleProverIO {
 			String line = this.input.nextLine();
 			if (line.equals("<")) {
 				return Decision.COMPLETE_PROOF;
-			} else if (line.equals(">")) {
-				return Decision.ASSUME;
-			} else if (line.equals("-")) {
-				return Decision.ASSUME_NEGATION;
 			} else if (line.equals("G")) {
 				return Decision.SUGGEST_RULE;
 			} else if (line.equals("Q")) {

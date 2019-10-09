@@ -6,28 +6,37 @@
 package com.choupom.forgik.rule;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
-import com.choupom.forgik.parser.FormulaParser;
+import com.choupom.forgik.formula.FreeVariable;
 
 public class Rule {
 
 	private final String name;
-	private final Formula[] antecedents; // "premises"
-	private final Formula consequent; // "conclusion"
+	private final Formula[] assumptions;
+	private final Formula[] antecedents;
+	private final Formula consequent;
+	private final String[] freeVariables;
 
-	public Rule(String name, String[] antecedentsStr, String consequentStr) {
+	public Rule(String name, Formula[] assumptions, Formula[] antecedents, Formula consequent) {
 		this.name = name;
+		this.assumptions = assumptions;
+		this.antecedents = antecedents;
+		this.consequent = consequent;
 
-		this.antecedents = new Formula[antecedentsStr.length];
-		for (int i = 0; i < antecedentsStr.length; i++) {
-			this.antecedents[i] = FormulaParser.parse(antecedentsStr[i]);
+		Set<String> freeVariablesSet = new HashSet<>();
+		for (Formula ruleAssumption : assumptions) {
+			ruleAssumption.getFreeVariables(freeVariablesSet);
 		}
-
-		this.consequent = FormulaParser.parse(consequentStr);
+		for (Formula ruleAntecedent : antecedents) {
+			ruleAntecedent.getFreeVariables(freeVariablesSet);
+		}
+		consequent.getFreeVariables(freeVariablesSet);
+		this.freeVariables = freeVariablesSet.toArray(new String[freeVariablesSet.size()]);
 	}
 
 	public String getName() {
@@ -41,18 +50,18 @@ public class Rule {
 		stringBuilder.append(": ");
 		for (int i = 0; i < this.antecedents.length; i++) {
 			if (i != 0) {
-				stringBuilder.append(" ; ");
+				stringBuilder.append(", ");
 			}
 			stringBuilder.append(this.antecedents[i]);
 		}
-		stringBuilder.append(" -| ");
+		stringBuilder.append(" |- ");
 		stringBuilder.append(this.consequent);
 		return stringBuilder.toString();
 	}
 
-	public Formula[] apply(Formula consequent, Set<String> leftover) {
+	public RuleApplicationResult apply(Formula consequent) {
 		Map<String, List<Formula>> map = new HashMap<>();
-		if (!this.consequent.identify(consequent, map)) {
+		if (!this.consequent.identify(consequent, map)) { // TODO: use FormulaIdentifier
 			return null;
 		}
 
@@ -65,11 +74,16 @@ public class Rule {
 			simpleMap.put(mapping.getKey(), list.get(0));
 		}
 
-		if (leftover != null) {
-			for (Formula ruleAntecedent : this.antecedents) {
-				ruleAntecedent.getFreeVariables(leftover);
+		Set<String> leftover = new HashSet<>();
+		for (String freeVariable : this.freeVariables) {
+			if (!simpleMap.containsKey(freeVariable)) {
+				leftover.add(freeVariable);
 			}
-			leftover.removeAll(simpleMap.keySet());
+		}
+
+		Formula[] assumptions = new Formula[this.assumptions.length];
+		for (int i = 0; i < this.assumptions.length; i++) {
+			assumptions[i] = this.assumptions[i].apply(simpleMap);
 		}
 
 		Formula[] antecedents = new Formula[this.antecedents.length];
@@ -77,7 +91,20 @@ public class Rule {
 			antecedents[i] = this.antecedents[i].apply(simpleMap);
 		}
 
-		return antecedents;
+		Map<String, Formula> consequentMap = new HashMap<>();
+		Set<String> consequentVariables = new HashSet<>();
+		consequent.getFreeVariables(consequentVariables);
+		for (String consequentVariable : consequentVariables) {
+			Formula mapped = simpleMap.get(consequentVariable);
+			if (mapped != null) {
+				mapped = mapped.apply(simpleMap);
+				if (!mapped.checkEquals(new FreeVariable(consequentVariable))) {
+					consequentMap.put(consequentVariable, mapped);
+				}
+			}
+		}
+
+		return new RuleApplicationResult(assumptions, antecedents, leftover, consequentMap);
 	}
 
 	private static boolean checkAllEquals(List<Formula> formulas) {

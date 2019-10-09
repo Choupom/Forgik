@@ -6,8 +6,6 @@
 package com.choupom.forgik.prover;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,11 +22,15 @@ public class ProverTest {
 
 	private static final Rule RULE_DOUBLE_NEG_ELIMINATION;
 	private static final Rule RULE_EFQ;
+	private static final Rule RULE_IMPLICATION_INTRO;
+	private static final Rule RULE_RAA;
 
 	static {
 		try {
 			RULE_DOUBLE_NEG_ELIMINATION = RuleParser.parseRule("double_neg_elim");
 			RULE_EFQ = RuleParser.parseRule("efq");
+			RULE_IMPLICATION_INTRO = RuleParser.parseRule("implication_intro");
+			RULE_RAA = RuleParser.parseRule("raa");
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
@@ -39,17 +41,17 @@ public class ProverTest {
 		Prover prover = new Prover(ANTECEDENTS, CONSEQUENTS);
 
 		prover.proveByRule(0, RULE_DOUBLE_NEG_ELIMINATION);
-		prover.proveByContradiction(0);
-		prover.completeConsequent(1, 0, createSimpleMap("A", "p > q"));
-		prover.proveImplication(0);
+		prover.proveByRule(0, RULE_RAA);
+		prover.completeConsequent(1, 0);
+		prover.proveByRule(0, RULE_IMPLICATION_INTRO);
 		prover.proveByRule(0, RULE_EFQ);
-		prover.completeConsequent(0, 2, createSimpleMap("B", "p"));
-		prover.completeConsequent(1, 1, new HashMap<String, Formula>());
+		prover.completeConsequent(0, 2);
+		prover.completeConsequent(1, 1);
 
-		prover.proveByContradiction(1);
-		prover.completeConsequent(1, 0, createSimpleMap("C", "p > q"));
-		prover.proveImplication(0);
-		prover.completeConsequent(0, 1, new HashMap<String, Formula>());
+		prover.proveByRule(1, RULE_RAA);
+		prover.completeConsequent(1, 0);
+		prover.proveByRule(0, RULE_IMPLICATION_INTRO);
+		prover.completeConsequent(0, 1);
 
 		Assert.assertNull(prover.getProofInfo());
 	}
@@ -59,25 +61,19 @@ public class ProverTest {
 		Prover prover = new Prover(ANTECEDENTS, CONSEQUENTS);
 
 		prover.proveByRule(0, RULE_DOUBLE_NEG_ELIMINATION);
-		prover.proveByContradiction(0);
-		prover.proveImplication(0);
+		prover.proveByRule(0, RULE_RAA);
+		prover.proveByRule(0, RULE_IMPLICATION_INTRO);
 		prover.proveByRule(0, RULE_EFQ);
-		prover.completeConsequent(0, 2, createSimpleMap("D", "B"));
-		prover.completeConsequent(1, 1, createSimpleMap("B", "p"));
-		prover.completeConsequent(1, 0, createSimpleMap("C", "q"));
+		prover.completeConsequent(0, 2);
+		prover.completeConsequent(1, 1);
+		prover.completeConsequent(1, 0);
 
-		prover.proveByContradiction(1);
-		prover.proveImplication(0);
-		prover.completeConsequent(0, 1, createSimpleMap("G", "q"));
-		prover.completeConsequent(1, 0, createSimpleMap("F", "p"));
+		prover.proveByRule(1, RULE_RAA);
+		prover.proveByRule(0, RULE_IMPLICATION_INTRO);
+		prover.completeConsequent(0, 1);
+		prover.completeConsequent(1, 0);
 
 		Assert.assertNull(prover.getProofInfo());
-	}
-
-	private Map<String, Formula> createSimpleMap(String variable, String formulaStr) {
-		Map<String, Formula> map = new HashMap<>();
-		map.put(variable, FormulaParser.parse(formulaStr));
-		return map;
 	}
 
 	@SuppressWarnings("unused")

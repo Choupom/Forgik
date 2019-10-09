@@ -6,15 +6,14 @@
 package com.choupom.forgik.prover;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.FreeVariable;
-import com.choupom.forgik.formula.Implication;
-import com.choupom.forgik.formula.Negation;
+import com.choupom.forgik.identifier.FormulaIdentifier;
+import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.rule.Rule;
+import com.choupom.forgik.rule.RuleApplicationResult;
 
 public class Prover {
 
@@ -59,105 +58,50 @@ public class Prover {
 		this.proof = this.proof.parent;
 	}
 
-	public void completeConsequent(int consequentId, int antecedentId, Map<String, Formula> map) {
+	public void completeConsequent(int consequentId, int antecedentId) {
 		Formula consequent = this.proof.consequents[consequentId];
 		Formula antecedent = this.proof.antecedents[antecedentId];
 
-		Formula mappedConsequent = consequent.apply(map);
-		Formula mappedAntecedent = antecedent.apply(map);
-		if (!mappedConsequent.checkEquals(mappedAntecedent)) {
-			System.out.println("Antecedent does not match the consequent when applying the given map");
-			return;
+		Identification identification = FormulaIdentifier.identify(antecedent, consequent);
+		if (identification != null) {
+			completeConsequent(consequentId, identification.getMap());
 		}
-
-		completeConsequent(consequentId, map);
-	}
-
-	public boolean canProveImplication(int consequentId) {
-		Formula consequent = this.proof.consequents[consequentId];
-		return (consequent instanceof Implication || consequent instanceof FreeVariable);
-	}
-
-	public void proveImplication(int consequentId) {
-		Formula consequent = this.proof.consequents[consequentId];
-
-		Implication implication;
-		if (consequent instanceof Implication) {
-			implication = (Implication) consequent;
-		} else if (consequent instanceof FreeVariable) {
-			Formula freeVariable1 = createUniqueVariable();
-			Formula freeVariable2 = createUniqueVariable();
-			implication = new Implication(freeVariable1, freeVariable2);
-
-			Map<String, Formula> map = new HashMap<>();
-			map.put(((FreeVariable) consequent).getName(), implication);
-			updateProofInfo(this.proof, map);
-		} else {
-			System.out.println("The consequent is not an implication");
-			return;
-		}
-
-		Formula[] subproofAntecedents = new Formula[this.proof.antecedents.length + 1];
-		for (int i = 0; i < this.proof.antecedents.length; i++) {
-			subproofAntecedents[i] = this.proof.antecedents[i];
-		}
-		subproofAntecedents[this.proof.antecedents.length] = implication.getOperand1();
-
-		Formula[] subproofConsequents = new Formula[1];
-		subproofConsequents[0] = implication.getOperand2();
-
-		this.proof = new Proof(subproofAntecedents, subproofConsequents, this.proof, consequentId);
-	}
-
-	public boolean canProveByContradiction(int consequentId) {
-		Formula consequent = this.proof.consequents[consequentId];
-		return (consequent instanceof Negation);
-	}
-
-	public void proveByContradiction(int consequentId) {
-		Formula consequent = this.proof.consequents[consequentId];
-
-		if (!(consequent instanceof Negation)) {
-			System.out.println("The consequent is not a negation");
-			return;
-		}
-
-		Negation negation = (Negation) consequent;
-
-		Formula[] subproofAntecedents = new Formula[this.proof.antecedents.length + 1];
-		for (int i = 0; i < this.proof.antecedents.length; i++) {
-			subproofAntecedents[i] = this.proof.antecedents[i];
-		}
-		subproofAntecedents[this.proof.antecedents.length] = negation.getOperand();
-
-		Formula[] subproofConsequents = new Formula[2];
-		subproofConsequents[0] = createUniqueVariable();
-		subproofConsequents[1] = new Negation(subproofConsequents[0]);
-
-		this.proof = new Proof(subproofAntecedents, subproofConsequents, this.proof, consequentId);
 	}
 
 	public void proveByRule(int consequentId, Rule rule) {
 		Formula consequent = this.proof.consequents[consequentId];
 
-		Set<String> leftover = new HashSet<>();
-		Formula[] ruleAntecedents = rule.apply(consequent, leftover);
-		if (ruleAntecedents == null) {
+		RuleApplicationResult result = rule.apply(consequent);
+		if (result == null) {
 			System.out.println("Given rule can not be applied to the consequent");
 			return;
 		}
 
 		Map<String, Formula> leftoverMap = new HashMap<>();
-		for (String ruleVariable : leftover) {
+		for (String ruleVariable : result.getLeftover()) {
 			leftoverMap.put(ruleVariable, createUniqueVariable());
 		}
 
+		Formula[] ruleAssumptions = result.getAssumptions();
+		Formula[] proofAntecedents = new Formula[this.proof.antecedents.length + ruleAssumptions.length];
+		System.arraycopy(this.proof.antecedents, 0, proofAntecedents, 0, this.proof.antecedents.length);
+		for (int i = 0; i < ruleAssumptions.length; i++) {
+			proofAntecedents[this.proof.antecedents.length + i] = ruleAssumptions[i].apply(leftoverMap);
+		}
+
+		Formula[] ruleAntecedents = result.getAntecedents();
 		Formula[] proofConsequents = new Formula[ruleAntecedents.length];
-		for (int i = 0; i < proofConsequents.length; i++) {
+		for (int i = 0; i < ruleAntecedents.length; i++) {
 			proofConsequents[i] = ruleAntecedents[i].apply(leftoverMap);
 		}
 
-		this.proof = new Proof(this.proof.antecedents, proofConsequents, this.proof, consequentId);
+		Map<String, Formula> consequentMap = new HashMap<>();
+		for (Map.Entry<String, Formula> entry : result.getConsequentMap().entrySet()) {
+			consequentMap.put(entry.getKey(), entry.getValue().apply(leftoverMap));
+		}
+		updateProofInfo(this.proof, consequentMap);
+
+		this.proof = new Proof(proofAntecedents, proofConsequents, this.proof, consequentId);
 	}
 
 	private void completeConsequent(int consequentId, Map<String, Formula> map) {

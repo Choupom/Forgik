@@ -5,9 +5,6 @@
  */
 package com.choupom.forgik.console;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.choupom.forgik.console.ConsoleProverIO.Decision;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.FormulaIdentifier;
@@ -15,8 +12,6 @@ import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
 import com.choupom.forgik.rule.Rule;
-import com.choupom.forgik.suggester.FormulaSuggester;
-import com.choupom.forgik.suggester.Suggestion;
 
 public class ConsoleProver {
 
@@ -60,8 +55,7 @@ public class ConsoleProver {
 		} else if (decision == Decision.COMPLETE_PROOF) {
 			int antecedentId = checkProved(antecedents, consequent);
 			if (antecedentId != -1) {
-				Map<String, Formula> map = new HashMap<String, Formula>();
-				prover.completeConsequent(consequentId, antecedentId, map);
+				prover.completeConsequent(consequentId, antecedentId);
 			} else {
 				Identification[] identifications = new Identification[antecedents.length];
 				for (int i = 0; i < identifications.length; i++) {
@@ -70,21 +64,14 @@ public class ConsoleProver {
 
 				antecedentId = io.requestIdentification(identifications);
 				if (antecedentId != -1) {
-					Identification identification = identifications[antecedentId];
-					prover.completeConsequent(consequentId, antecedentId, identification.getMap());
+					prover.completeConsequent(consequentId, antecedentId);
 				}
 			}
-		} else if (decision == Decision.ASSUME) {
-			prover.proveImplication(consequentId);
-		} else if (decision == Decision.ASSUME_NEGATION) {
-			prover.proveByContradiction(consequentId);
 		} else if (decision == Decision.SUGGEST_RULE) {
-			Suggestion[] suggestions = FormulaSuggester.suggest(consequent, rules);
-
-			int suggestionId = io.requestSuggestion(suggestions);
+			int suggestionId = io.requestSuggestion(rules);
 			if (suggestionId != -1) {
-				Suggestion suggestion = suggestions[suggestionId];
-				prover.proveByRule(consequentId, suggestion.getRule());
+				Rule suggestion = rules[suggestionId];
+				prover.proveByRule(consequentId, suggestion);
 			}
 		}
 
