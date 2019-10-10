@@ -1,5 +1,5 @@
 {
-	"name": ">i",
+	"name": ">I",
 	"assumptions": ["X"],
 	"antecedents": ["Y"],
 	"consequent": "X > Y"

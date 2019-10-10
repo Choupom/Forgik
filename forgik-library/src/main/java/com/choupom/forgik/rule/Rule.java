@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.FormulaSettings;
 import com.choupom.forgik.formula.FreeVariable;
 
 public class Rule {
@@ -40,7 +41,13 @@ public class Rule {
 	}
 
 	public String getName() {
-		return this.name;
+		FormulaSettings settings = FormulaSettings.getInstance();
+		String string = this.name;
+		string = string.replace(FormulaSettings.DEFAULT_CONJUNCTION_STRING, settings.getConjunctionString());
+		string = string.replace(FormulaSettings.DEFAULT_DISJUNCTION_STRING, settings.getDisjunctionString());
+		string = string.replace(FormulaSettings.DEFAULT_IMPLICATION_STRING, settings.getImplicationString());
+		string = string.replace(FormulaSettings.DEFAULT_NEGATION_STRING, settings.getNegationString());
+		return string;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
+import com.choupom.forgik.prover.ProverException;
 import com.choupom.forgik.rule.Rule;
 
 public class ConsoleProver {
@@ -23,19 +24,17 @@ public class ConsoleProver {
 		Prover prover = new Prover(antecedents, consequents);
 		ConsoleProverIO io = new ConsoleProverIO();
 
-		while (true) {
-			if (!proveStep(prover, io, rules)) {
-				break;
+		while (!prover.isMainProofComplete()) {
+			try {
+				proveStep(prover, io, rules);
+			} catch (ProverException e) {
+				System.out.println("Proof step failed: " + e.getMessage());
 			}
 		}
 	}
 
-	public static boolean proveStep(Prover prover, ConsoleProverIO io, Rule[] rules) {
+	public static void proveStep(Prover prover, ConsoleProverIO io, Rule[] rules) throws ProverException {
 		ProofInfo proofInfo = prover.getProofInfo();
-		if (proofInfo == null) {
-			return false;
-		}
-
 		Formula[] antecedents = proofInfo.getAntecedents();
 		Formula[] consequents = proofInfo.getConsequents();
 		boolean[] completedConsequents = proofInfo.getCompletedConsequents();
@@ -43,29 +42,23 @@ public class ConsoleProver {
 		int consequentId = io.requestSubproof(antecedents, consequents, completedConsequents);
 		if (consequentId == -1) {
 			prover.cancelProof();
-			return true;
+			return;
 		}
 
 		Formula consequent = consequents[consequentId];
-
 		Decision decision = io.requestDecision(antecedents, consequent);
 
 		if (decision == Decision.CANCEL_PROOF) {
 			prover.cancelProof();
 		} else if (decision == Decision.COMPLETE_PROOF) {
-			int antecedentId = checkProved(antecedents, consequent);
+			Identification[] identifications = new Identification[antecedents.length];
+			for (int i = 0; i < identifications.length; i++) {
+				identifications[i] = FormulaIdentifier.identify(antecedents[i], consequent);
+			}
+
+			int antecedentId = io.requestIdentification(identifications);
 			if (antecedentId != -1) {
 				prover.completeConsequent(consequentId, antecedentId);
-			} else {
-				Identification[] identifications = new Identification[antecedents.length];
-				for (int i = 0; i < identifications.length; i++) {
-					identifications[i] = FormulaIdentifier.identify(antecedents[i], consequent);
-				}
-
-				antecedentId = io.requestIdentification(identifications);
-				if (antecedentId != -1) {
-					prover.completeConsequent(consequentId, antecedentId);
-				}
 			}
 		} else if (decision == Decision.SUGGEST_RULE) {
 			int suggestionId = io.requestSuggestion(rules);
@@ -74,16 +67,5 @@ public class ConsoleProver {
 				prover.proveByRule(consequentId, suggestion);
 			}
 		}
-
-		return true;
-	}
-
-	private static int checkProved(Formula[] antecedents, Formula consequent) {
-		for (int i = 0; i < antecedents.length; i++) {
-			if (antecedents[i].checkEquals(consequent)) {
-				return i;
-			}
-		}
-		return -1;
 	}
 }

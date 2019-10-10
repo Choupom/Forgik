@@ -29,7 +29,7 @@ public class Disjunction implements Formula {
 
 	@Override
 	public String toString() {
-		String operatorStr = FormulaSettings.getDisjunctionString();
+		String operatorStr = FormulaSettings.getInstance().getDisjunctionString();
 		return this.operand1.toStringNested() + " " + operatorStr + " " + this.operand2.toStringNested();
 	}
 

@@ -37,7 +37,7 @@ public class ProverTest {
 	}
 
 	@Test
-	public void testEasy() {
+	public void testEasy() throws ProverException {
 		Prover prover = new Prover(ANTECEDENTS, CONSEQUENTS);
 
 		prover.proveByRule(0, RULE_DOUBLE_NEG_ELIMINATION);
@@ -57,7 +57,7 @@ public class ProverTest {
 	}
 
 	@Test
-	public void testHard() {
+	public void testHard() throws ProverException {
 		Prover prover = new Prover(ANTECEDENTS, CONSEQUENTS);
 
 		prover.proveByRule(0, RULE_DOUBLE_NEG_ELIMINATION);

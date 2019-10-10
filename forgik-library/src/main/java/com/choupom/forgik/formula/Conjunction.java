@@ -29,7 +29,7 @@ public class Conjunction implements Formula {
 
 	@Override
 	public String toString() {
-		String operatorStr = FormulaSettings.getConjunctionString();
+		String operatorStr = FormulaSettings.getInstance().getConjunctionString();
 		return this.operand1.toStringNested() + " " + operatorStr + " " + this.operand2.toStringNested();
 	}
 

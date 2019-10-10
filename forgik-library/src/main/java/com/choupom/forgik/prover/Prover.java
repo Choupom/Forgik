@@ -23,7 +23,6 @@ public class Prover {
 		public Formula[] consequents;
 		public boolean[] completedConsequents;
 		public Map<String, Formula> map;
-
 		public Proof parent;
 		public int parentConsequentId;
 
@@ -32,14 +31,21 @@ public class Prover {
 			this.consequents = consequents.clone();
 			this.completedConsequents = new boolean[consequents.length];
 			this.map = new HashMap<>();
-
 			this.parent = parent;
 			this.parentConsequentId = parentConsequentId;
+		}
+
+		public boolean isComplete() {
+			for (boolean completedConsequent : this.completedConsequents) {
+				if (!completedConsequent) {
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 
 	private int uniqueVariableCounter;
-
 	private Proof proof;
 
 	public Prover(Formula[] antecedents, Formula[] consequents) {
@@ -47,34 +53,52 @@ public class Prover {
 		this.proof = new Proof(antecedents, consequents, null, -1);
 	}
 
+	public boolean isMainProofComplete() {
+		return (isOnMainProof() && this.proof.isComplete());
+	}
+
+	public boolean isOnMainProof() {
+		return (this.proof.parent == null);
+	}
+
 	public ProofInfo getProofInfo() {
-		if (this.proof == null) {
-			return null;
-		}
 		return new ProofInfo(this.proof.antecedents, this.proof.consequents, this.proof.completedConsequents);
 	}
 
-	public void cancelProof() {
+	public void cancelProof() throws ProverException {
+		if (this.proof.parent == null) {
+			throw new ProverException("Main proof can not be canceled");
+		}
+
 		this.proof = this.proof.parent;
 	}
 
-	public void completeConsequent(int consequentId, int antecedentId) {
+	public void completeConsequent(int consequentId, int antecedentId) throws ProverException {
+		if (this.proof.completedConsequents[consequentId]) {
+			throw new ProverException("Consequent is already completed");
+		}
+
 		Formula consequent = this.proof.consequents[consequentId];
 		Formula antecedent = this.proof.antecedents[antecedentId];
 
 		Identification identification = FormulaIdentifier.identify(antecedent, consequent);
-		if (identification != null) {
-			completeConsequent(consequentId, identification.getMap());
+		if (identification == null) {
+			throw new ProverException("Antecedent can not be identified with consequent");
 		}
+
+		completeConsequent(consequentId, identification.getMap());
 	}
 
-	public void proveByRule(int consequentId, Rule rule) {
+	public void proveByRule(int consequentId, Rule rule) throws ProverException {
+		if (this.proof.completedConsequents[consequentId]) {
+			throw new ProverException("Consequent is already completed");
+		}
+
 		Formula consequent = this.proof.consequents[consequentId];
 
 		RuleApplicationResult result = rule.apply(consequent);
 		if (result == null) {
-			System.out.println("Given rule can not be applied to the consequent");
-			return;
+			throw new ProverException("Rule can not be applied to consequent");
 		}
 
 		Map<String, Formula> leftoverMap = new HashMap<>();
@@ -99,41 +123,31 @@ public class Prover {
 		for (Map.Entry<String, Formula> entry : result.getConsequentMap().entrySet()) {
 			consequentMap.put(entry.getKey(), entry.getValue().apply(leftoverMap));
 		}
-		updateProofInfo(this.proof, consequentMap);
+		updateProof(this.proof, consequentMap);
 
 		this.proof = new Proof(proofAntecedents, proofConsequents, this.proof, consequentId);
 	}
 
 	private void completeConsequent(int consequentId, Map<String, Formula> map) {
 		this.proof.completedConsequents[consequentId] = true;
-		updateProofInfo(this.proof, map);
+		updateProof(this.proof, map);
 
-		boolean done = true;
-		for (boolean completedConsequent : this.proof.completedConsequents) {
-			if (!completedConsequent) {
-				done = false;
-				break;
-			}
-		}
-
-		if (done) {
+		if (this.proof.isComplete() && !isOnMainProof()) {
 			Proof subproof = this.proof;
 			this.proof = subproof.parent;
-			if (this.proof != null) {
-				completeConsequent(subproof.parentConsequentId, subproof.map);
-			}
+			completeConsequent(subproof.parentConsequentId, subproof.map);
 		}
 	}
 
-	private static void updateProofInfo(Proof proofInfo, Map<String, Formula> map) {
-		proofInfo.map.putAll(map);
+	private static void updateProof(Proof proof, Map<String, Formula> map) {
+		proof.map.putAll(map);
 
-		for (int i = 0; i < proofInfo.antecedents.length; i++) {
-			proofInfo.antecedents[i] = proofInfo.antecedents[i].apply(map);
+		for (int i = 0; i < proof.antecedents.length; i++) {
+			proof.antecedents[i] = proof.antecedents[i].apply(map);
 		}
 
-		for (int i = 0; i < proofInfo.consequents.length; i++) {
-			proofInfo.consequents[i] = proofInfo.consequents[i].apply(map);
+		for (int i = 0; i < proof.consequents.length; i++) {
+			proof.consequents[i] = proof.consequents[i].apply(map);
 		}
 	}
 
