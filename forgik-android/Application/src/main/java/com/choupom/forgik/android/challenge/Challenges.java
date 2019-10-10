@@ -7,11 +7,18 @@ package com.choupom.forgik.android.challenge;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Challenges {
 
     private Challenges() {
         // private constructor
+    }
+
+    public static Challenge getRandomChallenge() {
+        Challenge[] challenges = Challenges.getChallenges();
+        int challengeId = new Random().nextInt(challenges.length);
+        return challenges[challengeId];
     }
 
     public static Challenge[] getChallenges() {
@@ -26,6 +33,8 @@ public class Challenges {
         challenges.add(getChallenge7());
         challenges.add(getChallenge8());
         challenges.add(getChallenge9());
+        challenges.add(getChallenge10());
+        challenges.add(getChallenge11());
         return challenges.toArray(new Challenge[challenges.size()]);
     }
 
@@ -94,10 +103,25 @@ public class Challenges {
         builder.addConsequent("p v -p");
         return builder.build();
     }
+
     private static Challenge getChallenge9() {
+        ChallengeBuilder builder = new ChallengeBuilder(0);
+        builder.addConsequent("-(p ^ -p)");
+        return builder.build();
+    }
+
+    private static Challenge getChallenge10() {
         ChallengeBuilder builder = new ChallengeBuilder(0);
         builder.addAntecedent("-p");
         builder.addConsequent("p > q");
+        return builder.build();
+    }
+
+    private static Challenge getChallenge11() {
+        ChallengeBuilder builder = new ChallengeBuilder(0);
+        builder.addAntecedent("p v q");
+        builder.addAntecedent("-p v r");
+        builder.addConsequent("q v r");
         return builder.build();
     }
 }

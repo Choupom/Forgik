@@ -4,68 +4,97 @@
 
 	Copyright 2019 Andy Poudret. All rights reserved.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <!-- Main layout scroll -->
     <ScrollView android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Main layout -->
         <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TableLayout android:layout_width="match_parent"
+            <!-- Premises list -->
+            <TextView android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:stretchColumns="*"
-                android:background="#EEEEEE">
-                <TableRow android:id="@+id/consequents_table"/>
-            </TableLayout>
-
-            <Space android:layout_width="match_parent"
-                android:layout_height="5dp"/>
-
+                android:text="@string/premises"
+                android:textSize="24dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="5dp"/>
             <TableLayout android:id="@+id/antecedents_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#EEEEEE"/>
 
-            <Space android:layout_width="match_parent"
-                android:layout_height="10dp"/>
-
-            <Button android:id="@+id/prove_implication_button"
-                android:text="@string/prove_implication"
+            <!-- Conclusions list -->
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/conclusions"
+                android:textSize="24dp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="5dp"/>
+            <TableLayout android:id="@+id/consequents_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="24dp"/>
+                android:background="#EEEEEE"/>
 
-            <Button android:id="@+id/prove_by_contradiction_button"
-                android:text="@string/prove_by_contradiction"
+            <!-- Information text -->
+            <TextView android:id="@+id/information_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/please_select_consequent"
+                android:textSize="20dp"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"/>
+
+            <!-- Apply rule text -->
+            <TextView android:id="@+id/apply_rule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/apply_rule"
+                android:textSize="24dp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="5dp"/>
+
+            <!-- Rules list -->
+            <com.google.android.flexbox.FlexboxLayout android:id="@+id/rules_table"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="24dp"/>
-
-            <LinearLayout android:id="@+id/rules_table"
-                android:orientation="vertical"
-                android:showDividers="middle"
-                android:divider="@layout/rule_divider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                app:justifyContent="center"
+                app:flexWrap="wrap"/>
         </LinearLayout>
     </ScrollView>
 
-    <Space android:layout_width="match_parent"
-        android:layout_height="5dp"/>
-
+    <!-- Bottom layout -->
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="bottom">
+        <!-- Spacing -->
+        <Space android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+
+        <!-- Cancel proof button -->
         <Button android:id="@+id/cancel_proof_button"
             android:text="@string/cancel_proof"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:textSize="24dp"/>
+
+        <!-- Complete proof button -->
+        <Button android:id="@+id/reroll_challenge_button"
+            android:text="@string/reroll_challenge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"

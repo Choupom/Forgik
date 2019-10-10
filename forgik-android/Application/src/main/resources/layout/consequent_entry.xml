@@ -4,8 +4,28 @@
 
 	Copyright 2019 Andy Poudret. All rights reserved.
 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="0dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
-    android:textSize="24dp"/>
+    android:orientation="horizontal"
+    android:minHeight="40dp">
+    <TextView android:id="@+id/consequent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="10dp"
+        android:gravity="left"
+        android:textSize="24dp"/>
+
+    <ImageView
+        android:id="@+id/consequent_state"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="7dp"
+        android:paddingTop="3dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/baseline_assignment_black_36"/>
+</RelativeLayout>

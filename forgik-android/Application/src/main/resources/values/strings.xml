@@ -6,7 +6,12 @@
 -->
 <resources>
     <string name="app_name">Forgik</string>
-    <string name="prove_implication">Prove implication</string>
-    <string name="prove_by_contradiction">Prove by contradiction</string>
+    <string name="premises">Premises</string>
+    <string name="conclusions">Conclusions</string>
+    <string name="please_select_consequent">Please select the conclusion that you want to prove first.</string>
+    <string name="congratulations">Congratulations!\nYou have completed this challenge.</string>
+    <string name="apply_rule">Rules</string>
+    <string name="identify">Identify</string>
     <string name="cancel_proof">Cancel proof</string>
+    <string name="reroll_challenge">Reroll challenge</string>
 </resources>
