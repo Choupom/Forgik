@@ -53,7 +53,7 @@ public class ProverTest {
 		prover.proveByRule(0, RULE_IMPLICATION_INTRO);
 		prover.completeConsequent(0, 1);
 
-		Assert.assertNull(prover.getProofInfo());
+		Assert.assertTrue(prover.isMainProofComplete());
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class ProverTest {
 		prover.completeConsequent(0, 1);
 		prover.completeConsequent(1, 0);
 
-		Assert.assertNull(prover.getProofInfo());
+		Assert.assertTrue(prover.isMainProofComplete());
 	}
 
 	@SuppressWarnings("unused")
