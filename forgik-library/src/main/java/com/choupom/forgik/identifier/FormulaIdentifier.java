@@ -24,36 +24,36 @@ public class FormulaIdentifier {
 				return null;
 			}
 
-			String latestVariable = null;
-			for (String variable : map.keySet()) {
-				if (latestVariable == null || variable.compareTo(latestVariable) > 0) {
-					latestVariable = variable;
+			String latestFreeFormula = null;
+			for (String freeFormula : map.keySet()) {
+				if (latestFreeFormula == null || freeFormula.compareTo(latestFreeFormula) > 0) {
+					latestFreeFormula = freeFormula;
 				}
 			}
 
-			if (latestVariable == null) {
+			if (latestFreeFormula == null) {
 				return new Identification(formula1, identificationMap);
 			}
 
-			Formula substitute = map.get(latestVariable).get(0);
+			Formula substitute = map.get(latestFreeFormula).get(0);
 
-			Set<String> freeVariables = new HashSet<>();
-			substitute.getFreeVariables(freeVariables);
-			if (freeVariables.contains(latestVariable)) {
+			Set<String> freeFormulas = new HashSet<>();
+			substitute.getFreeFormulas(freeFormulas);
+			if (freeFormulas.contains(latestFreeFormula)) {
 				return null;
 			}
 
 			Map<String, Formula> newMap = new HashMap<>();
-			newMap.put(latestVariable, substitute);
+			newMap.put(latestFreeFormula, substitute);
 
 			formula1 = formula1.apply(newMap);
 			formula2 = formula2.apply(newMap);
 			for (Map.Entry<String, Formula> entry : identificationMap.entrySet()) {
-				String variable = entry.getKey();
+				String freeFormula = entry.getKey();
 				Formula newFormula = entry.getValue().apply(newMap);
-				identificationMap.put(variable, newFormula);
+				identificationMap.put(freeFormula, newFormula);
 			}
-			identificationMap.put(latestVariable, substitute);
+			identificationMap.put(latestFreeFormula, substitute);
 		}
 	}
 }

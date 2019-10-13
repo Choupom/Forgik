@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.choupom.forgik.formula.Conjunction;
+import com.choupom.forgik.formula.BinaryConnective;
+import com.choupom.forgik.formula.BinaryConnective.Type;
 import com.choupom.forgik.formula.Formula;
-import com.choupom.forgik.formula.Implication;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rulebook.RulebookParser;
@@ -37,8 +37,8 @@ public class Main {
 
 		Formula[] antecedents;
 		Formula[] consequents;
-		if (formula instanceof Implication) {
-			Implication implication = (Implication) formula;
+		if (formula instanceof BinaryConnective && ((BinaryConnective) formula).getType() == Type.IMPLICATION) {
+			BinaryConnective implication = (BinaryConnective) formula;
 
 			List<Formula> antecedentsList = new ArrayList<>();
 			getConjuctions(implication.getOperand1(), antecedentsList);
@@ -59,8 +59,8 @@ public class Main {
 	}
 
 	private static void getConjuctions(Formula formula, List<Formula> list) {
-		if (formula instanceof Conjunction) {
-			Conjunction conjunction = (Conjunction) formula;
+		if (formula instanceof BinaryConnective && ((BinaryConnective) formula).getType() == Type.CONJUNCTION) {
+			BinaryConnective conjunction = (BinaryConnective) formula;
 			getConjuctions(conjunction.getOperand1(), list);
 			getConjuctions(conjunction.getOperand2(), list);
 		} else {

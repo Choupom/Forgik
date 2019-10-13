@@ -42,8 +42,8 @@ public class FormulaIdentifierTest {
 			Assert.assertEquals(stringR, result.getFormula().toString());
 			Formula mapped1 = formula1.apply(result.getMap());
 			Formula mapped2 = formula2.apply(result.getMap());
-			Assert.assertTrue(mapped1.checkEquals(mapped2));
-			Assert.assertTrue(mapped2.checkEquals(mapped1));
+			Assert.assertTrue(mapped1.equals(mapped2));
+			Assert.assertTrue(mapped2.equals(mapped1));
 		}
 	}
 }

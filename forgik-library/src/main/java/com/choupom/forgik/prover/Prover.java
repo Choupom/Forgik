@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.choupom.forgik.formula.Formula;
-import com.choupom.forgik.formula.FreeVariable;
+import com.choupom.forgik.formula.FreeFormula;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.rule.Rule;
@@ -45,11 +45,11 @@ public class Prover {
 		}
 	}
 
-	private int uniqueVariableCounter;
+	private int freeFormulaCounter;
 	private Proof proof;
 
 	public Prover(Formula[] antecedents, Formula[] consequents) {
-		this.uniqueVariableCounter = 0;
+		this.freeFormulaCounter = 0;
 		this.proof = new Proof(antecedents, consequents, null, -1);
 	}
 
@@ -102,8 +102,8 @@ public class Prover {
 		}
 
 		Map<String, Formula> leftoverMap = new HashMap<>();
-		for (String ruleVariable : result.getLeftover()) {
-			leftoverMap.put(ruleVariable, createUniqueVariable());
+		for (String ruleFormula : result.getLeftover()) {
+			leftoverMap.put(ruleFormula, createFreeFormula());
 		}
 
 		Formula[] ruleAssumptions = result.getAssumptions();
@@ -151,13 +151,13 @@ public class Prover {
 		}
 	}
 
-	private FreeVariable createUniqueVariable() {
+	private FreeFormula createFreeFormula() {
 		// TODO: re-use names which are not used anymore
-		if (this.uniqueVariableCounter >= 26) {
+		if (this.freeFormulaCounter >= 26) {
 			throw new IllegalStateException();
 		}
-		char name = (char) ('A' + this.uniqueVariableCounter);
-		this.uniqueVariableCounter++;
-		return new FreeVariable(Character.toString(name));
+		char name = (char) ('A' + this.freeFormulaCounter);
+		this.freeFormulaCounter++;
+		return new FreeFormula(Character.toString(name));
 	}
 }

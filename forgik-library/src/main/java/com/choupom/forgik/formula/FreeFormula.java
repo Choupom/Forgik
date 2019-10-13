@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FreeVariable implements Formula {
+public class FreeFormula implements Formula {
 
 	private final String name;
 
-	public FreeVariable(String name) {
+	public FreeFormula(String name) {
 		if (!Character.isUpperCase(name.charAt(0))) {
 			throw new IllegalArgumentException();
 		}
@@ -36,23 +36,23 @@ public class FreeVariable implements Formula {
 	}
 
 	@Override
-	public boolean checkEquals(Formula formula) {
-		if (!(formula instanceof FreeVariable)) {
+	public boolean equals(Object object) {
+		if (!(object instanceof FreeFormula)) {
 			return false;
 		}
 
-		FreeVariable variable = (FreeVariable) formula;
-		return this.name.equals(variable.name);
+		FreeFormula freeFormula = (FreeFormula) object;
+		return this.name.equals(freeFormula.name);
 	}
 
 	@Override
 	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
-		if (formula instanceof FreeVariable) {
-			FreeVariable variable = (FreeVariable) formula;
-			if (variable.name.equals(this.name)) {
+		if (formula instanceof FreeFormula) {
+			FreeFormula freeFormula = (FreeFormula) formula;
+			if (freeFormula.name.equals(this.name)) {
 				return true;
 			}
-			addToMap(variable.name, this, map);
+			addToMap(freeFormula.name, this, map);
 		}
 
 		addToMap(this.name, formula, map);
@@ -70,8 +70,8 @@ public class FreeVariable implements Formula {
 	}
 
 	@Override
-	public void getFreeVariables(Set<String> variables) {
-		variables.add(this.name);
+	public void getFreeFormulas(Set<String> freeFormulas) {
+		freeFormulas.add(this.name);
 	}
 
 	private static void addToMap(String name, Formula formula, Map<String, List<Formula>> map) {

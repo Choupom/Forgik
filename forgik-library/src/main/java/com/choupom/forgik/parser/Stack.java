@@ -5,11 +5,9 @@
  */
 package com.choupom.forgik.parser;
 
-import com.choupom.forgik.formula.Conjunction;
-import com.choupom.forgik.formula.Disjunction;
+import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
-import com.choupom.forgik.formula.Implication;
-import com.choupom.forgik.formula.Negation;
+import com.choupom.forgik.formula.UnaryConnective;
 
 class Stack {
 
@@ -88,23 +86,23 @@ class Stack {
 		}
 	}
 
-	private Formula reduceUnary(Token operator, Formula f) {
-		switch (operator) {
+	private Formula reduceUnary(Token token, Formula f) {
+		switch (token) {
 		case NEGATION:
-			return new Negation(f);
+			return new UnaryConnective(UnaryConnective.Type.NEGATION, f);
 		default:
 			return null;
 		}
 	}
 
-	private Formula reduceBinary(Token operator, Formula f1, Formula f2) {
-		switch (operator) {
+	private Formula reduceBinary(Token token, Formula f1, Formula f2) {
+		switch (token) {
 		case CONJUNCTION:
-			return new Conjunction(f1, f2);
+			return new BinaryConnective(BinaryConnective.Type.CONJUNCTION, f1, f2);
 		case DISJUNCTION:
-			return new Disjunction(f1, f2);
+			return new BinaryConnective(BinaryConnective.Type.DISJUNCTION, f1, f2);
 		case IMPLICATION:
-			return new Implication(f1, f2);
+			return new BinaryConnective(BinaryConnective.Type.IMPLICATION, f1, f2);
 		default:
 			return null;
 		}

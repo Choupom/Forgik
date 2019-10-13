@@ -13,7 +13,7 @@ import com.choupom.forgik.formula.Formula;
 public class FormulaParserTest {
 
 	@Test
-	public void testVariable() {
+	public void testPredicate() {
 		String string = "test";
 		Formula formula = FormulaParser.parse(string);
 		Assert.assertEquals(string, formula.toString());
@@ -28,7 +28,7 @@ public class FormulaParserTest {
 
 	@Test
 	public void testComplex() {
-		String string = "(p > q) > ((q > r) > (p > r))";
+		String string = "-(p > q) > ((q v r) > (p ^ r))";
 		Formula formula = FormulaParser.parse(string);
 		Assert.assertEquals(string, formula.toString());
 	}

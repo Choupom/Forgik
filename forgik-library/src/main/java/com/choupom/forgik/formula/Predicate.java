@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BoundVariable implements Formula {
+public class Predicate implements Formula {
 
 	private final String name;
 
-	public BoundVariable(String name) {
+	public Predicate(String name) {
 		if (!Character.isLowerCase(name.charAt(0))) {
 			throw new IllegalArgumentException();
 		}
@@ -35,28 +35,28 @@ public class BoundVariable implements Formula {
 	}
 
 	@Override
-	public boolean checkEquals(Formula formula) {
-		if (!(formula instanceof BoundVariable)) {
+	public boolean equals(Object object) {
+		if (!(object instanceof Predicate)) {
 			return false;
 		}
 
-		BoundVariable variable = (BoundVariable) formula;
-		return this.name.equals(variable.name);
+		Predicate predicate = (Predicate) object;
+		return this.name.equals(predicate.name);
 	}
 
 	@Override
 	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
-		if (formula instanceof FreeVariable) {
-			FreeVariable variable = (FreeVariable) formula;
-			return variable.identify(this, map);
+		if (formula instanceof FreeFormula) {
+			FreeFormula freeFormula = (FreeFormula) formula;
+			return freeFormula.identify(this, map);
 		}
 
-		if (!(formula instanceof BoundVariable)) {
+		if (!(formula instanceof Predicate)) {
 			return false;
 		}
 
-		BoundVariable variable = (BoundVariable) formula;
-		return this.name.equals(variable.name);
+		Predicate predicate = (Predicate) formula;
+		return this.name.equals(predicate.name);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class BoundVariable implements Formula {
 	}
 
 	@Override
-	public void getFreeVariables(Set<String> variables) {
+	public void getFreeFormulas(Set<String> freeFormulas) {
 		// do nothing
 	}
 }

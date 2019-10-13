@@ -13,11 +13,9 @@ public interface Formula {
 
 	String toStringNested();
 
-	boolean checkEquals(Formula formula);
-
 	boolean identify(Formula formula, Map<String, List<Formula>> map);
 
 	Formula apply(Map<String, Formula> map);
 
-	void getFreeVariables(Set<String> variables);
+	void getFreeFormulas(Set<String> freeFormulas);
 }

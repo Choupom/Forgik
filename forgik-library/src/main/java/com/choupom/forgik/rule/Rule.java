@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
-import com.choupom.forgik.formula.FormulaSettings;
-import com.choupom.forgik.formula.FreeVariable;
+import com.choupom.forgik.formula.FreeFormula;
 
 public class Rule {
 
@@ -21,7 +20,7 @@ public class Rule {
 	private final Formula[] assumptions;
 	private final Formula[] antecedents;
 	private final Formula consequent;
-	private final String[] freeVariables;
+	private final String[] freeFormulas;
 
 	public Rule(String name, Formula[] assumptions, Formula[] antecedents, Formula consequent) {
 		this.name = name;
@@ -29,25 +28,19 @@ public class Rule {
 		this.antecedents = antecedents;
 		this.consequent = consequent;
 
-		Set<String> freeVariablesSet = new HashSet<>();
+		Set<String> freeFormulasSet = new HashSet<>();
 		for (Formula ruleAssumption : assumptions) {
-			ruleAssumption.getFreeVariables(freeVariablesSet);
+			ruleAssumption.getFreeFormulas(freeFormulasSet);
 		}
 		for (Formula ruleAntecedent : antecedents) {
-			ruleAntecedent.getFreeVariables(freeVariablesSet);
+			ruleAntecedent.getFreeFormulas(freeFormulasSet);
 		}
-		consequent.getFreeVariables(freeVariablesSet);
-		this.freeVariables = freeVariablesSet.toArray(new String[freeVariablesSet.size()]);
+		consequent.getFreeFormulas(freeFormulasSet);
+		this.freeFormulas = freeFormulasSet.toArray(new String[freeFormulasSet.size()]);
 	}
 
 	public String getName() {
-		FormulaSettings settings = FormulaSettings.getInstance();
-		String string = this.name;
-		string = string.replace(FormulaSettings.DEFAULT_CONJUNCTION_STRING, settings.getConjunctionString());
-		string = string.replace(FormulaSettings.DEFAULT_DISJUNCTION_STRING, settings.getDisjunctionString());
-		string = string.replace(FormulaSettings.DEFAULT_IMPLICATION_STRING, settings.getImplicationString());
-		string = string.replace(FormulaSettings.DEFAULT_NEGATION_STRING, settings.getNegationString());
-		return string;
+		return this.name;
 	}
 
 	@Override
@@ -82,9 +75,9 @@ public class Rule {
 		}
 
 		Set<String> leftover = new HashSet<>();
-		for (String freeVariable : this.freeVariables) {
-			if (!simpleMap.containsKey(freeVariable)) {
-				leftover.add(freeVariable);
+		for (String freeFormula : this.freeFormulas) {
+			if (!simpleMap.containsKey(freeFormula)) {
+				leftover.add(freeFormula);
 			}
 		}
 
@@ -99,14 +92,14 @@ public class Rule {
 		}
 
 		Map<String, Formula> consequentMap = new HashMap<>();
-		Set<String> consequentVariables = new HashSet<>();
-		consequent.getFreeVariables(consequentVariables);
-		for (String consequentVariable : consequentVariables) {
-			Formula mapped = simpleMap.get(consequentVariable);
+		Set<String> consequentFreeFormulas = new HashSet<>();
+		consequent.getFreeFormulas(consequentFreeFormulas);
+		for (String consequentFreeFormula : consequentFreeFormulas) {
+			Formula mapped = simpleMap.get(consequentFreeFormula);
 			if (mapped != null) {
 				mapped = mapped.apply(simpleMap);
-				if (!mapped.checkEquals(new FreeVariable(consequentVariable))) {
-					consequentMap.put(consequentVariable, mapped);
+				if (!mapped.equals(new FreeFormula(consequentFreeFormula))) {
+					consequentMap.put(consequentFreeFormula, mapped);
 				}
 			}
 		}
@@ -121,7 +114,7 @@ public class Rule {
 
 		Formula reference = formulas.get(0);
 		for (int i = 1; i < formulas.size(); i++) {
-			if (!formulas.get(i).checkEquals(reference)) {
+			if (!formulas.get(i).equals(reference)) {
 				return false;
 			}
 		}

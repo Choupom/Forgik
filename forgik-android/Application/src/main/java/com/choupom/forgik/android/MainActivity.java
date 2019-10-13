@@ -19,8 +19,9 @@ import android.widget.TextView;
 
 import com.choupom.forgik.android.challenge.Challenge;
 import com.choupom.forgik.android.challenge.Challenges;
+import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
-import com.choupom.forgik.formula.FormulaSettings;
+import com.choupom.forgik.formula.UnaryConnective;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.prover.ProofInfo;
@@ -38,10 +39,10 @@ public class MainActivity extends Activity {
 
     private static final String RULEBOOK = "classical_logic";
 
-    private static final String CONJUNCTION_STRING = "\u2227";
-    private static final String DISJUNCTION_STRING = "\u2228";
-	private static final String IMPLICATION_STRING = "\u279D";
-	private static final String NEGATION_STRING = "\u00AC";
+    private static final String NEGATION_SYMBOL = "\u00AC";
+    private static final String IMPLICATION_SYMBOL = "\u279D";
+    private static final String CONJUNCTION_SYMBOL = "\u2227";
+    private static final String DISJUNCTION_SYMBOL = "\u2228";
 
     private static final int[] RULES_PER_ROW = new int[] {2, 3, 3, 3};
 
@@ -50,12 +51,6 @@ public class MainActivity extends Activity {
     private int selectedConsequentId;
 
     public MainActivity() throws IOException {
-        FormulaSettings settings = FormulaSettings.getInstance();
-        settings.setConjunctionString(CONJUNCTION_STRING);
-        settings.setDisjunctionString(DISJUNCTION_STRING);
-        settings.setImplicationString(IMPLICATION_STRING);
-        settings.setNegationString(NEGATION_STRING);
-
         this.rules = RulebookParser.parseRulebook(RULEBOOK).getRules();
 
         Challenge challenge = Challenges.getRandomChallenge();
@@ -184,7 +179,7 @@ public class MainActivity extends Activity {
         View row = getLayoutInflater().inflate(R.layout.antecedent_entry, null);
 
         TextView leftFormulaView = row.findViewById(R.id.antecedent);
-        leftFormulaView.setText(antecedent.toString());
+        leftFormulaView.setText(replaceConnectiveSymbols(antecedent.toString()));
 
         Button identifyButton = row.findViewById(R.id.identify);
         identifyButton.setEnabled(identifiable);
@@ -212,7 +207,7 @@ public class MainActivity extends Activity {
         }
 
         TextView leftFormulaView = row.findViewById(R.id.consequent);
-        leftFormulaView.setText(consequent.toString());
+        leftFormulaView.setText(replaceConnectiveSymbols(consequent.toString()));
 
         ImageView stateImage = row.findViewById(R.id.consequent_state);
         if (completedConsequent) {
@@ -234,7 +229,7 @@ public class MainActivity extends Activity {
                 proveByRule(rule);
             }
         });
-        String ruleName = rule.getName();
+        String ruleName = replaceConnectiveSymbols(rule.getName());
         ruleName = ruleName.replace("1", "<sub><small>1</small></sub>");
         ruleName = ruleName.replace("2", "<sub><small>2</small></sub>");
         button.setText(Html.fromHtml(ruleName));
@@ -305,5 +300,13 @@ public class MainActivity extends Activity {
         }
 
         updateView();
+    }
+
+    private static String replaceConnectiveSymbols(String string) {
+        string = string.replace(UnaryConnective.Type.NEGATION.getSymbol(), NEGATION_SYMBOL);
+        string = string.replace(BinaryConnective.Type.IMPLICATION.getSymbol(), IMPLICATION_SYMBOL);
+        string = string.replace(BinaryConnective.Type.CONJUNCTION.getSymbol(), CONJUNCTION_SYMBOL);
+        string = string.replace(BinaryConnective.Type.DISJUNCTION.getSymbol(), DISJUNCTION_SYMBOL);
+        return string;
     }
 }
