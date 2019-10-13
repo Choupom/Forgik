@@ -64,13 +64,10 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="5dp"/>
 
-            <!-- Rules list -->
-            <com.google.android.flexbox.FlexboxLayout android:id="@+id/rules_table"
-                android:orientation="horizontal"
+            <!-- Rules table -->
+            <TableLayout android:id="@+id/rules_table"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:justifyContent="center"
-                app:flexWrap="wrap"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </ScrollView>
 

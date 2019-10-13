@@ -21,7 +21,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.android:flexbox:1.0.0'
     implementation 'com.google.firebase:firebase-appindexing:19.0.0'
     implementation files('libs/forgik.jar')
 }

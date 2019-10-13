@@ -9,10 +9,12 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.choupom.forgik.android.challenge.Challenge;
@@ -26,7 +28,6 @@ import com.choupom.forgik.prover.Prover;
 import com.choupom.forgik.prover.ProverException;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rulebook.RulebookParser;
-import com.google.android.flexbox.FlexboxLayout;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -41,6 +42,8 @@ public class MainActivity extends Activity {
     private static final String DISJUNCTION_STRING = "\u2228";
 	private static final String IMPLICATION_STRING = "\u279D";
 	private static final String NEGATION_STRING = "\u00AC";
+
+    private static final int[] RULES_PER_ROW = new int[] {2, 3, 3, 3};
 
     private final Rule[] rules;
     private Prover prover;
@@ -97,47 +100,12 @@ public class MainActivity extends Activity {
 		}
 
         // update antecedents table
-        TableLayout antecedentsTable = findViewById(R.id.antecedents_table);
-        antecedentsTable.removeAllViews();
-
-        for (int i = 0; i < antecedents.length; i++) {
-            Formula antecedent = antecedents[i];
-            final int antecedentId = i;
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    completeConsequent(antecedentId);
-                }
-            };
-            boolean identifiable = false;
-            if (selectedConsequent != null) {
-                Identification identification = FormulaIdentifier.identify(antecedent, selectedConsequent);
-                identifiable = (identification != null);
-            }
-            View view = createAntecedentView(antecedent, identifiable, onClickListener);
-            antecedentsTable.addView(view);
-        }
+        updateAntecedentsTable(antecedents, selectedConsequent);
 
         // update consequents table
-        TableLayout consequentsTable = findViewById(R.id.consequents_table);
-        consequentsTable.removeAllViews();
+        updateConsequentsTable(consequents, completedConsequents);
 
-        for (int i = 0; i < consequents.length; i++) {
-            Formula consequent = consequents[i];
-            final int consequentId = i;
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    selectConsequent(consequentId);
-                }
-            };
-            boolean isSelected = (this.selectedConsequentId == i);
-            boolean isCompleted = completedConsequents[i];
-            View view = createConsequentView(consequent, onClickListener, isSelected, isCompleted);
-            consequentsTable.addView(view);
-        }
-
-        // update please select consequent text
+        // update information text
         TextView informationText = findViewById(R.id.information_text);
         informationText.setVisibility(selectedConsequent == null ? View.VISIBLE : View.GONE);
         if (this.prover.isMainProofComplete()) {
@@ -151,51 +119,109 @@ public class MainActivity extends Activity {
         applyRuleView.setVisibility(selectedConsequent != null ? View.VISIBLE : View.GONE);
 
         // update rules table
-        FlexboxLayout rulesTable = findViewById(R.id.rules_table);
-        rulesTable.removeAllViews();
-
-        if (selectedConsequent != null) {
-            for (Rule rule : this.rules) {
-                View view = createRuleView(rule);
-                rulesTable.addView(view);
-            }
-        }
+        updateRulesTable();
 
         // update cancel proof button
         Button cancelProofButton = findViewById(R.id.cancel_proof_button);
         cancelProofButton.setEnabled(!this.prover.isOnMainProof());
     }
 
-    private View createAntecedentView(Formula antecedent, boolean identifiable, View.OnClickListener onClickListener) {
+    private void updateAntecedentsTable(Formula[] antecedents, Formula selectedConsequent) {
+        TableLayout antecedentsTable = findViewById(R.id.antecedents_table);
+        antecedentsTable.removeAllViews();
+
+        for (int i = 0; i < antecedents.length; i++) {
+            View view = createAntecedentView(i, antecedents[i], selectedConsequent);
+            antecedentsTable.addView(view);
+        }
+    }
+
+    private void updateConsequentsTable(Formula[] consequents, boolean[] completedConsequents) {
+        TableLayout consequentsTable = findViewById(R.id.consequents_table);
+        consequentsTable.removeAllViews();
+
+        for (int i = 0; i < consequents.length; i++) {
+            View view = createConsequentView(i, consequents[i], completedConsequents[i]);
+            consequentsTable.addView(view);
+        }
+    }
+
+    private void updateRulesTable() {
+        TableLayout rulesTable = findViewById(R.id.rules_table);
+        rulesTable.removeAllViews();
+
+        if (this.selectedConsequentId != -1) {
+            TableRow row = null;
+            int rowIndex = 0;
+            int rowCount = 0;
+
+            for (int i = 0; i < this.rules.length; i++) {
+                if (row == null) {
+                    row = new TableRow(this);
+                    row.setGravity(Gravity.CENTER_HORIZONTAL);
+                    rulesTable.addView(row);
+                }
+
+                View view = createRuleView(this.rules[i]);
+                row.addView(view);
+
+                if (i+1 >= rowCount+RULES_PER_ROW[rowIndex]) {
+                    row = null;
+                    rowCount += RULES_PER_ROW[rowIndex];
+                    rowIndex++;
+                }
+            }
+        }
+    }
+
+    private View createAntecedentView(final int antecedentId, Formula antecedent, Formula selectedConsequent) {
+        boolean identifiable = false;
+        if (selectedConsequent != null) {
+            Identification identification = FormulaIdentifier.identify(antecedent, selectedConsequent);
+            identifiable = (identification != null);
+        }
+
         View row = getLayoutInflater().inflate(R.layout.antecedent_entry, null);
 
         TextView leftFormulaView = row.findViewById(R.id.antecedent);
         leftFormulaView.setText(antecedent.toString());
 
         Button identifyButton = row.findViewById(R.id.identify);
-        identifyButton.setOnClickListener(onClickListener);
         identifyButton.setEnabled(identifiable);
+        identifyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                completeConsequent(antecedentId);
+            }
+        });
 
         return row;
     }
 
-    private View createConsequentView(Formula formula, View.OnClickListener onClickListener,
-                                      boolean isSelected, boolean isCompleted) {
+    private View createConsequentView(final int consequentId, Formula consequent, boolean completedConsequent) {
         View row = getLayoutInflater().inflate(R.layout.consequent_entry, null);
-        row.setOnClickListener(onClickListener);
-        row.setEnabled(!isCompleted);
-        if (isSelected) {
+        row.setEnabled(!completedConsequent);
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectConsequent(consequentId);
+            }
+        });
+        if (consequentId == this.selectedConsequentId) {
             row.setBackgroundColor(Color.parseColor("#DDDDFF"));
         }
 
         TextView leftFormulaView = row.findViewById(R.id.consequent);
-        leftFormulaView.setText(formula.toString());
+        leftFormulaView.setText(consequent.toString());
 
         ImageView stateImage = row.findViewById(R.id.consequent_state);
-        int image = (isCompleted ? R.drawable.baseline_assignment_turned_in_black_24 : R.drawable.baseline_assignment_black_24);
-        String color = (isCompleted ? "#22BB55" : "#AA3355");
-        stateImage.setImageResource(image);
-        stateImage.setColorFilter(Color.parseColor(color));
+        if (completedConsequent) {
+            stateImage.setImageResource(R.drawable.baseline_assignment_turned_in_black_24);
+            stateImage.setColorFilter(Color.parseColor("#22BB55"));
+        } else {
+            stateImage.setImageResource(R.drawable.baseline_assignment_black_24);
+            stateImage.setColorFilter(Color.parseColor("#AA3355"));
+        }
 
         return row;
     }
