@@ -1,6 +1,7 @@
 /.gradle
 /.idea
 /Application/build/
+/Application/release/
 /Application/Application.iml
 /build/
 /gradle/
