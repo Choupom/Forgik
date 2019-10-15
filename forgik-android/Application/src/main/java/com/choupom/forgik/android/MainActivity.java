@@ -48,13 +48,18 @@ public class MainActivity extends Activity {
 
     private final Rule[] rules;
     private Prover prover;
+    private int currentChallengeIndex;
     private int selectedConsequentId;
 
     public MainActivity() throws IOException {
         this.rules = RulebookParser.parseRulebook(RULEBOOK).getRules();
+        loadChallenge(0);
+    }
 
-        Challenge challenge = Challenges.getRandomChallenge();
+    private void loadChallenge(int index) {
+        Challenge challenge = Challenges.getChallenge(index);
         this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
+        this.currentChallengeIndex = index;
     }
 
     @Override
@@ -71,11 +76,11 @@ public class MainActivity extends Activity {
             }
         });
 
-        Button rerollChallengeButton = findViewById(R.id.reroll_challenge_button);
-        rerollChallengeButton.setOnClickListener(new View.OnClickListener() {
+        Button nextChallengeButton = findViewById(R.id.next_challenge_button);
+        nextChallengeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                rerollChallenge();
+                nextChallenge();
             }
         });
 
@@ -119,6 +124,10 @@ public class MainActivity extends Activity {
         // update cancel proof button
         Button cancelProofButton = findViewById(R.id.cancel_proof_button);
         cancelProofButton.setEnabled(!this.prover.isOnMainProof());
+
+        // update next challenge button
+        Button nextChallengeButton = findViewById(R.id.next_challenge_button);
+        nextChallengeButton.setEnabled(this.prover.isMainProofComplete());
     }
 
     private void updateAntecedentsTable(Formula[] antecedents, Formula selectedConsequent) {
@@ -275,9 +284,13 @@ public class MainActivity extends Activity {
         resetProofState();
     }
 
-    private void rerollChallenge() {
-        Challenge challenge = Challenges.getRandomChallenge();
-        this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
+    private void nextChallenge() {
+        int newIndex = this.currentChallengeIndex+1;
+        if (newIndex == Challenges.getNumChallenges()) {
+            newIndex = 0;
+        }
+
+        loadChallenge(newIndex);
         resetProofState();
     }
 

@@ -89,9 +89,9 @@
             android:layout_gravity="bottom"
             android:textSize="24dp"/>
 
-        <!-- Complete proof button -->
-        <Button android:id="@+id/reroll_challenge_button"
-            android:text="@string/reroll_challenge"
+        <!-- Next challenge button -->
+        <Button android:id="@+id/next_challenge_button"
+            android:text="@string/next_challenge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"

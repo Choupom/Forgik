@@ -7,21 +7,24 @@ package com.choupom.forgik.android.challenge;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Challenges {
+
+    private static final Challenge[] CHALLENGES = createChallenges();
 
     private Challenges() {
         // private constructor
     }
 
-    public static Challenge getRandomChallenge() {
-        Challenge[] challenges = Challenges.getChallenges();
-        int challengeId = new Random().nextInt(challenges.length);
-        return challenges[challengeId];
+    public static int getNumChallenges() {
+        return CHALLENGES.length;
     }
 
-    public static Challenge[] getChallenges() {
+    public static Challenge getChallenge(int index) {
+        return CHALLENGES[index];
+    }
+
+    private static Challenge[] createChallenges() {
         List<Challenge> challenges = new ArrayList<>();
         challenges.add(getChallenge0());
         challenges.add(getChallenge1());

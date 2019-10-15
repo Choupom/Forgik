@@ -13,5 +13,5 @@
     <string name="apply_rule">Rules</string>
     <string name="identify">Identify</string>
     <string name="cancel_proof">Cancel proof</string>
-    <string name="reroll_challenge">Reroll challenge</string>
+    <string name="next_challenge">Next challenge</string>
 </resources>
