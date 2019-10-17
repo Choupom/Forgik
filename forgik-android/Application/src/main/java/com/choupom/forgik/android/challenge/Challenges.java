@@ -38,6 +38,7 @@ public class Challenges {
         challenges.add(getChallenge9());
         challenges.add(getChallenge10());
         challenges.add(getChallenge11());
+        challenges.add(getChallenge12());
         return challenges.toArray(new Challenge[challenges.size()]);
     }
 
@@ -125,6 +126,14 @@ public class Challenges {
         builder.addAntecedent("p v q");
         builder.addAntecedent("-p v r");
         builder.addConsequent("q v r");
+        return builder.build();
+    }
+
+    private static Challenge getChallenge12() {
+        ChallengeBuilder builder = new ChallengeBuilder(0);
+        builder.addAntecedent("p > (q v r)");
+        builder.addAntecedent("q > -p");
+        builder.addConsequent("p > r");
         return builder.build();
     }
 }
