@@ -4,7 +4,7 @@
 
 	Copyright 2019 Andy Poudret. All rights reserved.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,7 +12,8 @@
 
     <!-- Main layout scroll -->
     <ScrollView android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/footer">
 
         <!-- Main layout -->
         <LinearLayout android:orientation="vertical"
@@ -72,21 +73,21 @@
     </ScrollView>
 
     <!-- Bottom layout -->
-    <LinearLayout android:orientation="vertical"
+    <LinearLayout android:id="@+id/footer"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="bottom">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
         <!-- Spacing -->
         <Space android:layout_width="match_parent"
-            android:layout_height="10dp"/>
+            android:layout_height="5dp"/>
 
         <!-- Cancel proof button -->
         <Button android:id="@+id/cancel_proof_button"
             android:text="@string/cancel_proof"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
             android:textSize="24dp"/>
 
         <!-- Next challenge button -->
@@ -94,7 +95,6 @@
             android:text="@string/next_challenge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
             android:textSize="24dp"/>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
