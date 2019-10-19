@@ -1,6 +1,6 @@
 {
 	"name": "Challenge #2",
-	"difficulty": 3,
+	"difficulty": 2,
 	"rulebook": "classical_logic",
 	"antecedents": [
 		"P"

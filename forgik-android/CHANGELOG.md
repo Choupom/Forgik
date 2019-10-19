@@ -4,6 +4,10 @@
 	Copyright 2019 Andy Poudret. All rights reserved.
 -->
 
+# 1.0.4 (2019-10-19)
+  - Sort challenges by difficulty.
+  - Remove storage permission requirement.
+
 # 1.0.3 (2019-10-19)
   - Add new challenge.
   - Improve UI accessibility.

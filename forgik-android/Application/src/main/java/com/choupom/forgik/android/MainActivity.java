@@ -19,7 +19,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.choupom.forgik.challenge.Challenge;
-import com.choupom.forgik.challenge.ChallengeParser;
 import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.FreeFormula;
@@ -41,10 +40,6 @@ public class MainActivity extends Activity {
 
     private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
-    private static final String[] CHALLENGES = new String[] { "modus_tollens", "hypothetical_syllogism",
-			"challenge1", "challenge2", "challenge3", "challenge4", "challenge5", "challenge6",
-			"challenge7", "challenge8", "challenge9", "challenge10", "challenge11" };
-
     private static final String FREE_FORMULA_SYMBOL = "\u03C6";
     private static final String NEGATION_SYMBOL = "\u00AC";
     private static final String IMPLICATION_SYMBOL = "\u279D";
@@ -53,6 +48,8 @@ public class MainActivity extends Activity {
 
     private static final int[] RULES_PER_ROW = new int[] {2, 3, 3, 3};
 
+    private Challenge[] challenges;
+
     private int currentChallengeIndex;
     private Rule[] rules;
     private Prover prover;
@@ -60,12 +57,21 @@ public class MainActivity extends Activity {
     private int selectedConsequentId;
 
     public MainActivity() {
+        this.challenges = loadChallenges();
         loadChallenge(0);
+    }
+
+    private Challenge[] loadChallenges() {
+        try {
+            return ChallengesHelper.loadSortedChallenges();
+        } catch (IOException | FormulaParserException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private void loadChallenge(int index) {
         try {
-            Challenge challenge = ChallengeParser.parseChallenge(CHALLENGES[index]);
+            Challenge challenge = this.challenges[index];
             Rulebook rulebook = RulebookParser.parseRulebook(challenge.getRulebook());
             this.rules = rulebook.getRules();
             this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
@@ -300,7 +306,7 @@ public class MainActivity extends Activity {
 
     private void nextChallenge() {
         int newIndex = this.currentChallengeIndex + 1;
-        if (newIndex == CHALLENGES.length) {
+        if (newIndex == challenges.length) {
             newIndex = 0;
         }
 
