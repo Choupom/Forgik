@@ -1,0 +1,12 @@
+{
+	"name": "Hypothetical syllogism",
+	"difficulty": 2,
+	"rulebook": "classical_logic",
+	"antecedents": [
+		"P > Q",
+		"Q > R"
+	],
+	"consequents": [
+		"P > R"
+	]
+}

@@ -14,12 +14,12 @@ import com.choupom.forgik.formula.Predicate;
 
 public class FormulaParser {
 
-	public static Formula parse(String string) {
+	public static Formula parse(String string) throws FormulaParserException {
 		TokenInfo[] tokens = tokenize(string.toCharArray());
 		return createFormula(tokens);
 	}
 
-	private static TokenInfo[] tokenize(char[] chars) {
+	private static TokenInfo[] tokenize(char[] chars) throws FormulaParserException {
 		List<TokenInfo> tokens = new ArrayList<>(chars.length + 1);
 
 		int stringStart = -1;
@@ -50,15 +50,25 @@ public class FormulaParser {
 		return tokens.toArray(new TokenInfo[tokens.size()]);
 	}
 
-	private static Formula createFormulaFromString(String string) {
+	private static Formula createFormulaFromString(String string) throws FormulaParserException {
+		// free formula
 		if (string.startsWith(FreeFormula.STRING_PREFIX)) {
 			return new FreeFormula(Integer.parseInt(string.substring(1)));
-		} else {
-			return new Predicate(string);
 		}
+
+		// predicate
+		if (string.length() == 1){
+			char predicateName = string.charAt(0);
+			if (Character.isUpperCase(predicateName)) {
+				return new Predicate(predicateName);
+			}
+		}
+
+		// invalid token
+		throw new FormulaParserException("Invalid token " + string);
 	}
 
-	private static Formula createFormula(TokenInfo[] tokens) {
+	private static Formula createFormula(TokenInfo[] tokens) throws FormulaParserException {
 		if (tokens.length == 0) {
 			return null;
 		}
@@ -75,8 +85,7 @@ public class FormulaParser {
 				} else if (token == Token.NEGATION || token == Token.LEFT_PARENTHESIS) {
 					state = 0;
 				} else {
-					System.out.println("Invalid token " + token + " at state " + state);
-					throw new IllegalStateException();
+					throw new FormulaParserException("Invalid token " + token + " at state " + state);
 				}
 				stack.shift(tokenInfo);
 			} else if (state == 1) {
@@ -87,14 +96,12 @@ public class FormulaParser {
 				} else if (token == Token.EOF) {
 					state = 2;
 				} else {
-					System.out.println("Invalid token " + token + " at state " + state);
-					throw new IllegalStateException();
+					throw new FormulaParserException("Invalid token " + token + " at state " + state);
 				}
 				stack.reduce();
 				stack.shift(tokenInfo);
 			} else if (state == 2) {
-				System.out.println("Invalid token " + token + " at state " + state);
-				throw new IllegalStateException();
+				throw new FormulaParserException("Invalid token " + token + " at state " + state);
 			}
 		}
 

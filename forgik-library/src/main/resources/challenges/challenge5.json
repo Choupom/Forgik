@@ -1,0 +1,11 @@
+{
+	"name": "Challenge #5",
+	"difficulty": 1,
+	"rulebook": "classical_logic",
+	"antecedents": [
+		"P v (P ^ P)"
+	],
+	"consequents": [
+		"P"
+	]
+}

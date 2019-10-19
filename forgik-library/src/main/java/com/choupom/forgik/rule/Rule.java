@@ -24,19 +24,10 @@ public class Rule {
 
 	public Rule(String name, Formula[] assumptions, Formula[] antecedents, Formula consequent) {
 		this.name = name;
-		this.assumptions = assumptions;
-		this.antecedents = antecedents;
+		this.assumptions = assumptions.clone();
+		this.antecedents = antecedents.clone();
 		this.consequent = consequent;
-
-		Set<Integer> freeFormulasSet = new HashSet<>();
-		for (Formula ruleAssumption : assumptions) {
-			ruleAssumption.getFreeFormulas(freeFormulasSet);
-		}
-		for (Formula ruleAntecedent : antecedents) {
-			ruleAntecedent.getFreeFormulas(freeFormulasSet);
-		}
-		consequent.getFreeFormulas(freeFormulasSet);
-		this.freeFormulas = freeFormulasSet.toArray(new Integer[freeFormulasSet.size()]);
+		this.freeFormulas = getFreeFormulas(assumptions, antecedents, consequent);
 	}
 
 	public String getName() {
@@ -120,5 +111,17 @@ public class Rule {
 		}
 
 		return true;
+	}
+
+	private static Integer[] getFreeFormulas(Formula[] assumptions, Formula[] antecedents, Formula consequent) {
+		Set<Integer> freeFormulasSet = new HashSet<>();
+		for (Formula ruleAssumption : assumptions) {
+			ruleAssumption.getFreeFormulas(freeFormulasSet);
+		}
+		for (Formula ruleAntecedent : antecedents) {
+			ruleAntecedent.getFreeFormulas(freeFormulasSet);
+		}
+		consequent.getFreeFormulas(freeFormulasSet);
+		return freeFormulasSet.toArray(new Integer[freeFormulasSet.size()]);
 	}
 }

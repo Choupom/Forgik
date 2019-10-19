@@ -12,13 +12,14 @@ import org.junit.Test;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.parser.FormulaParser;
+import com.choupom.forgik.parser.FormulaParserException;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rule.RuleParser;
 
 public class ProverTest {
 
-	private static final Formula[] ANTECEDENTS = new Formula[] { FormulaParser.parse("-(p > q)") };
-	private static final Formula[] CONSEQUENTS = new Formula[] { FormulaParser.parse("p"), FormulaParser.parse("-q") };
+	private static final Formula[] ANTECEDENTS;
+	private static final Formula[] CONSEQUENTS;
 
 	private static final Rule RULE_DOUBLE_NEG_ELIMINATION;
 	private static final Rule RULE_EFQ;
@@ -27,11 +28,13 @@ public class ProverTest {
 
 	static {
 		try {
+			ANTECEDENTS = new Formula[] { FormulaParser.parse("-(P > Q)") };
+			CONSEQUENTS = new Formula[] { FormulaParser.parse("P"), FormulaParser.parse("-Q") };
 			RULE_DOUBLE_NEG_ELIMINATION = RuleParser.parseRule("double_neg_elim");
 			RULE_EFQ = RuleParser.parseRule("efq");
 			RULE_IMPLICATION_INTRO = RuleParser.parseRule("implication_intro");
 			RULE_RAA = RuleParser.parseRule("raa");
-		} catch (IOException e) {
+		} catch (IOException | FormulaParserException e) {
 			throw new IllegalStateException(e);
 		}
 	}

@@ -1,0 +1,12 @@
+{
+	"name": "Modus tollens",
+	"difficulty": 3,
+	"rulebook": "classical_logic",
+	"antecedents": [
+		"P > Q",
+		"-Q"
+	],
+	"consequents": [
+		"-P"
+	]
+}

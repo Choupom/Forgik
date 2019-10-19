@@ -18,19 +18,20 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.choupom.forgik.android.challenge.Challenge;
-import com.choupom.forgik.android.challenge.Challenges;
+import com.choupom.forgik.challenge.Challenge;
+import com.choupom.forgik.challenge.ChallengeParser;
 import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.FreeFormula;
 import com.choupom.forgik.formula.UnaryConnective;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
+import com.choupom.forgik.parser.FormulaParserException;
 import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
 import com.choupom.forgik.prover.ProverException;
 import com.choupom.forgik.rule.Rule;
-import com.choupom.forgik.rule.RuleApplicationResult;
+import com.choupom.forgik.rulebook.Rulebook;
 import com.choupom.forgik.rulebook.RulebookParser;
 
 import java.io.IOException;
@@ -40,7 +41,9 @@ public class MainActivity extends Activity {
 
     private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
-    private static final String RULEBOOK = "classical_logic";
+    private static final String[] CHALLENGES = new String[] { "modus_tollens", "hypothetical_syllogism",
+			"challenge1", "challenge2", "challenge3", "challenge4", "challenge5", "challenge6",
+			"challenge7", "challenge8", "challenge9", "challenge10", "challenge11" };
 
     private static final String FREE_FORMULA_SYMBOL = "\u03C6";
     private static final String NEGATION_SYMBOL = "\u00AC";
@@ -50,20 +53,26 @@ public class MainActivity extends Activity {
 
     private static final int[] RULES_PER_ROW = new int[] {2, 3, 3, 3};
 
-    private final Rule[] rules;
-    private Prover prover;
     private int currentChallengeIndex;
+    private Rule[] rules;
+    private Prover prover;
+
     private int selectedConsequentId;
 
-    public MainActivity() throws IOException {
-        this.rules = RulebookParser.parseRulebook(RULEBOOK).getRules();
+    public MainActivity() {
         loadChallenge(0);
     }
 
     private void loadChallenge(int index) {
-        Challenge challenge = Challenges.getChallenge(index);
-        this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
-        this.currentChallengeIndex = index;
+        try {
+            Challenge challenge = ChallengeParser.parseChallenge(CHALLENGES[index]);
+            Rulebook rulebook = RulebookParser.parseRulebook(challenge.getRulebook());
+            this.rules = rulebook.getRules();
+            this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
+            this.currentChallengeIndex = index;
+        } catch (IOException | FormulaParserException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
@@ -92,16 +101,16 @@ public class MainActivity extends Activity {
     }
 
     private void updateView() {
-    	// get proof info
+        // get proof info
         ProofInfo proofInfo = this.prover.getProofInfo();
         Formula[] antecedents = proofInfo.getAntecedents();
         Formula[] consequents = proofInfo.getConsequents();
         boolean[] completedConsequents = proofInfo.getCompletedConsequents();
 
-		Formula selectedConsequent = null;
-		if (this.selectedConsequentId != -1) {
-			selectedConsequent = consequents[this.selectedConsequentId];
-		}
+        Formula selectedConsequent = null;
+        if (this.selectedConsequentId != -1) {
+            selectedConsequent = consequents[this.selectedConsequentId];
+        }
 
         // update antecedents table
         updateAntecedentsTable(antecedents, selectedConsequent);
@@ -256,12 +265,12 @@ public class MainActivity extends Activity {
     }
 
     private void completeConsequent(int antecedentId) {
-		if (this.selectedConsequentId != -1) {
-		    try {
+        if (this.selectedConsequentId != -1) {
+            try {
                 this.prover.completeConsequent(this.selectedConsequentId, antecedentId);
             } catch (ProverException e) {
-		        LOGGER.severe(e.getMessage());
-		        return;
+                LOGGER.severe(e.getMessage());
+                return;
             }
             resetProofState();
         }
@@ -290,8 +299,8 @@ public class MainActivity extends Activity {
     }
 
     private void nextChallenge() {
-        int newIndex = this.currentChallengeIndex+1;
-        if (newIndex == Challenges.getNumChallenges()) {
+        int newIndex = this.currentChallengeIndex + 1;
+        if (newIndex == CHALLENGES.length) {
             newIndex = 0;
         }
 
@@ -336,6 +345,7 @@ public class MainActivity extends Activity {
     }
 
     private static String replaceFreeFormulas(String string) {
-        return string.replaceAll("\\"+ FreeFormula.STRING_PREFIX+"([0-9]+)", FREE_FORMULA_SYMBOL+"<sub><small>$1</small></sub>");
+        return string.replaceAll("\\"+ FreeFormula.STRING_PREFIX+"([0-9]+)",
+				FREE_FORMULA_SYMBOL+"<sub><small>$1</small></sub>");
     }
 }

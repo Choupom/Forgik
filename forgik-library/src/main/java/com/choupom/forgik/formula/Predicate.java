@@ -11,19 +11,19 @@ import java.util.Set;
 
 public class Predicate implements Formula {
 
-	private final String name;
+	private final char name;
 
-	public Predicate(String name) {
+	public Predicate(char name) {
 		this.name = name;
 	}
 
-	public String getName() {
+	public char getName() {
 		return this.name;
 	}
 
 	@Override
 	public String toString() {
-		return this.name;
+		return Character.toString(this.name);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class Predicate implements Formula {
 		}
 
 		Predicate predicate = (Predicate) object;
-		return this.name.equals(predicate.name);
+		return (this.name == predicate.name);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class Predicate implements Formula {
 		}
 
 		Predicate predicate = (Predicate) formula;
-		return this.name.equals(predicate.name);
+		return (this.name == predicate.name);
 	}
 
 	@Override
