@@ -15,21 +15,21 @@ public class FormulaIdentifierTest {
 
 	@Test
 	public void test() {
-		testIdentify("A v q", "p v A", null);
-		testIdentify("A v q", "B v B", "q v q");
-		testIdentify("(A v B) v C", "(B v C) v A", "(A v A) v A");
-		testIdentify("A ^ B", "(B ^ q) ^ q", "(q ^ q) ^ q");
-		testIdentify("A v A", "p v q", null);
-		testIdentify("A v (A v A)", "(A v A) v A", null);
-		testIdentify("A", "A v p", null);
-		testIdentify("A v B", "B v A", "A v A");
-		testIdentify("A v p", "B v A", "p v p");
-		testIdentify("A v A", "B v p", "p v p");
-		testIdentify("(A ^ p) ^ A", "B ^ B", null);
-		testIdentify("(A v B) v C", "(B v C) v p", "(p v p) v p");
-		testIdentify("A v p", "(B > C) v D", "(B > C) v p");
-		testIdentify("A v p", "q v A", null);
-		testIdentify("p v A", "A v q", null);
+		testIdentify("$1 v q", "p v $1", null);
+		testIdentify("$1 v q", "$2 v $2", "q v q");
+		testIdentify("($1 v $2) v $3", "($2 v $3) v $1", "($1 v $1) v $1");
+		testIdentify("$1 ^ $2", "($2 ^ q) ^ q", "(q ^ q) ^ q");
+		testIdentify("$1 v $1", "p v q", null);
+		testIdentify("$1 v ($1 v $1)", "($1 v $1) v $1", null);
+		testIdentify("$1", "$1 v p", null);
+		testIdentify("$1 v $2", "$2 v $1", "$1 v $1");
+		testIdentify("$1 v p", "$2 v $1", "p v p");
+		testIdentify("$1 v $1", "$2 v p", "p v p");
+		testIdentify("($1 ^ p) ^ $1", "$2 ^ $2", null);
+		testIdentify("($1 v $2) v $3", "($2 v $3) v p", "(p v p) v p");
+		testIdentify("$1 v p", "($2 > $3) v $4", "($2 > $3) v p");
+		testIdentify("$1 v p", "q v $1", null);
+		testIdentify("p v $1", "$1 v q", null);
 	}
 
 	private static void testIdentify(String string1, String string2, String stringR) {

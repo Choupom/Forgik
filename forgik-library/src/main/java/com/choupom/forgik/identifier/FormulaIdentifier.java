@@ -16,16 +16,16 @@ import com.choupom.forgik.formula.Formula;
 public class FormulaIdentifier {
 
 	public static Identification identify(Formula formula1, Formula formula2) {
-		Map<String, Formula> identificationMap = new HashMap<>();
+		Map<Integer, Formula> identificationMap = new HashMap<>();
 
 		while (true) {
-			Map<String, List<Formula>> map = new HashMap<>();
+			Map<Integer, List<Formula>> map = new HashMap<>();
 			if (!formula2.identify(formula1, map)) {
 				return null;
 			}
 
-			String latestFreeFormula = null;
-			for (String freeFormula : map.keySet()) {
+			Integer latestFreeFormula = null;
+			for (Integer freeFormula : map.keySet()) {
 				if (latestFreeFormula == null || freeFormula.compareTo(latestFreeFormula) > 0) {
 					latestFreeFormula = freeFormula;
 				}
@@ -37,19 +37,19 @@ public class FormulaIdentifier {
 
 			Formula substitute = map.get(latestFreeFormula).get(0);
 
-			Set<String> freeFormulas = new HashSet<>();
+			Set<Integer> freeFormulas = new HashSet<>();
 			substitute.getFreeFormulas(freeFormulas);
 			if (freeFormulas.contains(latestFreeFormula)) {
 				return null;
 			}
 
-			Map<String, Formula> newMap = new HashMap<>();
+			Map<Integer, Formula> newMap = new HashMap<>();
 			newMap.put(latestFreeFormula, substitute);
 
 			formula1 = formula1.apply(newMap);
 			formula2 = formula2.apply(newMap);
-			for (Map.Entry<String, Formula> entry : identificationMap.entrySet()) {
-				String freeFormula = entry.getKey();
+			for (Map.Entry<Integer, Formula> entry : identificationMap.entrySet()) {
+				Integer freeFormula = entry.getKey();
 				Formula newFormula = entry.getValue().apply(newMap);
 				identificationMap.put(freeFormula, newFormula);
 			}

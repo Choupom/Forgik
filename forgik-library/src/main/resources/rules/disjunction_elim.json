@@ -1,5 +1,5 @@
 {
 	"name": "vE",
-	"antecedents": ["X v Y", "X > Z", "Y > Z"],
-	"consequent": "Z"
+	"antecedents": ["$1 v $2", "$1 > $3", "$2 > $3"],
+	"consequent": "$3"
 }

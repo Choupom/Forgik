@@ -63,7 +63,7 @@ public class UnaryConnective implements Formula {
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+	public boolean identify(Formula formula, Map<Integer, List<Formula>> map) {
 		if (formula instanceof FreeFormula) {
 			FreeFormula freeFormula = (FreeFormula) formula;
 			return freeFormula.identify(this, map);
@@ -78,13 +78,13 @@ public class UnaryConnective implements Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map) {
+	public Formula apply(Map<Integer, Formula> map) {
 		Formula newOperand = this.operand.apply(map);
 		return new UnaryConnective(this.type, newOperand);
 	}
 
 	@Override
-	public void getFreeFormulas(Set<String> freeFormulas) {
+	public void getFreeFormulas(Set<Integer> freeFormulas) {
 		this.operand.getFreeFormulas(freeFormulas);
 	}
 }

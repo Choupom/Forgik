@@ -12,9 +12,9 @@ import com.choupom.forgik.formula.Formula;
 public class Identification {
 
 	private final Formula formula;
-	private final Map<String, Formula> map;
+	private final Map<Integer, Formula> map;
 
-	public Identification(Formula formula, Map<String, Formula> map) {
+	public Identification(Formula formula, Map<Integer, Formula> map) {
 		this.formula = formula;
 		this.map = map;
 	}
@@ -23,7 +23,7 @@ public class Identification {
 		return this.formula;
 	}
 
-	public Map<String, Formula> getMap() {
+	public Map<Integer, Formula> getMap() {
 		return this.map;
 	}
 }

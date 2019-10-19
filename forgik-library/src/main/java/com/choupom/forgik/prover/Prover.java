@@ -22,7 +22,7 @@ public class Prover {
 		public Formula[] antecedents;
 		public Formula[] consequents;
 		public boolean[] completedConsequents;
-		public Map<String, Formula> map;
+		public Map<Integer, Formula> map;
 		public Proof parent;
 		public int parentConsequentId;
 
@@ -49,7 +49,7 @@ public class Prover {
 	private Proof proof;
 
 	public Prover(Formula[] antecedents, Formula[] consequents) {
-		this.freeFormulaCounter = 0;
+		this.freeFormulaCounter = 1;
 		this.proof = new Proof(antecedents, consequents, null, -1);
 	}
 
@@ -101,8 +101,8 @@ public class Prover {
 			throw new ProverException("Rule can not be applied to consequent");
 		}
 
-		Map<String, Formula> leftoverMap = new HashMap<>();
-		for (String ruleFormula : result.getLeftover()) {
+		Map<Integer, Formula> leftoverMap = new HashMap<>();
+		for (Integer ruleFormula : result.getLeftover()) {
 			leftoverMap.put(ruleFormula, createFreeFormula());
 		}
 
@@ -119,8 +119,8 @@ public class Prover {
 			proofConsequents[i] = ruleAntecedents[i].apply(leftoverMap);
 		}
 
-		Map<String, Formula> consequentMap = new HashMap<>();
-		for (Map.Entry<String, Formula> entry : result.getConsequentMap().entrySet()) {
+		Map<Integer, Formula> consequentMap = new HashMap<>();
+		for (Map.Entry<Integer, Formula> entry : result.getConsequentMap().entrySet()) {
 			consequentMap.put(entry.getKey(), entry.getValue().apply(leftoverMap));
 		}
 		updateProof(this.proof, consequentMap);
@@ -128,7 +128,7 @@ public class Prover {
 		this.proof = new Proof(proofAntecedents, proofConsequents, this.proof, consequentId);
 	}
 
-	private void completeConsequent(int consequentId, Map<String, Formula> map) {
+	private void completeConsequent(int consequentId, Map<Integer, Formula> map) {
 		this.proof.completedConsequents[consequentId] = true;
 		updateProof(this.proof, map);
 
@@ -139,7 +139,7 @@ public class Prover {
 		}
 	}
 
-	private static void updateProof(Proof proof, Map<String, Formula> map) {
+	private static void updateProof(Proof proof, Map<Integer, Formula> map) {
 		proof.map.putAll(map);
 
 		for (int i = 0; i < proof.antecedents.length; i++) {
@@ -152,12 +152,6 @@ public class Prover {
 	}
 
 	private FreeFormula createFreeFormula() {
-		// TODO: re-use names which are not used anymore
-		if (this.freeFormulaCounter >= 26) {
-			throw new IllegalStateException();
-		}
-		char name = (char) ('A' + this.freeFormulaCounter);
-		this.freeFormulaCounter++;
-		return new FreeFormula(Character.toString(name));
+		return new FreeFormula(this.freeFormulaCounter++);
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"name": "RAA",
-	"assumptions": ["X"],
-	"antecedents": ["Y", "-Y"],
-	"consequent": "-X"
+	"assumptions": ["$1"],
+	"antecedents": ["$2", "-$2"],
+	"consequent": "-$1"
 }

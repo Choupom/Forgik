@@ -14,11 +14,11 @@ public class RuleApplicationResult {
 
 	private final Formula[] assumptions;
 	private final Formula[] antecedents;
-	private final Set<String> leftover;
-	private final Map<String, Formula> consequentMap;
+	private final Set<Integer> leftover;
+	private final Map<Integer, Formula> consequentMap;
 
-	public RuleApplicationResult(Formula[] assumptions, Formula[] antecedents, Set<String> leftover,
-			Map<String, Formula> consequentMap) {
+	public RuleApplicationResult(Formula[] assumptions, Formula[] antecedents, Set<Integer> leftover,
+			Map<Integer, Formula> consequentMap) {
 		this.assumptions = assumptions;
 		this.antecedents = antecedents;
 		this.leftover = leftover;
@@ -33,11 +33,11 @@ public class RuleApplicationResult {
 		return this.antecedents;
 	}
 
-	public Set<String> getLeftover() {
+	public Set<Integer> getLeftover() {
 		return this.leftover;
 	}
 
-	public Map<String, Formula> getConsequentMap() {
+	public Map<Integer, Formula> getConsequentMap() {
 		return this.consequentMap;
 	}
 }

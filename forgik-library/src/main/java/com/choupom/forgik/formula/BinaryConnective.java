@@ -70,7 +70,7 @@ public class BinaryConnective implements Formula {
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+	public boolean identify(Formula formula, Map<Integer, List<Formula>> map) {
 		if (formula instanceof FreeFormula) {
 			FreeFormula freeFormula = (FreeFormula) formula;
 			return freeFormula.identify(this, map);
@@ -86,14 +86,14 @@ public class BinaryConnective implements Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map) {
+	public Formula apply(Map<Integer, Formula> map) {
 		Formula newOperand1 = this.operand1.apply(map);
 		Formula newOperand2 = this.operand2.apply(map);
 		return new BinaryConnective(this.type, newOperand1, newOperand2);
 	}
 
 	@Override
-	public void getFreeFormulas(Set<String> freeFormulas) {
+	public void getFreeFormulas(Set<Integer> freeFormulas) {
 		this.operand1.getFreeFormulas(freeFormulas);
 		this.operand2.getFreeFormulas(freeFormulas);
 	}

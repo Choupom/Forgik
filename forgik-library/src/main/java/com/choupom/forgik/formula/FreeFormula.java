@@ -12,22 +12,21 @@ import java.util.Set;
 
 public class FreeFormula implements Formula {
 
-	private final String name;
+	public static final String STRING_PREFIX = "$";
 
-	public FreeFormula(String name) {
-		if (!Character.isUpperCase(name.charAt(0))) {
-			throw new IllegalArgumentException();
-		}
-		this.name = name;
+	private final Integer id;
+
+	public FreeFormula(int id) {
+		this.id = id;
 	}
 
-	public String getName() {
-		return this.name;
+	public int getId() {
+		return this.id;
 	}
 
 	@Override
 	public String toString() {
-		return this.name;
+		return STRING_PREFIX + this.id;
 	}
 
 	@Override
@@ -42,26 +41,26 @@ public class FreeFormula implements Formula {
 		}
 
 		FreeFormula freeFormula = (FreeFormula) object;
-		return this.name.equals(freeFormula.name);
+		return (this.id == freeFormula.id);
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+	public boolean identify(Formula formula, Map<Integer, List<Formula>> map) {
 		if (formula instanceof FreeFormula) {
 			FreeFormula freeFormula = (FreeFormula) formula;
-			if (freeFormula.name.equals(this.name)) {
+			if (freeFormula.id == this.id) {
 				return true;
 			}
-			addToMap(freeFormula.name, this, map);
+			addToMap(freeFormula.id, this, map);
 		}
 
-		addToMap(this.name, formula, map);
+		addToMap(this.id, formula, map);
 		return true;
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map) {
-		Formula formula = map.get(this.name);
+	public Formula apply(Map<Integer, Formula> map) {
+		Formula formula = map.get(this.id);
 		if (formula != null) {
 			return formula;
 		} else {
@@ -70,15 +69,15 @@ public class FreeFormula implements Formula {
 	}
 
 	@Override
-	public void getFreeFormulas(Set<String> freeFormulas) {
-		freeFormulas.add(this.name);
+	public void getFreeFormulas(Set<Integer> freeFormulas) {
+		freeFormulas.add(this.id);
 	}
 
-	private static void addToMap(String name, Formula formula, Map<String, List<Formula>> map) {
-		List<Formula> list = map.get(name);
+	private static void addToMap(Integer id, Formula formula, Map<Integer, List<Formula>> map) {
+		List<Formula> list = map.get(id);
 		if (list == null) {
 			list = new ArrayList<>();
-			map.put(name, list);
+			map.put(id, list);
 		}
 		list.add(formula);
 	}

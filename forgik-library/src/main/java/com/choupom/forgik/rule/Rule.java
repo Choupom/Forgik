@@ -20,7 +20,7 @@ public class Rule {
 	private final Formula[] assumptions;
 	private final Formula[] antecedents;
 	private final Formula consequent;
-	private final String[] freeFormulas;
+	private final Integer[] freeFormulas;
 
 	public Rule(String name, Formula[] assumptions, Formula[] antecedents, Formula consequent) {
 		this.name = name;
@@ -28,7 +28,7 @@ public class Rule {
 		this.antecedents = antecedents;
 		this.consequent = consequent;
 
-		Set<String> freeFormulasSet = new HashSet<>();
+		Set<Integer> freeFormulasSet = new HashSet<>();
 		for (Formula ruleAssumption : assumptions) {
 			ruleAssumption.getFreeFormulas(freeFormulasSet);
 		}
@@ -36,7 +36,7 @@ public class Rule {
 			ruleAntecedent.getFreeFormulas(freeFormulasSet);
 		}
 		consequent.getFreeFormulas(freeFormulasSet);
-		this.freeFormulas = freeFormulasSet.toArray(new String[freeFormulasSet.size()]);
+		this.freeFormulas = freeFormulasSet.toArray(new Integer[freeFormulasSet.size()]);
 	}
 
 	public String getName() {
@@ -60,13 +60,13 @@ public class Rule {
 	}
 
 	public RuleApplicationResult apply(Formula consequent) {
-		Map<String, List<Formula>> map = new HashMap<>();
+		Map<Integer, List<Formula>> map = new HashMap<>();
 		if (!this.consequent.identify(consequent, map)) { // TODO: use FormulaIdentifier
 			return null;
 		}
 
-		Map<String, Formula> simpleMap = new HashMap<>();
-		for (Map.Entry<String, List<Formula>> mapping : map.entrySet()) {
+		Map<Integer, Formula> simpleMap = new HashMap<>();
+		for (Map.Entry<Integer, List<Formula>> mapping : map.entrySet()) {
 			List<Formula> list = mapping.getValue();
 			if (!checkAllEquals(list)) {
 				return null;
@@ -74,8 +74,8 @@ public class Rule {
 			simpleMap.put(mapping.getKey(), list.get(0));
 		}
 
-		Set<String> leftover = new HashSet<>();
-		for (String freeFormula : this.freeFormulas) {
+		Set<Integer> leftover = new HashSet<>();
+		for (Integer freeFormula : this.freeFormulas) {
 			if (!simpleMap.containsKey(freeFormula)) {
 				leftover.add(freeFormula);
 			}
@@ -91,10 +91,10 @@ public class Rule {
 			antecedents[i] = this.antecedents[i].apply(simpleMap);
 		}
 
-		Map<String, Formula> consequentMap = new HashMap<>();
-		Set<String> consequentFreeFormulas = new HashSet<>();
+		Map<Integer, Formula> consequentMap = new HashMap<>();
+		Set<Integer> consequentFreeFormulas = new HashSet<>();
 		consequent.getFreeFormulas(consequentFreeFormulas);
-		for (String consequentFreeFormula : consequentFreeFormulas) {
+		for (Integer consequentFreeFormula : consequentFreeFormulas) {
 			Formula mapped = simpleMap.get(consequentFreeFormula);
 			if (mapped != null) {
 				mapped = mapped.apply(simpleMap);

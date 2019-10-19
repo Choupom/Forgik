@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Spanned;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,7 @@ import com.choupom.forgik.android.challenge.Challenge;
 import com.choupom.forgik.android.challenge.Challenges;
 import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.FreeFormula;
 import com.choupom.forgik.formula.UnaryConnective;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
@@ -39,6 +41,7 @@ public class MainActivity extends Activity {
 
     private static final String RULEBOOK = "classical_logic";
 
+    private static final String FREE_FORMULA_SYMBOL = "\u03C6";
     private static final String NEGATION_SYMBOL = "\u00AC";
     private static final String IMPLICATION_SYMBOL = "\u279D";
     private static final String CONJUNCTION_SYMBOL = "\u2227";
@@ -188,7 +191,7 @@ public class MainActivity extends Activity {
         View row = getLayoutInflater().inflate(R.layout.antecedent_entry, null);
 
         TextView leftFormulaView = row.findViewById(R.id.antecedent);
-        leftFormulaView.setText(replaceConnectiveSymbols(antecedent.toString()));
+        leftFormulaView.setText(createFormulaText(antecedent));
 
         Button identifyButton = row.findViewById(R.id.identify);
         identifyButton.setEnabled(identifiable);
@@ -216,7 +219,7 @@ public class MainActivity extends Activity {
         }
 
         TextView leftFormulaView = row.findViewById(R.id.consequent);
-        leftFormulaView.setText(replaceConnectiveSymbols(consequent.toString()));
+        leftFormulaView.setText(createFormulaText(consequent));
 
         ImageView stateImage = row.findViewById(R.id.consequent_state);
         if (completedConsequent) {
@@ -315,11 +318,22 @@ public class MainActivity extends Activity {
         updateView();
     }
 
+    private static Spanned createFormulaText(Formula formula) {
+        String string = formula.toString();
+        string = replaceConnectiveSymbols(string);
+        string = replaceFreeFormulas(string);
+        return Html.fromHtml(string);
+    }
+
     private static String replaceConnectiveSymbols(String string) {
         string = string.replace(UnaryConnective.Type.NEGATION.getSymbol(), NEGATION_SYMBOL);
         string = string.replace(BinaryConnective.Type.IMPLICATION.getSymbol(), IMPLICATION_SYMBOL);
         string = string.replace(BinaryConnective.Type.CONJUNCTION.getSymbol(), CONJUNCTION_SYMBOL);
         string = string.replace(BinaryConnective.Type.DISJUNCTION.getSymbol(), DISJUNCTION_SYMBOL);
         return string;
+    }
+
+    private static String replaceFreeFormulas(String string) {
+        return string.replaceAll("\\"+ FreeFormula.STRING_PREFIX+"([0-9]+)", FREE_FORMULA_SYMBOL+"<sub><small>$1</small></sub>");
     }
 }

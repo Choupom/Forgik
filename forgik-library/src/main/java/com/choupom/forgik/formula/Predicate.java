@@ -14,9 +14,6 @@ public class Predicate implements Formula {
 	private final String name;
 
 	public Predicate(String name) {
-		if (!Character.isLowerCase(name.charAt(0))) {
-			throw new IllegalArgumentException();
-		}
 		this.name = name;
 	}
 
@@ -45,7 +42,7 @@ public class Predicate implements Formula {
 	}
 
 	@Override
-	public boolean identify(Formula formula, Map<String, List<Formula>> map) {
+	public boolean identify(Formula formula, Map<Integer, List<Formula>> map) {
 		if (formula instanceof FreeFormula) {
 			FreeFormula freeFormula = (FreeFormula) formula;
 			return freeFormula.identify(this, map);
@@ -60,12 +57,12 @@ public class Predicate implements Formula {
 	}
 
 	@Override
-	public Formula apply(Map<String, Formula> map) {
+	public Formula apply(Map<Integer, Formula> map) {
 		return this;
 	}
 
 	@Override
-	public void getFreeFormulas(Set<String> freeFormulas) {
+	public void getFreeFormulas(Set<Integer> freeFormulas) {
 		// do nothing
 	}
 }

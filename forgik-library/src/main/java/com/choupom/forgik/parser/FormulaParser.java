@@ -51,10 +51,10 @@ public class FormulaParser {
 	}
 
 	private static Formula createFormulaFromString(String string) {
-		if (Character.isLowerCase(string.charAt(0))) {
-			return new Predicate(string);
+		if (string.startsWith(FreeFormula.STRING_PREFIX)) {
+			return new FreeFormula(Integer.parseInt(string.substring(1)));
 		} else {
-			return new FreeFormula(string);
+			return new Predicate(string);
 		}
 	}
 

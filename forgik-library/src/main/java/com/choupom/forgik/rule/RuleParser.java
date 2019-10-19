@@ -7,11 +7,16 @@ package com.choupom.forgik.rule;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.FreeFormula;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.utils.InputStreamUtils;
 
@@ -55,16 +60,30 @@ public class RuleParser {
 
 		Formula[] parsedAssumptions = new Formula[assumptions.length()];
 		for (int i = 0; i < assumptions.length(); i++) {
-			parsedAssumptions[i] = FormulaParser.parse(assumptions.getString(i));
+			parsedAssumptions[i] = parseFormula(assumptions.getString(i));
 		}
 
 		Formula[] parsedAntecedents = new Formula[antecedents.length()];
 		for (int i = 0; i < antecedents.length(); i++) {
-			parsedAntecedents[i] = FormulaParser.parse(antecedents.getString(i));
+			parsedAntecedents[i] = parseFormula(antecedents.getString(i));
 		}
 
-		Formula parsedConsequent = FormulaParser.parse(consequent);
+		Formula parsedConsequent = parseFormula(consequent);
 
 		return new Rule(name, parsedAssumptions, parsedAntecedents, parsedConsequent);
+	}
+
+	private static Formula parseFormula(String string) {
+		Formula formula = FormulaParser.parse(string);
+
+		Set<Integer> freeFormulas = new HashSet<>();
+		formula.getFreeFormulas(freeFormulas);
+
+		Map<Integer, Formula> map = new HashMap<>();
+		for (Integer freeFormula : freeFormulas) {
+			map.put(freeFormula, new FreeFormula(-freeFormula - 1)); // replace id by negative id
+		}
+
+		return formula.apply(map);
 	}
 }

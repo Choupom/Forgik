@@ -1,5 +1,5 @@
 {
 	"name": "vI2",
-	"antecedents": ["X"],
-	"consequent": "Y v X"
+	"antecedents": ["$1"],
+	"consequent": "$2 v $1"
 }
