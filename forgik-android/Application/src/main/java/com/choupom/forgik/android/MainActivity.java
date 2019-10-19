@@ -30,6 +30,7 @@ import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
 import com.choupom.forgik.prover.ProverException;
 import com.choupom.forgik.rule.Rule;
+import com.choupom.forgik.rule.RuleApplicationResult;
 import com.choupom.forgik.rulebook.RulebookParser;
 
 import java.io.IOException;
@@ -122,7 +123,7 @@ public class MainActivity extends Activity {
         applyRuleView.setVisibility(selectedConsequent != null ? View.VISIBLE : View.GONE);
 
         // update rules table
-        updateRulesTable();
+        updateRulesTable(selectedConsequent);
 
         // update cancel proof button
         Button cancelProofButton = findViewById(R.id.cancel_proof_button);
@@ -153,11 +154,11 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void updateRulesTable() {
+    private void updateRulesTable(Formula selectedConsequent) {
         TableLayout rulesTable = findViewById(R.id.rules_table);
         rulesTable.removeAllViews();
 
-        if (this.selectedConsequentId != -1) {
+        if (selectedConsequent != null) {
             TableRow row = null;
             int rowIndex = 0;
             int rowCount = 0;
@@ -169,7 +170,7 @@ public class MainActivity extends Activity {
                     rulesTable.addView(row);
                 }
 
-                View view = createRuleView(this.rules[i]);
+                View view = createRuleView(this.rules[i], selectedConsequent);
                 row.addView(view);
 
                 if (i+1 >= rowCount+RULES_PER_ROW[rowIndex]) {
@@ -233,8 +234,9 @@ public class MainActivity extends Activity {
         return row;
     }
 
-    private View createRuleView(final Rule rule) {
+    private View createRuleView(final Rule rule, Formula selectedConsequent) {
         Button button = (Button) getLayoutInflater().inflate(R.layout.rule_entry, null);
+        button.setEnabled(rule.apply(selectedConsequent) != null);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
