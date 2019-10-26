@@ -5,6 +5,7 @@
 -->
 
 # 1.0.5-RC
+  - Add README with app description.
   - Always enable next challenge button.
 
 # 1.0.4 (2019-10-19)
