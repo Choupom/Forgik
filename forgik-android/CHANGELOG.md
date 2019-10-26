@@ -4,6 +4,9 @@
 	Copyright 2019 Andy Poudret. All rights reserved.
 -->
 
+# 1.0.5-RC
+  - Always enable next challenge button.
+
 # 1.0.4 (2019-10-19)
   - Sort challenges by difficulty.
   - Remove storage permission requirement.

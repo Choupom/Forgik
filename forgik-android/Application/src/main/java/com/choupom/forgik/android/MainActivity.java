@@ -143,10 +143,6 @@ public class MainActivity extends Activity {
         // update cancel proof button
         Button cancelProofButton = findViewById(R.id.cancel_proof_button);
         cancelProofButton.setEnabled(!this.prover.isOnMainProof());
-
-        // update next challenge button
-        Button nextChallengeButton = findViewById(R.id.next_challenge_button);
-        nextChallengeButton.setEnabled(this.prover.isMainProofComplete());
     }
 
     private void updateAntecedentsTable(Formula[] antecedents, Formula selectedConsequent) {
