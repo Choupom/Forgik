@@ -34,16 +34,38 @@ public class Rule {
 		return this.name;
 	}
 
+	public Formula[] getAssumptions() {
+		return this.assumptions.clone();
+	}
+
+	public Formula[] getAntecedents() {
+		return this.antecedents.clone();
+	}
+
+	public Formula getConsequent() {
+		return this.consequent;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(this.name);
 		stringBuilder.append(": ");
-		for (int i = 0; i < this.antecedents.length; i++) {
-			if (i != 0) {
+		boolean firstAntecedent = true;
+		for (Formula assumption : this.assumptions) {
+			if (!firstAntecedent) {
 				stringBuilder.append(", ");
 			}
-			stringBuilder.append(this.antecedents[i]);
+			stringBuilder.append("asm ");
+			stringBuilder.append(assumption);
+			firstAntecedent = false;
+		}
+		for (Formula antecedent : this.antecedents) {
+			if (!firstAntecedent) {
+				stringBuilder.append(", ");
+			}
+			stringBuilder.append(antecedent);
+			firstAntecedent = false;
 		}
 		stringBuilder.append(" |- ");
 		stringBuilder.append(this.consequent);

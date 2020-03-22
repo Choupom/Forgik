@@ -123,7 +123,7 @@ public class Prover {
 		for (Map.Entry<Integer, Formula> entry : result.getConsequentMap().entrySet()) {
 			consequentMap.put(entry.getKey(), entry.getValue().apply(leftoverMap));
 		}
-		updateProof(this.proof, consequentMap);
+		updateProof(this.proof, consequentMap); // TODO: is this ever reversed?
 
 		this.proof = new Proof(proofAntecedents, proofConsequents, this.proof, consequentId);
 	}
