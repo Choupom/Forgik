@@ -18,6 +18,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import androidx.core.text.HtmlCompat;
+
 import com.choupom.forgik.challenge.Challenge;
 import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
@@ -87,7 +89,7 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.main_view);
 
-        Button cancelProofButton = findViewById(R.id.cancel_proof_button);
+        Button cancelProofButton = (Button) findViewById(R.id.cancel_proof_button);
         cancelProofButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,7 +97,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        Button nextChallengeButton = findViewById(R.id.next_challenge_button);
+        Button nextChallengeButton = (Button) findViewById(R.id.next_challenge_button);
         nextChallengeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,7 +127,7 @@ public class MainActivity extends Activity {
         updateConsequentsTable(consequents, completedConsequents);
 
         // update information text
-        TextView informationText = findViewById(R.id.information_text);
+        TextView informationText = (TextView) findViewById(R.id.information_text);
         informationText.setVisibility(selectedConsequent == null ? View.VISIBLE : View.GONE);
         if (this.prover.isMainProofComplete()) {
             informationText.setText(R.string.congratulations);
@@ -141,12 +143,12 @@ public class MainActivity extends Activity {
         updateRulesTable(selectedConsequent);
 
         // update cancel proof button
-        Button cancelProofButton = findViewById(R.id.cancel_proof_button);
+        Button cancelProofButton = (Button) findViewById(R.id.cancel_proof_button);
         cancelProofButton.setEnabled(!this.prover.isOnMainProof());
     }
 
     private void updateAntecedentsTable(Formula[] antecedents, Formula selectedConsequent) {
-        TableLayout antecedentsTable = findViewById(R.id.antecedents_table);
+        TableLayout antecedentsTable = (TableLayout) findViewById(R.id.antecedents_table);
         antecedentsTable.removeAllViews();
 
         for (int i = 0; i < antecedents.length; i++) {
@@ -156,7 +158,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateConsequentsTable(Formula[] consequents, boolean[] completedConsequents) {
-        TableLayout consequentsTable = findViewById(R.id.consequents_table);
+        TableLayout consequentsTable = (TableLayout) findViewById(R.id.consequents_table);
         consequentsTable.removeAllViews();
 
         for (int i = 0; i < consequents.length; i++) {
@@ -166,7 +168,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateRulesTable(Formula selectedConsequent) {
-        TableLayout rulesTable = findViewById(R.id.rules_table);
+        TableLayout rulesTable = (TableLayout) findViewById(R.id.rules_table);
         rulesTable.removeAllViews();
 
         if (selectedConsequent != null) {
@@ -202,10 +204,10 @@ public class MainActivity extends Activity {
 
         View row = getLayoutInflater().inflate(R.layout.antecedent_entry, null);
 
-        TextView leftFormulaView = row.findViewById(R.id.antecedent);
+        TextView leftFormulaView = (TextView) row.findViewById(R.id.antecedent);
         leftFormulaView.setText(createFormulaText(antecedent));
 
-        Button identifyButton = row.findViewById(R.id.identify);
+        Button identifyButton = (Button) row.findViewById(R.id.identify);
         identifyButton.setEnabled(identifiable);
         identifyButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,10 +232,10 @@ public class MainActivity extends Activity {
             row.setBackgroundColor(Color.parseColor("#DDDDFF"));
         }
 
-        TextView leftFormulaView = row.findViewById(R.id.consequent);
+        TextView leftFormulaView = (TextView) row.findViewById(R.id.consequent);
         leftFormulaView.setText(createFormulaText(consequent));
 
-        ImageView stateImage = row.findViewById(R.id.consequent_state);
+        ImageView stateImage = (ImageView) row.findViewById(R.id.consequent_state);
         if (completedConsequent) {
             stateImage.setImageResource(R.drawable.baseline_assignment_turned_in_black_24);
             stateImage.setColorFilter(Color.parseColor("#22BB55"));
@@ -257,7 +259,7 @@ public class MainActivity extends Activity {
         String ruleName = replaceConnectiveSymbols(rule.getName());
         ruleName = ruleName.replace("1", "<sub><small>1</small></sub>");
         ruleName = ruleName.replace("2", "<sub><small>2</small></sub>");
-        button.setText(Html.fromHtml(ruleName));
+        button.setText(HtmlCompat.fromHtml(ruleName, HtmlCompat.FROM_HTML_MODE_LEGACY));
         return button;
     }
 
@@ -335,7 +337,7 @@ public class MainActivity extends Activity {
         String string = formula.toString();
         string = replaceConnectiveSymbols(string);
         string = replaceFreeFormulas(string);
-        return Html.fromHtml(string);
+        return HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     private static String replaceConnectiveSymbols(String string) {
