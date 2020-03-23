@@ -5,6 +5,7 @@
  */
 package com.choupom.forgik.prover;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,14 +26,20 @@ public class Prover {
 		public Map<Integer, Formula> map;
 		public Proof parent;
 		public int parentConsequentId;
+		public Rule rule;
+		public int numAssumptions;
+		public ProofReport[] reports;
 
-		public Proof(Formula[] antecedents, Formula[] consequents, Proof parent, int parentConsequentId) {
+		public Proof(Formula[] antecedents, Formula[] consequents, Proof parent, int parentConsequentId, Rule rule, int numAssumptions) {
 			this.antecedents = antecedents.clone();
 			this.consequents = consequents.clone();
 			this.completedConsequents = new boolean[consequents.length];
 			this.map = new HashMap<>();
 			this.parent = parent;
 			this.parentConsequentId = parentConsequentId;
+			this.rule = rule;
+			this.numAssumptions = numAssumptions;
+			this.reports = new ProofReport[consequents.length];
 		}
 
 		public boolean isComplete() {
@@ -50,7 +57,7 @@ public class Prover {
 
 	public Prover(Formula[] antecedents, Formula[] consequents) {
 		this.freeFormulaCounter = 1;
-		this.proof = new Proof(antecedents, consequents, null, -1);
+		this.proof = new Proof(antecedents, consequents, null, -1, null, 0);
 	}
 
 	public boolean isMainProofComplete() {
@@ -59,6 +66,10 @@ public class Prover {
 
 	public boolean isOnMainProof() {
 		return (this.proof.parent == null);
+	}
+
+	public ProofReport[] getProofReports() {
+		return this.proof.reports.clone();
 	}
 
 	public ProofInfo getProofInfo() {
@@ -125,7 +136,8 @@ public class Prover {
 		}
 		updateProof(this.proof, consequentMap); // TODO: is this ever reversed?
 
-		this.proof = new Proof(proofAntecedents, proofConsequents, this.proof, consequentId);
+		this.proof = new Proof(proofAntecedents, proofConsequents, this.proof, consequentId, rule,
+				ruleAssumptions.length);
 	}
 
 	private void completeConsequent(int consequentId, Map<Integer, Formula> map) {
@@ -135,8 +147,16 @@ public class Prover {
 		if (this.proof.isComplete() && !isOnMainProof()) {
 			Proof subproof = this.proof;
 			this.proof = subproof.parent;
+			this.proof.reports[subproof.parentConsequentId] = createReport(subproof);
 			completeConsequent(subproof.parentConsequentId, subproof.map);
 		}
+	}
+
+	private static ProofReport createReport(Proof proof) {
+		Formula[] assumptions = Arrays.copyOfRange(proof.antecedents, proof.antecedents.length - proof.numAssumptions,
+				proof.antecedents.length);
+		Formula parentConsequent = proof.parent.consequents[proof.parentConsequentId];
+		return new ProofReport(proof.rule, assumptions, proof.consequents, parentConsequent, proof.reports);
 	}
 
 	private static void updateProof(Proof proof, Map<Integer, Formula> map) {
@@ -148,6 +168,13 @@ public class Prover {
 
 		for (int i = 0; i < proof.consequents.length; i++) {
 			proof.consequents[i] = proof.consequents[i].apply(map);
+		}
+
+		for (int i = 0; i < proof.reports.length; i++) {
+			ProofReport report = proof.reports[i];
+			if (report != null) {
+				proof.reports[i] = report.apply(map);
+			}
 		}
 	}
 
