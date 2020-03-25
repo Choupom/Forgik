@@ -17,10 +17,10 @@ public class FreeFormula implements Formula {
 	private final Integer id;
 
 	public FreeFormula(int id) {
-		this.id = id;
+		this.id = Integer.valueOf(id);
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 

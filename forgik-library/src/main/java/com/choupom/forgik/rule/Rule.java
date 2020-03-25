@@ -111,7 +111,7 @@ public class Rule {
 			Formula mapped = simpleMap.get(consequentFreeFormula);
 			if (mapped != null) {
 				mapped = mapped.apply(simpleMap);
-				if (!mapped.equals(new FreeFormula(consequentFreeFormula))) {
+				if (!mapped.equals(new FreeFormula(consequentFreeFormula.intValue()))) {
 					consequentMap.put(consequentFreeFormula, mapped);
 				}
 			}

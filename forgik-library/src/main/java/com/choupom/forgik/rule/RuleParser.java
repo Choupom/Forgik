@@ -81,7 +81,7 @@ public class RuleParser {
 
 		Map<Integer, Formula> map = new HashMap<>();
 		for (Integer freeFormula : freeFormulas) {
-			map.put(freeFormula, new FreeFormula(-freeFormula - 1)); // replace id by negative id
+			map.put(freeFormula, new FreeFormula(-freeFormula.intValue() - 1)); // replace id by negative id
 		}
 
 		return formula.apply(map);
