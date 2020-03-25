@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.FreeFormula;
 import com.choupom.forgik.parser.FormulaParser;
-import com.choupom.forgik.parser.FormulaParserException;
 import com.choupom.forgik.utils.InputStreamUtils;
 
 public class RuleParser {
@@ -35,7 +34,7 @@ public class RuleParser {
 		// private constructor
 	}
 
-	public static Rule parseRule(String ruleId) throws IOException, FormulaParserException {
+	public static Rule parseRule(String ruleId) throws IOException {
 		String resourceName = DIRECTORY + ruleId + EXTENSION;
 
 		String jsonString;
@@ -74,7 +73,7 @@ public class RuleParser {
 		return new Rule(name, parsedAssumptions, parsedAntecedents, parsedConsequent);
 	}
 
-	private static Formula parseFormula(String string) throws FormulaParserException {
+	private static Formula parseFormula(String string) {
 		Formula formula = FormulaParser.parse(string);
 
 		Set<Integer> freeFormulas = new HashSet<>();

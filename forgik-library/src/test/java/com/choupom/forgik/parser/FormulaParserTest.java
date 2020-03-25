@@ -35,21 +35,21 @@ public class FormulaParserTest {
 	}
 
 	@Test
-	public void testPredicate() throws FormulaParserException {
+	public void testPredicate() {
 		String string = "T";
 		Formula formula = FormulaParser.parse(string);
 		Assert.assertEquals(string, formula.toString());
 	}
 
 	@Test
-	public void testPredicates() throws FormulaParserException {
+	public void testPredicates() {
 		String string = "-(P > Q) > ((-Q v R) > (P ^ R))";
 		Formula formula = FormulaParser.parse(string);
 		Assert.assertEquals(string, formula.toString());
 	}
 
 	@Test
-	public void testFreeFormulas() throws FormulaParserException {
+	public void testFreeFormulas() {
 		String string = "--($1 v $2) > ($1 ^ -$3)";
 		Formula formula = FormulaParser.parse(string);
 		Assert.assertEquals(string, formula.toString());

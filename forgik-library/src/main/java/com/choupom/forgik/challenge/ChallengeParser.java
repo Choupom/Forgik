@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.parser.FormulaParser;
-import com.choupom.forgik.parser.FormulaParserException;
 import com.choupom.forgik.utils.InputStreamUtils;
 
 public class ChallengeParser {
@@ -31,7 +30,7 @@ public class ChallengeParser {
 		// private constructor
 	}
 
-	public static Challenge parseChallenge(String challengeId) throws IOException, FormulaParserException {
+	public static Challenge parseChallenge(String challengeId) throws IOException {
 		String resourceName = DIRECTORY + challengeId + EXTENSION;
 
 		String jsonString;

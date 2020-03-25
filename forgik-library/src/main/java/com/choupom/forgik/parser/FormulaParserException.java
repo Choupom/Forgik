@@ -5,7 +5,7 @@
  */
 package com.choupom.forgik.parser;
 
-public class FormulaParserException extends Exception {
+public class FormulaParserException extends RuntimeException {
 
 	private static final long serialVersionUID = 647354625694288214L;
 

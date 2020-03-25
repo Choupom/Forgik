@@ -18,12 +18,12 @@ public class FormulaParser {
 		// private constructor
 	}
 
-	public static Formula parse(String string) throws FormulaParserException {
+	public static Formula parse(String string) {
 		TokenInfo[] tokens = tokenize(string.toCharArray());
 		return createFormula(tokens);
 	}
 
-	private static TokenInfo[] tokenize(char[] chars) throws FormulaParserException {
+	private static TokenInfo[] tokenize(char[] chars) {
 		List<TokenInfo> tokens = new ArrayList<>(chars.length + 1);
 
 		int stringStart = -1;
@@ -54,7 +54,7 @@ public class FormulaParser {
 		return tokens.toArray(new TokenInfo[tokens.size()]);
 	}
 
-	private static Formula createFormulaFromString(String string) throws FormulaParserException {
+	private static Formula createFormulaFromString(String string) {
 		// free formula
 		if (string.startsWith(FreeFormula.STRING_PREFIX)) {
 			return new FreeFormula(Integer.parseInt(string.substring(1)));
@@ -72,7 +72,7 @@ public class FormulaParser {
 		throw new FormulaParserException("Invalid token " + string);
 	}
 
-	private static Formula createFormula(TokenInfo[] tokens) throws FormulaParserException {
+	private static Formula createFormula(TokenInfo[] tokens) {
 		if (tokens.length == 0) {
 			return null;
 		}

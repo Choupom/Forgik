@@ -26,7 +26,6 @@ import com.choupom.forgik.formula.FreeFormula;
 import com.choupom.forgik.formula.UnaryConnective;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
-import com.choupom.forgik.parser.FormulaParserException;
 import com.choupom.forgik.proof.ProofConverter;
 import com.choupom.forgik.proof.linear.AssumptionStatement;
 import com.choupom.forgik.proof.linear.PremiseStatement;
@@ -73,7 +72,7 @@ public class MainActivity extends Activity {
     private Challenge[] loadChallenges() {
         try {
             return ChallengesHelper.loadSortedChallenges();
-        } catch (IOException | FormulaParserException e) {
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -85,7 +84,7 @@ public class MainActivity extends Activity {
             this.rules = rulebook.getRules();
             this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
             this.currentChallengeIndex = index;
-        } catch (IOException | FormulaParserException e) {
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }

@@ -10,12 +10,11 @@ import org.junit.Test;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.parser.FormulaParser;
-import com.choupom.forgik.parser.FormulaParserException;
 
 public class FormulaIdentifierTest {
 
 	@Test
-	public void test() throws FormulaParserException {
+	public void test() {
 		testIdentify("$1 v Q", "P v $1", null);
 		testIdentify("$1 v Q", "$2 v $2", "Q v Q");
 		testIdentify("($1 v $2) v $3", "($2 v $3) v $1", "($1 v $1) v $1");
@@ -33,7 +32,7 @@ public class FormulaIdentifierTest {
 		testIdentify("P v $1", "$1 v Q", null);
 	}
 
-	private static void testIdentify(String string1, String string2, String stringR) throws FormulaParserException {
+	private static void testIdentify(String string1, String string2, String stringR) {
 		Formula formula1 = FormulaParser.parse(string1);
 		Formula formula2 = FormulaParser.parse(string2);
 		Identification result = FormulaIdentifier.identify(formula1, formula2);

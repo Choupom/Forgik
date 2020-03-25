@@ -12,9 +12,9 @@ import org.junit.Test;
 
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.parser.FormulaParser;
-import com.choupom.forgik.parser.FormulaParserException;
 import com.choupom.forgik.proof.ProofConverter;
 import com.choupom.forgik.proof.linear.AssumptionStatement;
+import com.choupom.forgik.proof.linear.PremiseStatement;
 import com.choupom.forgik.proof.linear.RuleStatement;
 import com.choupom.forgik.proof.linear.Statement;
 import com.choupom.forgik.rule.Rule;
@@ -38,7 +38,7 @@ public class ProverTest {
 			RULE_EFQ = RuleParser.parseRule("efq");
 			RULE_IMPLICATION_INTRO = RuleParser.parseRule("implication_intro");
 			RULE_RAA = RuleParser.parseRule("raa");
-		} catch (IOException | FormulaParserException e) {
+		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
@@ -89,7 +89,7 @@ public class ProverTest {
 		ProofInfo info = prover.getProofInfo();
 		Statement[] statements = ProofConverter.generateLinearProof(info.getAntecedents(), info.getConsequentProofs());
 
-		checkAssumptionStatement(statements[0], "-(P > Q)");
+		checkPremiseStatement(statements[0], "-(P > Q)");
 		checkAssumptionStatement(statements[1], "-P");
 		checkAssumptionStatement(statements[2], "P");
 		checkRuleStatement(statements[3], "Q", "EFQ", new int[] { 2, 1 });
@@ -102,13 +102,17 @@ public class ProverTest {
 		checkRuleStatement(statements[10], "-Q", "RAA", new int[] { 7, 9, 0 });
 	}
 
+	private static void checkPremiseStatement(Statement s, String expectedConclusionString) {
+		Formula expectedConclusion = FormulaParser.parse(expectedConclusionString);
+
+		Assert.assertTrue(s instanceof PremiseStatement);
+		PremiseStatement statement = (PremiseStatement) s;
+
+		Assert.assertEquals(statement.getConclusion(), expectedConclusion);
+	}
+
 	private static void checkAssumptionStatement(Statement s, String expectedConclusionString) {
-		Formula expectedConclusion;
-		try {
-			expectedConclusion = FormulaParser.parse(expectedConclusionString);
-		} catch (FormulaParserException e) {
-			throw new IllegalArgumentException(e);
-		}
+		Formula expectedConclusion = FormulaParser.parse(expectedConclusionString);
 
 		Assert.assertTrue(s instanceof AssumptionStatement);
 		AssumptionStatement statement = (AssumptionStatement) s;
@@ -118,12 +122,7 @@ public class ProverTest {
 
 	private static void checkRuleStatement(Statement s, String expectedConclusionString, String expectedRuleName,
 			int[] expectedAntecedentStatements) {
-		Formula expectedConclusion;
-		try {
-			expectedConclusion = FormulaParser.parse(expectedConclusionString);
-		} catch (FormulaParserException e) {
-			throw new IllegalArgumentException(e);
-		}
+		Formula expectedConclusion = FormulaParser.parse(expectedConclusionString);
 
 		Assert.assertTrue(s instanceof RuleStatement);
 		RuleStatement statement = (RuleStatement) s;

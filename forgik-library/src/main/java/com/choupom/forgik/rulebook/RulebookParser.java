@@ -11,7 +11,6 @@ import java.io.InputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.choupom.forgik.parser.FormulaParserException;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rule.RuleParser;
 import com.choupom.forgik.utils.InputStreamUtils;
@@ -28,7 +27,7 @@ public class RulebookParser {
 		// private constructor
 	}
 
-	public static Rulebook parseRulebook(String rulebookId) throws IOException, FormulaParserException {
+	public static Rulebook parseRulebook(String rulebookId) throws IOException {
 		String resourceName = DIRECTORY + rulebookId + EXTENSION;
 
 		String jsonString;
