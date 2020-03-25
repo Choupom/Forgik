@@ -12,6 +12,9 @@ import java.util.Map;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
+import com.choupom.forgik.proof.tree.ProofReport;
+import com.choupom.forgik.proof.tree.ProofReportIdentification;
+import com.choupom.forgik.proof.tree.ProofReportRule;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rule.RuleApplicationResult;
 
@@ -26,8 +29,8 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 	private final FreeFormulaFactory freeFormulaFactory;
 
 	private final boolean[] completedConsequents;
+	private final ProofReport[] consequentReports;
 	private final Map<Integer, Formula> map;
-	private final ProofReport[] reports;
 
 	public Proof(Formula[] antecedents, Formula[] consequents, Proof parent, int parentConsequentId,
 			Rule parentConsequentRule, int numAssumptions, FreeFormulaFactory freeFormulaFactory) {
@@ -40,8 +43,8 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 		this.freeFormulaFactory = freeFormulaFactory;
 
 		this.completedConsequents = new boolean[consequents.length];
+		this.consequentReports = new ProofReport[consequents.length];
 		this.map = new HashMap<>();
-		this.reports = new ProofReport[consequents.length];
 	}
 
 	public Proof getParent() {
@@ -61,12 +64,8 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 		return true;
 	}
 
-	public ProofReport[] getReports() {
-		return this.reports.clone();
-	}
-
 	public ProofInfo getInfo() {
-		return new ProofInfo(this.antecedents, this.consequents, this.completedConsequents);
+		return new ProofInfo(this.antecedents, this.consequents, this.completedConsequents, this.consequentReports);
 	}
 
 	/**
@@ -93,6 +92,7 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 		}
 
 		this.completedConsequents[consequentId] = true;
+		this.consequentReports[consequentId] = new ProofReportIdentification(antecedent, antecedentId);
 		applyMap(identification.getMap());
 	}
 
@@ -118,7 +118,7 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 		}
 
 		this.completedConsequents[consequentId] = true;
-		this.reports[consequentId] = subproof.createReport();
+		this.consequentReports[consequentId] = subproof.createReport();
 		applyMap(subproof.map);
 	}
 
@@ -184,10 +184,10 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 			this.consequents[i] = this.consequents[i].apply(map);
 		}
 
-		for (int i = 0; i < this.reports.length; i++) {
-			ProofReport report = this.reports[i];
+		for (int i = 0; i < this.consequentReports.length; i++) {
+			ProofReport report = this.consequentReports[i];
 			if (report != null) {
-				this.reports[i] = report.apply(map);
+				this.consequentReports[i] = report.apply(map);
 			}
 		}
 	}
@@ -196,6 +196,6 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 		Formula[] assumptions = Arrays.copyOfRange(this.antecedents, this.antecedents.length - this.numAssumptions,
 				this.antecedents.length);
 		Formula parentConsequent = this.parent.consequents[this.parentConsequentId];
-		return new ProofReport(this.parentConsequentRule, assumptions, this.consequents, parentConsequent, this.reports);
+		return new ProofReportRule(this.parentConsequentRule, assumptions, this.consequentReports, parentConsequent);
 	}
 }

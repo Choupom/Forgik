@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	XML
+
+	Copyright 2020 Andy Poudret. All rights reserved.
+-->
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <com.choupom.forgik.android.StatementConclusionView android:id="@+id/proof_conclusion"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+		android:layout_centerVertical="true"
+        android:layout_marginLeft="7dp"
+        android:gravity="left|center_vertical"
+        android:textSize="20dp"
+		android:minHeight="30dp"/>
+
+    <TextView android:id="@+id/proof_source"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_centerVertical="true"
+		android:layout_marginRight="7dp"
+        android:gravity="left|center_vertical"
+        android:textSize="20dp"
+		android:minHeight="30dp"/>
+</TableRow>

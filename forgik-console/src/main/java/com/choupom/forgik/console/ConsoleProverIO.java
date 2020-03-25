@@ -42,7 +42,7 @@ public class ConsoleProverIO {
 		// System.out.println("What do you want to do?");
 		// System.out.println("{Q} Cancel this proof");
 		// System.out.println("{<} Complete this proof");
-		// System.out.println("{G} Suggest rules");
+		// System.out.println("{R} Suggest rules");
 		return getDecision();
 	}
 
@@ -67,7 +67,7 @@ public class ConsoleProverIO {
 		}
 	}
 
-	public int requestSuggestion(Rule[] rules) {
+	public int requestRule(Rule[] rules) {
 		System.out.println("Which rule do you want to use?");
 
 		for (int i = 0; i < rules.length; i++) {
@@ -119,7 +119,7 @@ public class ConsoleProverIO {
 			String line = this.input.nextLine();
 			if (line.equals("<")) {
 				return Decision.COMPLETE_PROOF;
-			} else if (line.equals("G")) {
+			} else if (line.equals("R")) {
 				return Decision.SUGGEST_RULE;
 			} else if (line.equals("Q")) {
 				return Decision.CANCEL_PROOF;

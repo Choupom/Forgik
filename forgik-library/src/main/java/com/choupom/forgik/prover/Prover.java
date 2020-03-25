@@ -17,7 +17,8 @@ public class Prover {
 
 	public Prover(Formula[] antecedents, Formula[] consequents) {
 		this.freeFormulaFactory = new FreeFormulaFactory();
-		this.mainProof = new Proof(antecedents, consequents, null, -1, null, 0, this.freeFormulaFactory);
+		this.mainProof = new Proof(antecedents, consequents, null, -1, null, antecedents.length,
+				this.freeFormulaFactory);
 
 		this.proof = this.mainProof;
 	}
@@ -32,10 +33,6 @@ public class Prover {
 
 	public boolean isProofComplete() {
 		return this.proof.isComplete();
-	}
-
-	public ProofReport[] getProofReports() {
-		return this.proof.getReports();
 	}
 
 	public ProofInfo getProofInfo() {

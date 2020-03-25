@@ -8,7 +8,6 @@ package com.choupom.forgik.android;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spanned;
 import android.view.Gravity;
 import android.view.View;
@@ -28,12 +27,19 @@ import com.choupom.forgik.formula.UnaryConnective;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.parser.FormulaParserException;
+import com.choupom.forgik.proof.ProofConverter;
+import com.choupom.forgik.proof.linear.AssumptionStatement;
+import com.choupom.forgik.proof.linear.PremiseStatement;
+import com.choupom.forgik.proof.linear.RuleStatement;
+import com.choupom.forgik.proof.linear.Statement;
+import com.choupom.forgik.proof.tree.ProofReport;
 import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
 import com.choupom.forgik.prover.ProverException;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rulebook.Rulebook;
 import com.choupom.forgik.rulebook.RulebookParser;
+import com.google.android.gms.common.util.ArrayUtils;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -57,6 +63,7 @@ public class MainActivity extends Activity {
     private Prover prover;
 
     private int selectedConsequentId;
+    private int selectedStatementId;
 
     public MainActivity() {
         this.challenges = loadChallenges();
@@ -89,11 +96,11 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.main_view);
 
-        Button cancelProofButton = (Button) findViewById(R.id.cancel_proof_button);
+        Button cancelProofButton = (Button) findViewById(R.id.cancel_subproof_button);
         cancelProofButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cancelProof();
+                cancelSubproof();
             }
         });
 
@@ -135,16 +142,23 @@ public class MainActivity extends Activity {
             informationText.setText(R.string.please_select_consequent);
         }
 
-        // update apply rule text
-        View applyRuleView = findViewById(R.id.apply_rule);
-        applyRuleView.setVisibility(selectedConsequent != null ? View.VISIBLE : View.GONE);
+        // update rules text
+        View rulesView = findViewById(R.id.rules_text);
+        rulesView.setVisibility(selectedConsequent != null ? View.VISIBLE : View.GONE);
 
         // update rules table
         updateRulesTable(selectedConsequent);
 
-        // update cancel proof button
-        Button cancelProofButton = (Button) findViewById(R.id.cancel_proof_button);
-        cancelProofButton.setEnabled(!this.prover.isOnMainProof());
+        // update proof text
+        View proofView = findViewById(R.id.proof_text);
+        proofView.setVisibility(this.prover.isMainProofComplete() ? View.VISIBLE : View.GONE);
+
+        // update proof table
+        updateProofTable(antecedents, proofInfo.getConsequentProofs());
+
+        // update cancel subproof button
+        Button cancelSubproofButton = (Button) findViewById(R.id.cancel_subproof_button);
+        cancelSubproofButton.setVisibility(!this.prover.isOnMainProof() ? View.VISIBLE : View.GONE);
     }
 
     private void updateAntecedentsTable(Formula[] antecedents, Formula selectedConsequent) {
@@ -191,6 +205,62 @@ public class MainActivity extends Activity {
                     rowCount += RULES_PER_ROW[rowIndex];
                     rowIndex++;
                 }
+            }
+        }
+    }
+
+    private void updateProofTable(Formula[] antecedents, ProofReport[] consequentProofs) {
+        TableLayout proofTable = (TableLayout) findViewById(R.id.proof_table);
+        proofTable.removeAllViews();
+
+        if (this.prover.isMainProofComplete()) {
+            Statement[] statements = ProofConverter.generateLinearProof(antecedents, consequentProofs);
+            int[] selectedAntecedentStatements = new int[0];
+            if (this.selectedStatementId != -1 && statements[this.selectedStatementId] instanceof RuleStatement) {
+                RuleStatement selectedStatement = (RuleStatement) statements[this.selectedStatementId];
+                selectedAntecedentStatements = selectedStatement.getAntecedentStatements();
+            }
+
+            for (int i = 0; i < statements.length; i++) {
+                final int statementId = i;
+                Statement statement = statements[statementId];
+
+                View row = getLayoutInflater().inflate(R.layout.proof_entry, null);
+                StatementConclusionView conclusionView = (StatementConclusionView) row.findViewById(R.id.proof_conclusion);
+                TextView sourceView = (TextView) row.findViewById(R.id.proof_source);
+
+                row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        selectStatement(statementId);
+                    }
+                });
+
+                if (statementId == this.selectedStatementId) {
+                    row.setBackgroundColor(Color.parseColor("#DDDDFF"));
+                } else if (ArrayUtils.contains(selectedAntecedentStatements, statementId)) {
+                    row.setBackgroundColor(Color.parseColor("#F7DDDD"));
+                }
+
+                conclusionView.setPadding(statement.getDepth()*35, 0, 0, 0);
+                conclusionView.setDepth(statement.getDepth());
+
+                String conclusionString = replaceConnectiveSymbols(statement.getConclusion().toString());
+                conclusionView.setText(makeHtml(conclusionString));
+
+                String sourceString = "";
+                if (statement instanceof PremiseStatement) {
+                    sourceString = "premise";
+                } else if (statement instanceof AssumptionStatement) {
+                    sourceString = "assumption";
+                } else if (statement instanceof RuleStatement) {
+                    RuleStatement ruleStatement = (RuleStatement) statement;
+                    sourceString = formatRuleName(ruleStatement.getRule().getName());
+                }
+
+                sourceView.setText(makeHtml(sourceString));
+
+                proofTable.addView(row);
             }
         }
     }
@@ -256,15 +326,17 @@ public class MainActivity extends Activity {
                 proveByRule(rule);
             }
         });
-        String ruleName = replaceConnectiveSymbols(rule.getName());
-        ruleName = ruleName.replace("1", "<sub><small>1</small></sub>");
-        ruleName = ruleName.replace("2", "<sub><small>2</small></sub>");
-        button.setText(HtmlCompat.fromHtml(ruleName, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        button.setText(makeHtml(formatRuleName(rule.getName())));
         return button;
     }
 
     private void selectConsequent(int consequentId) {
         this.selectedConsequentId = consequentId;
+        updateView();
+    }
+
+    private void selectStatement(int statementId) {
+        this.selectedStatementId = statementId;
         updateView();
     }
 
@@ -292,7 +364,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void cancelProof() {
+    private void cancelSubproof() {
         try {
           this.prover.cancelProof();
         } catch (ProverException e) {
@@ -314,6 +386,7 @@ public class MainActivity extends Activity {
 
     private void resetProofState() {
         this.selectedConsequentId = -1;
+        this.selectedStatementId = -1;
 
         ProofInfo proofInfo = this.prover.getProofInfo();
         boolean[] completedConsequents = proofInfo.getCompletedConsequents();
@@ -340,6 +413,13 @@ public class MainActivity extends Activity {
         return HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
+    private static String formatRuleName(String ruleName) {
+        ruleName = replaceConnectiveSymbols(ruleName);
+        ruleName = ruleName.replace("1", "<sub><small>1</small></sub>");
+        ruleName = ruleName.replace("2", "<sub><small>2</small></sub>");
+        return ruleName;
+    }
+
     private static String replaceConnectiveSymbols(String string) {
         string = string.replace(UnaryConnective.Type.NEGATION.getSymbol(), NEGATION_SYMBOL);
         string = string.replace(BinaryConnective.Type.IMPLICATION.getSymbol(), IMPLICATION_SYMBOL);
@@ -351,5 +431,9 @@ public class MainActivity extends Activity {
     private static String replaceFreeFormulas(String string) {
         return string.replaceAll("\\"+ FreeFormula.STRING_PREFIX+"([0-9]+)",
 				FREE_FORMULA_SYMBOL+"<sub><small>$1</small></sub>");
+    }
+
+    private static Spanned makeHtml(String string) {
+        return HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 }

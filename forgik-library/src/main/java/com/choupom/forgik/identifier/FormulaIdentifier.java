@@ -15,6 +15,10 @@ import com.choupom.forgik.formula.Formula;
 
 public class FormulaIdentifier {
 
+	private FormulaIdentifier() {
+		// private constructor
+	}
+
 	public static Identification identify(Formula formula1, Formula formula2) {
 		Map<Integer, Formula> identificationMap = new HashMap<>();
 

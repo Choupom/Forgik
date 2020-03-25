@@ -14,6 +14,10 @@ import com.choupom.forgik.formula.Predicate;
 
 public class FormulaParser {
 
+	private FormulaParser() {
+		// private constructor
+	}
+
 	public static Formula parse(String string) throws FormulaParserException {
 		TokenInfo[] tokens = tokenize(string.toCharArray());
 		return createFormula(tokens);
@@ -57,7 +61,7 @@ public class FormulaParser {
 		}
 
 		// predicate
-		if (string.length() == 1){
+		if (string.length() == 1) {
 			char predicateName = string.charAt(0);
 			if (Character.isUpperCase(predicateName)) {
 				return new Predicate(predicateName);
