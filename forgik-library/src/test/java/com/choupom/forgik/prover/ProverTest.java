@@ -90,16 +90,16 @@ public class ProverTest {
 		Statement[] statements = ProofConverter.generateLinearProof(info.getAntecedents(), info.getConsequentProofs());
 
 		checkPremiseStatement(statements[0], "-(P > Q)");
-		checkAssumptionStatement(statements[1], "-P");
-		checkAssumptionStatement(statements[2], "P");
-		checkRuleStatement(statements[3], "Q", "EFQ", new int[] { 2, 1 });
-		checkRuleStatement(statements[4], "P > Q", ">I", new int[] { 2, 3 });
-		checkRuleStatement(statements[5], "--P", "RAA", new int[] { 1, 4, 0 });
-		checkRuleStatement(statements[6], "P", "--E", new int[] { 5 });
-		checkAssumptionStatement(statements[7], "Q");
-		checkAssumptionStatement(statements[8], "P");
-		checkRuleStatement(statements[9], "P > Q", ">I", new int[] { 8, 7 });
-		checkRuleStatement(statements[10], "-Q", "RAA", new int[] { 7, 9, 0 });
+		checkAssumptionStatement(statements[1], 0, "-P");
+		checkAssumptionStatement(statements[2], 1, "P");
+		checkRuleStatement(statements[3], 2, "Q", "EFQ", new int[] { 2, 1 });
+		checkRuleStatement(statements[4], 1, "P > Q", ">I", new int[] { 2, 3 });
+		checkRuleStatement(statements[5], 0, "--P", "RAA", new int[] { 1, 4, 0 });
+		checkRuleStatement(statements[6], 0, "P", "--E", new int[] { 5 });
+		checkAssumptionStatement(statements[7], 0, "Q");
+		checkAssumptionStatement(statements[8], 1, "P");
+		checkRuleStatement(statements[9], 1, "P > Q", ">I", new int[] { 8, 7 });
+		checkRuleStatement(statements[10], 0, "-Q", "RAA", new int[] { 7, 9, 0 });
 	}
 
 	private static void checkPremiseStatement(Statement s, String expectedConclusionString) {
@@ -108,25 +108,28 @@ public class ProverTest {
 		Assert.assertTrue(s instanceof PremiseStatement);
 		PremiseStatement statement = (PremiseStatement) s;
 
+		Assert.assertEquals(0, statement.getDepth());
 		Assert.assertEquals(statement.getConclusion(), expectedConclusion);
 	}
 
-	private static void checkAssumptionStatement(Statement s, String expectedConclusionString) {
+	private static void checkAssumptionStatement(Statement s, int expectedDepth, String expectedConclusionString) {
 		Formula expectedConclusion = FormulaParser.parse(expectedConclusionString);
 
 		Assert.assertTrue(s instanceof AssumptionStatement);
 		AssumptionStatement statement = (AssumptionStatement) s;
 
+		Assert.assertEquals(expectedDepth, statement.getDepth());
 		Assert.assertEquals(statement.getConclusion(), expectedConclusion);
 	}
 
-	private static void checkRuleStatement(Statement s, String expectedConclusionString, String expectedRuleName,
-			int[] expectedAntecedentStatements) {
+	private static void checkRuleStatement(Statement s, int expectedDepth, String expectedConclusionString,
+			String expectedRuleName, int[] expectedAntecedentStatements) {
 		Formula expectedConclusion = FormulaParser.parse(expectedConclusionString);
 
 		Assert.assertTrue(s instanceof RuleStatement);
 		RuleStatement statement = (RuleStatement) s;
 
+		Assert.assertEquals(expectedDepth, statement.getDepth());
 		Assert.assertEquals(expectedConclusion, statement.getConclusion());
 		Assert.assertEquals(expectedRuleName, statement.getRule().getName());
 		Assert.assertArrayEquals(expectedAntecedentStatements, statement.getAntecedentStatements());
