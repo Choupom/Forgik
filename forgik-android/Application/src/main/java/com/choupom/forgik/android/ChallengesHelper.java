@@ -24,7 +24,7 @@ public class ChallengesHelper {
 
     private static final String[] CHALLENGES = new String[] { "modus_tollens", "hypothetical_syllogism",
 			"challenge1", "challenge2", "challenge3", "challenge4", "challenge5", "challenge6",
-			"challenge7", "challenge8", "challenge9", "challenge10", "challenge11" };
+			"challenge7", "challenge8", "challenge9", "challenge10", "challenge11", "challenge12" };
 
     private ChallengesHelper() {
         // private constructor

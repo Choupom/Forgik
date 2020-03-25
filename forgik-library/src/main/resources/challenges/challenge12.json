@@ -1,0 +1,11 @@
+{
+	"name": "Challenge #12",
+	"difficulty": 3,
+	"rulebook": "classical_logic",
+	"antecedents": [
+		"P > Q"
+	],
+	"consequents": [
+		"P > (Q ^ Q)"
+	]
+}
