@@ -5,11 +5,7 @@
  */
 package com.choupom.forgik.formula;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-public class UnaryConnective implements Formula {
+public class UnaryConnective extends Formula {
 
 	public enum Type {
 
@@ -43,48 +39,7 @@ public class UnaryConnective implements Formula {
 	}
 
 	@Override
-	public String toString() {
-		return this.type.getSymbol() + this.operand.toStringNested();
-	}
-
-	@Override
-	public String toStringNested() {
-		return toString();
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof UnaryConnective)) {
-			return false;
-		}
-
-		UnaryConnective connective = (UnaryConnective) object;
-		return (this.type == connective.type && this.operand.equals(connective.operand));
-	}
-
-	@Override
-	public boolean identify(Formula formula, Map<Integer, List<Formula>> map) {
-		if (formula instanceof FreeFormula) {
-			FreeFormula freeFormula = (FreeFormula) formula;
-			return freeFormula.identify(this, map);
-		}
-
-		if (!(formula instanceof UnaryConnective)) {
-			return false;
-		}
-
-		UnaryConnective connective = (UnaryConnective) formula;
-		return (this.type == connective.type && this.operand.identify(connective.operand, map));
-	}
-
-	@Override
-	public Formula apply(Map<Integer, Formula> map) {
-		Formula newOperand = this.operand.apply(map);
-		return new UnaryConnective(this.type, newOperand);
-	}
-
-	@Override
-	public void getFreeFormulas(Set<Integer> freeFormulas) {
-		this.operand.getFreeFormulas(freeFormulas);
+	public <R, P> R runOperation(FormulaOperation<R, P> operation, P param) {
+		return operation.handleUnaryConnective(this, param);
 	}
 }

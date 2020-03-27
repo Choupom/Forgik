@@ -9,15 +9,16 @@ import java.util.Map;
 import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 
 public class RuleApplicationResult {
 
-	private final Formula[] assumptions;
-	private final Formula[] antecedents;
+	private final Formulas assumptions;
+	private final Formulas antecedents;
 	private final Set<Integer> leftover;
 	private final Map<Integer, Formula> consequentMap;
 
-	public RuleApplicationResult(Formula[] assumptions, Formula[] antecedents, Set<Integer> leftover,
+	public RuleApplicationResult(Formulas assumptions, Formulas antecedents, Set<Integer> leftover,
 			Map<Integer, Formula> consequentMap) {
 		this.assumptions = assumptions;
 		this.antecedents = antecedents;
@@ -25,12 +26,12 @@ public class RuleApplicationResult {
 		this.consequentMap = consequentMap;
 	}
 
-	public Formula[] getAssumptions() {
-		return this.assumptions;
+	public Formulas getAssumptions() {
+		return this.assumptions.getCopy();
 	}
 
-	public Formula[] getAntecedents() {
-		return this.antecedents;
+	public Formulas getAntecedents() {
+		return this.antecedents.getCopy();
 	}
 
 	public Set<Integer> getLeftover() {

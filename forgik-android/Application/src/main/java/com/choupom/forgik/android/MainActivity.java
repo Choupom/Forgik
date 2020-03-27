@@ -22,6 +22,7 @@ import androidx.core.text.HtmlCompat;
 import com.choupom.forgik.challenge.Challenge;
 import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.formula.FreeFormula;
 import com.choupom.forgik.formula.UnaryConnective;
 import com.choupom.forgik.identifier.FormulaIdentifier;
@@ -36,6 +37,7 @@ import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
 import com.choupom.forgik.prover.ProverException;
 import com.choupom.forgik.rule.Rule;
+import com.choupom.forgik.rule.RuleApplier;
 import com.choupom.forgik.rulebook.Rulebook;
 import com.choupom.forgik.rulebook.RulebookParser;
 import com.google.android.gms.common.util.ArrayUtils;
@@ -117,13 +119,13 @@ public class MainActivity extends Activity {
     private void updateView() {
         // get proof info
         ProofInfo proofInfo = this.prover.getProofInfo();
-        Formula[] antecedents = proofInfo.getAntecedents();
-        Formula[] consequents = proofInfo.getConsequents();
+        Formulas antecedents = proofInfo.getAntecedents();
+        Formulas consequents = proofInfo.getConsequents();
         boolean[] completedConsequents = proofInfo.getCompletedConsequents();
 
         Formula selectedConsequent = null;
         if (this.selectedConsequentId != -1) {
-            selectedConsequent = consequents[this.selectedConsequentId];
+            selectedConsequent = consequents.get(this.selectedConsequentId);
         }
 
         // update antecedents table
@@ -160,23 +162,27 @@ public class MainActivity extends Activity {
         cancelSubproofButton.setVisibility(!this.prover.isOnMainProof() ? View.VISIBLE : View.GONE);
     }
 
-    private void updateAntecedentsTable(Formula[] antecedents, Formula selectedConsequent) {
+    private void updateAntecedentsTable(Formulas antecedents, Formula selectedConsequent) {
         TableLayout antecedentsTable = (TableLayout) findViewById(R.id.antecedents_table);
         antecedentsTable.removeAllViews();
 
-        for (int i = 0; i < antecedents.length; i++) {
-            View view = createAntecedentView(i, antecedents[i], selectedConsequent);
+        int index = 0;
+        for (Formula antecedent : antecedents) {
+            View view = createAntecedentView(index, antecedent, selectedConsequent);
             antecedentsTable.addView(view);
+            index++;
         }
     }
 
-    private void updateConsequentsTable(Formula[] consequents, boolean[] completedConsequents) {
+    private void updateConsequentsTable(Formulas consequents, boolean[] completedConsequents) {
         TableLayout consequentsTable = (TableLayout) findViewById(R.id.consequents_table);
         consequentsTable.removeAllViews();
 
-        for (int i = 0; i < consequents.length; i++) {
-            View view = createConsequentView(i, consequents[i], completedConsequents[i]);
+        int index = 0;
+        for (Formula consequent : consequents) {
+            View view = createConsequentView(index, consequent, completedConsequents[index]);
             consequentsTable.addView(view);
+            index++;
         }
     }
 
@@ -208,7 +214,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void updateProofTable(Formula[] antecedents, ProofReport[] consequentProofs) {
+    private void updateProofTable(Formulas antecedents, ProofReport[] consequentProofs) {
         TableLayout proofTable = (TableLayout) findViewById(R.id.proof_table);
         proofTable.removeAllViews();
 
@@ -318,7 +324,7 @@ public class MainActivity extends Activity {
 
     private View createRuleView(final Rule rule, Formula selectedConsequent) {
         Button button = (Button) getLayoutInflater().inflate(R.layout.rule_entry, null);
-        button.setEnabled(rule.apply(selectedConsequent) != null);
+        button.setEnabled(RuleApplier.canApply(rule, selectedConsequent));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

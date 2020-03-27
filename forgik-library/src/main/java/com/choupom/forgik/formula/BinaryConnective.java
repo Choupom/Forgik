@@ -5,11 +5,7 @@
  */
 package com.choupom.forgik.formula;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-public class BinaryConnective implements Formula {
+public class BinaryConnective extends Formula {
 
 	public enum Type {
 
@@ -49,52 +45,7 @@ public class BinaryConnective implements Formula {
 	}
 
 	@Override
-	public String toString() {
-		return this.operand1.toStringNested() + " " + this.type.getSymbol() + " " + this.operand2.toStringNested();
-	}
-
-	@Override
-	public String toStringNested() {
-		return "(" + toString() + ")";
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof BinaryConnective)) {
-			return false;
-		}
-
-		BinaryConnective connective = (BinaryConnective) object;
-		return (this.type == connective.type && this.operand1.equals(connective.operand1)
-				&& this.operand2.equals(connective.operand2));
-	}
-
-	@Override
-	public boolean identify(Formula formula, Map<Integer, List<Formula>> map) {
-		if (formula instanceof FreeFormula) {
-			FreeFormula freeFormula = (FreeFormula) formula;
-			return freeFormula.identify(this, map);
-		}
-
-		if (!(formula instanceof BinaryConnective)) {
-			return false;
-		}
-
-		BinaryConnective connective = (BinaryConnective) formula;
-		return (this.type == connective.type && this.operand1.identify(connective.operand1, map)
-				&& this.operand2.identify(connective.operand2, map));
-	}
-
-	@Override
-	public Formula apply(Map<Integer, Formula> map) {
-		Formula newOperand1 = this.operand1.apply(map);
-		Formula newOperand2 = this.operand2.apply(map);
-		return new BinaryConnective(this.type, newOperand1, newOperand2);
-	}
-
-	@Override
-	public void getFreeFormulas(Set<Integer> freeFormulas) {
-		this.operand1.getFreeFormulas(freeFormulas);
-		this.operand2.getFreeFormulas(freeFormulas);
+	public <R, P> R runOperation(FormulaOperation<R, P> operation, P param) {
+		return operation.handleBinaryConnective(this, param);
 	}
 }

@@ -8,6 +8,7 @@ package com.choupom.forgik.console;
 import java.util.Scanner;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.rule.Rule;
 
@@ -31,7 +32,7 @@ public class ConsoleProverIO {
 		this.input = new Scanner(System.in);
 	}
 
-	public Decision requestDecision(Formula[] entries, Formula goal) {
+	public Decision requestDecision(Formulas entries, Formula goal) {
 		int i = 0;
 		for (Formula entry : entries) {
 			System.out.println("[" + (i++) + "] " + entry);
@@ -77,7 +78,7 @@ public class ConsoleProverIO {
 		return getIndex(0, rules.length - 1);
 	}
 
-	public int requestSubproof(Formula[] entries, Formula[] goals, boolean[] completedGoals) {
+	public int requestSubproof(Formulas entries, Formulas goals, boolean[] completedGoals) {
 		int numUncompletedGoals = 0;
 		int firstUncompletedGoal = -1;
 		for (int i = 0; i < completedGoals.length; i++) {
@@ -97,14 +98,14 @@ public class ConsoleProverIO {
 
 		System.out.println("What do you want to prove first?");
 
-		for (i = 0; i < goals.length; i++) {
+		for (i = 0; i < goals.size(); i++) {
 			if (!completedGoals[i]) {
-				System.out.println("{" + i + "} " + goals[i]);
+				System.out.println("{" + i + "} " + goals.get(i));
 			}
 		}
 
 		while (true) {
-			int index = getIndex(0, goals.length - 1);
+			int index = getIndex(0, goals.size() - 1);
 			if (index == -1) {
 				return -1;
 			} else if (completedGoals[index]) {

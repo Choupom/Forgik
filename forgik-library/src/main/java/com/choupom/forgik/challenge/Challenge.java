@@ -5,22 +5,22 @@
  */
 package com.choupom.forgik.challenge;
 
-import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 
 public class Challenge {
 
 	private final String name;
 	private final int difficulty;
 	private final String rulebook;
-	private final Formula[] antecedents;
-	private final Formula[] consequents;
+	private final Formulas antecedents;
+	private final Formulas consequents;
 
-	public Challenge(String name, int difficulty, String rulebook, Formula[] antecedents, Formula[] consequents) {
+	public Challenge(String name, int difficulty, String rulebook, Formulas antecedents, Formulas consequents) {
 		this.name = name;
 		this.difficulty = difficulty;
 		this.rulebook = rulebook;
-		this.antecedents = antecedents.clone();
-		this.consequents = consequents.clone();
+		this.antecedents = antecedents.getCopy();
+		this.consequents = consequents.getCopy();
 	}
 
 	public String getName() {
@@ -35,11 +35,11 @@ public class Challenge {
 		return this.rulebook;
 	}
 
-	public Formula[] getAntecedents() {
-		return this.antecedents.clone();
+	public Formulas getAntecedents() {
+		return this.antecedents.getCopy();
 	}
 
-	public Formula[] getConsequents() {
-		return this.consequents.clone();
+	public Formulas getConsequents() {
+		return this.consequents.getCopy();
 	}
 }

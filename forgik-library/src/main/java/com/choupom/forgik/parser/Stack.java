@@ -9,7 +9,7 @@ import com.choupom.forgik.formula.BinaryConnective;
 import com.choupom.forgik.formula.Formula;
 import com.choupom.forgik.formula.UnaryConnective;
 
-class Stack {
+/* package */ class Stack {
 
 	private final TokenInfo[] array;
 	private int size;
@@ -106,13 +106,5 @@ class Stack {
 		default:
 			return null;
 		}
-	}
-
-	public void print() {
-		System.out.print("Stack content: ");
-		for (int i = 0; i < this.size; i++) {
-			System.out.print(this.array[i] + " ");
-		}
-		System.out.println();
 	}
 }

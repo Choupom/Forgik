@@ -16,7 +16,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.formula.FreeFormula;
+import com.choupom.forgik.operations.ApplyOperation;
+import com.choupom.forgik.operations.GetFreeFormulasOperation;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.utils.InputStreamUtils;
 
@@ -70,20 +73,20 @@ public class RuleParser {
 
 		Formula parsedConsequent = parseFormula(consequent);
 
-		return new Rule(name, parsedAssumptions, parsedAntecedents, parsedConsequent);
+		return new Rule(name, Formulas.wrap(parsedAssumptions), Formulas.wrap(parsedAntecedents), parsedConsequent);
 	}
 
 	private static Formula parseFormula(String string) {
 		Formula formula = FormulaParser.parse(string);
 
 		Set<Integer> freeFormulas = new HashSet<>();
-		formula.getFreeFormulas(freeFormulas);
+		formula.runOperation(new GetFreeFormulasOperation(freeFormulas));
 
 		Map<Integer, Formula> map = new HashMap<>();
 		for (Integer freeFormula : freeFormulas) {
-			map.put(freeFormula, new FreeFormula(-freeFormula.intValue() - 1)); // replace id by negative id
+			map.put(freeFormula, new FreeFormula(-freeFormula - 1)); // replace id by negative id
 		}
 
-		return formula.apply(map);
+		return formula.runOperation(new ApplyOperation(map));
 	}
 }

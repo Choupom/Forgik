@@ -5,7 +5,7 @@
  */
 package com.choupom.forgik.prover;
 
-import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.rule.Rule;
 
 public class Prover {
@@ -15,9 +15,9 @@ public class Prover {
 
 	private Proof proof;
 
-	public Prover(Formula[] antecedents, Formula[] consequents) {
+	public Prover(Formulas antecedents, Formulas consequents) {
 		this.freeFormulaFactory = new FreeFormulaFactory();
-		this.mainProof = new Proof(antecedents, consequents, null, -1, null, antecedents.length,
+		this.mainProof = new Proof(antecedents, consequents, null, -1, null, antecedents.size(),
 				this.freeFormulaFactory);
 
 		this.proof = this.mainProof;

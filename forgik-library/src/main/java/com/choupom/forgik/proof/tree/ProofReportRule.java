@@ -8,18 +8,20 @@ package com.choupom.forgik.proof.tree;
 import java.util.Map;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
+import com.choupom.forgik.operations.ApplyOperation;
 import com.choupom.forgik.rule.Rule;
 
 public class ProofReportRule implements ProofReport {
 
 	private final Rule rule;
-	private final Formula[] assumptions;
+	private final Formulas assumptions;
 	private final ProofReport[] subproofs;
 	private final Formula conclusion;
 
-	public ProofReportRule(Rule rule, Formula[] assumptions, ProofReport[] subproofs, Formula conclusion) {
+	public ProofReportRule(Rule rule, Formulas assumptions, ProofReport[] subproofs, Formula conclusion) {
 		this.rule = rule;
-		this.assumptions = assumptions.clone();
+		this.assumptions = assumptions.getCopy();
 		this.subproofs = subproofs.clone();
 		this.conclusion = conclusion;
 	}
@@ -28,8 +30,8 @@ public class ProofReportRule implements ProofReport {
 		return this.rule;
 	}
 
-	public Formula[] getAssumptions() {
-		return this.assumptions.clone();
+	public Formulas getAssumptions() {
+		return this.assumptions.getCopy();
 	}
 
 	public ProofReport[] getSubproofs() {
@@ -43,17 +45,14 @@ public class ProofReportRule implements ProofReport {
 
 	@Override
 	public ProofReportRule apply(Map<Integer, Formula> map) {
-		Formula[] assumptions = new Formula[this.assumptions.length];
-		for (int i = 0; i < assumptions.length; i++) {
-			assumptions[i] = this.assumptions[i].apply(map);
-		}
+		ApplyOperation applyOperation = new ApplyOperation(map);
+		Formulas assumptions = this.assumptions.runOperation(applyOperation);
+		Formula conclusion = this.conclusion.runOperation(applyOperation);
 
 		ProofReport[] subproofs = new ProofReport[this.subproofs.length];
 		for (int i = 0; i < subproofs.length; i++) {
 			subproofs[i] = this.subproofs[i].apply(map);
 		}
-
-		Formula conclusion = this.conclusion.apply(map);
 
 		return new ProofReportRule(this.rule, assumptions, subproofs, conclusion);
 	}

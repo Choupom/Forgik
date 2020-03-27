@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.proof.ProofConverter;
 import com.choupom.forgik.proof.linear.AssumptionStatement;
@@ -22,8 +23,8 @@ import com.choupom.forgik.rule.RuleParser;
 
 public class ProverTest {
 
-	private static final Formula[] ANTECEDENTS;
-	private static final Formula[] CONSEQUENTS;
+	private static final Formulas ANTECEDENTS;
+	private static final Formulas CONSEQUENTS;
 
 	private static final Rule RULE_DOUBLE_NEG_ELIMINATION;
 	private static final Rule RULE_EFQ;
@@ -32,8 +33,8 @@ public class ProverTest {
 
 	static {
 		try {
-			ANTECEDENTS = new Formula[] { FormulaParser.parse("-(P > Q)") };
-			CONSEQUENTS = new Formula[] { FormulaParser.parse("P"), FormulaParser.parse("-Q") };
+			ANTECEDENTS = Formulas.list(FormulaParser.parse("-(P > Q)"));
+			CONSEQUENTS = Formulas.list(FormulaParser.parse("P"), FormulaParser.parse("-Q"));
 			RULE_DOUBLE_NEG_ELIMINATION = RuleParser.parseRule("double_neg_elim");
 			RULE_EFQ = RuleParser.parseRule("efq");
 			RULE_IMPLICATION_INTRO = RuleParser.parseRule("implication_intro");
@@ -109,7 +110,7 @@ public class ProverTest {
 		PremiseStatement statement = (PremiseStatement) s;
 
 		Assert.assertEquals(0, statement.getDepth());
-		Assert.assertEquals(statement.getConclusion(), expectedConclusion);
+		Assert.assertEquals(expectedConclusion, statement.getConclusion());
 	}
 
 	private static void checkAssumptionStatement(Statement s, int expectedDepth, String expectedConclusionString) {
@@ -119,7 +120,7 @@ public class ProverTest {
 		AssumptionStatement statement = (AssumptionStatement) s;
 
 		Assert.assertEquals(expectedDepth, statement.getDepth());
-		Assert.assertEquals(statement.getConclusion(), expectedConclusion);
+		Assert.assertEquals(expectedConclusion, statement.getConclusion());
 	}
 
 	private static void checkRuleStatement(Statement s, int expectedDepth, String expectedConclusionString,
@@ -137,16 +138,21 @@ public class ProverTest {
 
 	@SuppressWarnings("unused")
 	private static void printProofInfo(ProofInfo proofInfo) {
-		int i = 0;
+		int index = 0;
 		for (Formula antecedent : proofInfo.getAntecedents()) {
-			System.out.println("[" + (i++) + "] " + antecedent);
+			System.out.println("[" + index + "] " + antecedent);
+			index++;
 		}
+
 		System.out.println("...");
-		for (i = 0; i < proofInfo.getConsequents().length; i++) {
-			if (!proofInfo.getCompletedConsequents()[i]) {
-				Formula consequent = proofInfo.getConsequents()[i];
-				System.out.println("[G" + i + "] " + consequent + "?");
+
+		boolean[] completedConsequents = proofInfo.getCompletedConsequents();
+		index = 0;
+		for (Formula consequent : proofInfo.getConsequents()) {
+			if (!completedConsequents[index]) {
+				System.out.println("[G" + index + "] " + consequent + "?");
 			}
+			index++;
 		}
 	}
 }

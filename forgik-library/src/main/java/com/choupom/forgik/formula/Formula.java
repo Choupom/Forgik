@@ -5,17 +5,33 @@
  */
 package com.choupom.forgik.formula;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.choupom.forgik.operations.EqualsOperation;
+import com.choupom.forgik.operations.GetStringOperation;
 
-public interface Formula {
+public abstract class Formula {
 
-	String toStringNested();
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		runOperation(new GetStringOperation(stringBuilder), Boolean.FALSE);
+		return stringBuilder.toString();
+	}
 
-	boolean identify(Formula formula, Map<Integer, List<Formula>> map);
+	@Override
+	public boolean equals(Object object) {
+		if (object == this) {
+			return true;
+		} else if (!(object instanceof Formula)) {
+			return false;
+		} else {
+			Formula otherFormula = (Formula) object;
+			return runOperation(new EqualsOperation(), otherFormula);
+		}
+	}
 
-	Formula apply(Map<Integer, Formula> map);
+	public <R> R runOperation(FormulaOperation<R, Void> operation) {
+		return runOperation(operation, null);
+	}
 
-	void getFreeFormulas(Set<Integer> freeFormulas);
+	public abstract <R, P> R runOperation(FormulaOperation<R, P> operation, P param);
 }

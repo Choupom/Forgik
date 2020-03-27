@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.operations.ApplyOperation;
 import com.choupom.forgik.parser.FormulaParser;
 
 public class FormulaIdentifierTest {
@@ -39,9 +40,12 @@ public class FormulaIdentifierTest {
 		if (stringR == null) {
 			Assert.assertNull(result);
 		} else {
-			Assert.assertEquals(stringR, result.getFormula().toString());
-			Formula mapped1 = formula1.apply(result.getMap());
-			Formula mapped2 = formula2.apply(result.getMap());
+			Formula formulaR = FormulaParser.parse(stringR);
+			Assert.assertEquals(formulaR, result.getFormula());
+
+			ApplyOperation applyOperation = new ApplyOperation(result.getMap());
+			Formula mapped1 = formula1.runOperation(applyOperation);
+			Formula mapped2 = formula2.runOperation(applyOperation);
 			Assert.assertTrue(mapped1.equals(mapped2));
 			Assert.assertTrue(mapped2.equals(mapped1));
 		}

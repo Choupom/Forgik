@@ -7,6 +7,7 @@ package com.choupom.forgik.console;
 
 import com.choupom.forgik.console.ConsoleProverIO.Decision;
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
 import com.choupom.forgik.proof.ProofConverter;
@@ -25,7 +26,7 @@ public class ConsoleProver {
 		// private constructor
 	}
 
-	public static void prove(Formula[] antecedents, Formula[] consequents, Rule[] rules) {
+	public static void prove(Formulas antecedents, Formulas consequents, Rule[] rules) {
 		Prover prover = new Prover(antecedents, consequents);
 		ConsoleProverIO io = new ConsoleProverIO();
 
@@ -44,8 +45,8 @@ public class ConsoleProver {
 
 	public static void proveStep(Prover prover, ConsoleProverIO io, Rule[] rules) throws ProverException {
 		ProofInfo proofInfo = prover.getProofInfo();
-		Formula[] antecedents = proofInfo.getAntecedents();
-		Formula[] consequents = proofInfo.getConsequents();
+		Formulas antecedents = proofInfo.getAntecedents();
+		Formulas consequents = proofInfo.getConsequents();
 		boolean[] completedConsequents = proofInfo.getCompletedConsequents();
 
 		int consequentId = io.requestSubproof(antecedents, consequents, completedConsequents);
@@ -54,15 +55,15 @@ public class ConsoleProver {
 			return;
 		}
 
-		Formula consequent = consequents[consequentId];
+		Formula consequent = consequents.get(consequentId);
 		Decision decision = io.requestDecision(antecedents, consequent);
 
 		if (decision == Decision.CANCEL_PROOF) {
 			prover.cancelProof();
 		} else if (decision == Decision.COMPLETE_PROOF) {
-			Identification[] identifications = new Identification[antecedents.length];
+			Identification[] identifications = new Identification[antecedents.size()];
 			for (int i = 0; i < identifications.length; i++) {
-				identifications[i] = FormulaIdentifier.identify(antecedents[i], consequent);
+				identifications[i] = FormulaIdentifier.identify(antecedents.get(i), consequent);
 			}
 
 			int antecedentId = io.requestIdentification(identifications);

@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.parser.FormulaParser;
 import com.choupom.forgik.utils.InputStreamUtils;
 
@@ -60,6 +61,7 @@ public class ChallengeParser {
 			consequentsArray[i] = FormulaParser.parse(consequent);
 		}
 
-		return new Challenge(name, difficulty, rulebook, antecedentsArray, consequentsArray);
+		return new Challenge(name, difficulty, rulebook, Formulas.wrap(antecedentsArray),
+				Formulas.wrap(consequentsArray));
 	}
 }

@@ -5,11 +5,7 @@
  */
 package com.choupom.forgik.formula;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-public class Predicate implements Formula {
+public class Predicate extends Formula {
 
 	private final char name;
 
@@ -22,47 +18,7 @@ public class Predicate implements Formula {
 	}
 
 	@Override
-	public String toString() {
-		return Character.toString(this.name);
-	}
-
-	@Override
-	public String toStringNested() {
-		return toString();
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof Predicate)) {
-			return false;
-		}
-
-		Predicate predicate = (Predicate) object;
-		return (this.name == predicate.name);
-	}
-
-	@Override
-	public boolean identify(Formula formula, Map<Integer, List<Formula>> map) {
-		if (formula instanceof FreeFormula) {
-			FreeFormula freeFormula = (FreeFormula) formula;
-			return freeFormula.identify(this, map);
-		}
-
-		if (!(formula instanceof Predicate)) {
-			return false;
-		}
-
-		Predicate predicate = (Predicate) formula;
-		return (this.name == predicate.name);
-	}
-
-	@Override
-	public Formula apply(Map<Integer, Formula> map) {
-		return this;
-	}
-
-	@Override
-	public void getFreeFormulas(Set<Integer> freeFormulas) {
-		// do nothing
+	public <R, P> R runOperation(FormulaOperation<R, P> operation, P param) {
+		return operation.handlePredicate(this, param);
 	}
 }

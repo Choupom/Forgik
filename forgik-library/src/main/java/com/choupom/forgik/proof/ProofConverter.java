@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.proof.linear.AssumptionStatement;
 import com.choupom.forgik.proof.linear.PremiseStatement;
 import com.choupom.forgik.proof.linear.RuleStatement;
@@ -25,13 +25,13 @@ public class ProofConverter {
 		// private constructor
 	}
 
-	public static Statement[] generateLinearProof(Formula[] antecedents, ProofReport[] consequentProofs) {
+	public static Statement[] generateLinearProof(Formulas antecedents, ProofReport[] consequentProofs) {
 		List<Statement> statements = new ArrayList<>();
-		int[] assumptionStatementIds = new int[antecedents.length];
+		int[] assumptionStatementIds = new int[antecedents.size()];
 
 		// add premise statements
-		for (int i = 0; i < antecedents.length; i++) {
-			Statement statement = new PremiseStatement(antecedents[i]);
+		for (int i = 0; i < assumptionStatementIds.length; i++) {
+			Statement statement = new PremiseStatement(antecedents.get(i));
 			assumptionStatementIds[i] = statements.size();
 			statements.add(statement);
 		}
@@ -65,31 +65,32 @@ public class ProofConverter {
 
 	private static void browseRuleReport(ProofReportRule proof, List<Statement> statements,
 			int[] assumptionStatementIds, Map<ProofReport, Integer> proofStatementMap, int indent) {
-		Formula[] assumptions = proof.getAssumptions();
+		Formulas assumptions = proof.getAssumptions();
 		ProofReport[] subproofs = proof.getSubproofs();
+		int numAssumptions = assumptions.size();
 
 		// add assumption statements
-		int[] newAssumptionStatementIds = new int[assumptionStatementIds.length + assumptions.length];
+		int[] newAssumptionStatementIds = new int[assumptionStatementIds.length + numAssumptions];
 		System.arraycopy(assumptionStatementIds, 0, newAssumptionStatementIds, 0, assumptionStatementIds.length);
-		for (int i = 0; i < assumptions.length; i++) {
-			Statement statement = new AssumptionStatement(assumptions[i], indent);
+		for (int i = 0; i < numAssumptions; i++) {
+			Statement statement = new AssumptionStatement(assumptions.get(i), indent);
 			newAssumptionStatementIds[assumptionStatementIds.length + i] = statements.size();
 			statements.add(statement);
 		}
 
 		// browse subproofs
-		int subIndent = (assumptions.length > 0 ? indent + 1 : indent);
+		int subIndent = (numAssumptions > 0 ? indent + 1 : indent);
 		for (ProofReport subproof : subproofs) {
 			browseProof(subproof, statements, newAssumptionStatementIds, proofStatementMap, subIndent);
 		}
 
 		// add rule statement
-		int[] antecedents = new int[assumptions.length + subproofs.length];
-		for (int i = 0; i < assumptions.length; i++) {
+		int[] antecedents = new int[numAssumptions + subproofs.length];
+		for (int i = 0; i < numAssumptions; i++) {
 			antecedents[i] = newAssumptionStatementIds[assumptionStatementIds.length + i];
 		}
 		for (int i = 0; i < subproofs.length; i++) {
-			antecedents[assumptions.length + i] = proofStatementMap.get(subproofs[i]).intValue();
+			antecedents[numAssumptions + i] = proofStatementMap.get(subproofs[i]);
 		}
 		Statement statement = new RuleStatement(proof.getRule(), antecedents, proof.getConclusion(), indent);
 		proofStatementMap.put(proof, Integer.valueOf(statements.size()));

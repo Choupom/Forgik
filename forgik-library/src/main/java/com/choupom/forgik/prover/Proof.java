@@ -5,45 +5,47 @@
  */
 package com.choupom.forgik.prover;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.identifier.FormulaIdentifier;
 import com.choupom.forgik.identifier.Identification;
+import com.choupom.forgik.operations.ApplyOperation;
 import com.choupom.forgik.proof.tree.ProofReport;
 import com.choupom.forgik.proof.tree.ProofReportIdentification;
 import com.choupom.forgik.proof.tree.ProofReportRule;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rule.RuleApplicationResult;
+import com.choupom.forgik.rule.RuleApplier;
 
 /* package */ class Proof {
 
-	private final Formula[] antecedents;
-	private final Formula[] consequents;
 	private final Proof parent;
 	private final int parentConsequentId;
 	private final Rule parentConsequentRule;
 	private final int numAssumptions;
 	private final FreeFormulaFactory freeFormulaFactory;
 
+	private Formulas antecedents;
+	private Formulas consequents;
 	private final boolean[] completedConsequents;
 	private final ProofReport[] consequentReports;
 	private final Map<Integer, Formula> map;
 
-	public Proof(Formula[] antecedents, Formula[] consequents, Proof parent, int parentConsequentId,
+	public Proof(Formulas antecedents, Formulas consequents, Proof parent, int parentConsequentId,
 			Rule parentConsequentRule, int numAssumptions, FreeFormulaFactory freeFormulaFactory) {
-		this.antecedents = antecedents.clone();
-		this.consequents = consequents.clone();
 		this.parent = parent;
 		this.parentConsequentId = parentConsequentId;
 		this.parentConsequentRule = parentConsequentRule;
 		this.numAssumptions = numAssumptions;
 		this.freeFormulaFactory = freeFormulaFactory;
 
-		this.completedConsequents = new boolean[consequents.length];
-		this.consequentReports = new ProofReport[consequents.length];
+		this.antecedents = antecedents.getCopy();
+		this.consequents = consequents.getCopy();
+		this.completedConsequents = new boolean[consequents.size()];
+		this.consequentReports = new ProofReport[consequents.size()];
 		this.map = new HashMap<>();
 	}
 
@@ -83,8 +85,8 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 			throw new ProverException("Consequent is already completed");
 		}
 
-		Formula consequent = this.consequents[consequentId];
-		Formula antecedent = this.antecedents[antecedentId];
+		Formula consequent = this.consequents.get(consequentId);
+		Formula antecedent = this.antecedents.get(antecedentId);
 
 		Identification identification = FormulaIdentifier.identify(antecedent, consequent);
 		if (identification == null) {
@@ -138,9 +140,9 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 			throw new ProverException("Consequent is already completed");
 		}
 
-		Formula consequent = this.consequents[consequentId];
+		Formula consequent = this.consequents.get(consequentId);
 
-		RuleApplicationResult result = rule.apply(consequent);
+		RuleApplicationResult result = RuleApplier.apply(rule, consequent);
 		if (result == null) {
 			throw new ProverException("Rule can not be applied to consequent");
 		}
@@ -149,40 +151,30 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 		for (Integer ruleFormula : result.getLeftover()) {
 			leftoverMap.put(ruleFormula, this.freeFormulaFactory.createFreeFormula());
 		}
+		ApplyOperation applyOperation = new ApplyOperation(leftoverMap);
 
-		Formula[] ruleAssumptions = result.getAssumptions();
-		Formula[] proofAntecedents = new Formula[this.antecedents.length + ruleAssumptions.length];
-		System.arraycopy(this.antecedents, 0, proofAntecedents, 0, this.antecedents.length);
-		for (int i = 0; i < ruleAssumptions.length; i++) {
-			proofAntecedents[this.antecedents.length + i] = ruleAssumptions[i].apply(leftoverMap);
-		}
+		Formulas ruleAssumptions = result.getAssumptions();
+		Formulas proofAntecedents = Formulas.concat(this.antecedents, ruleAssumptions.runOperation(applyOperation));
 
-		Formula[] ruleAntecedents = result.getAntecedents();
-		Formula[] proofConsequents = new Formula[ruleAntecedents.length];
-		for (int i = 0; i < ruleAntecedents.length; i++) {
-			proofConsequents[i] = ruleAntecedents[i].apply(leftoverMap);
-		}
+		Formulas ruleAntecedents = result.getAntecedents();
+		Formulas proofConsequents = ruleAntecedents.runOperation(applyOperation);
 
 		Map<Integer, Formula> consequentMap = new HashMap<>();
 		for (Map.Entry<Integer, Formula> entry : result.getConsequentMap().entrySet()) {
-			consequentMap.put(entry.getKey(), entry.getValue().apply(leftoverMap));
+			consequentMap.put(entry.getKey(), entry.getValue().runOperation(applyOperation));
 		}
 		applyMap(consequentMap); // TODO: is this ever reversed?
 
-		return new Proof(proofAntecedents, proofConsequents, this, consequentId, rule, ruleAssumptions.length,
+		return new Proof(proofAntecedents, proofConsequents, this, consequentId, rule, ruleAssumptions.size(),
 				this.freeFormulaFactory);
 	}
 
 	private void applyMap(Map<Integer, Formula> map) {
 		this.map.putAll(map);
 
-		for (int i = 0; i < this.antecedents.length; i++) {
-			this.antecedents[i] = this.antecedents[i].apply(map);
-		}
-
-		for (int i = 0; i < this.consequents.length; i++) {
-			this.consequents[i] = this.consequents[i].apply(map);
-		}
+		ApplyOperation applyOperation = new ApplyOperation(map);
+		this.antecedents = this.antecedents.runOperation(applyOperation);
+		this.consequents = this.consequents.runOperation(applyOperation);
 
 		for (int i = 0; i < this.consequentReports.length; i++) {
 			ProofReport report = this.consequentReports[i];
@@ -193,9 +185,9 @@ import com.choupom.forgik.rule.RuleApplicationResult;
 	}
 
 	private ProofReport createReport() {
-		Formula[] assumptions = Arrays.copyOfRange(this.antecedents, this.antecedents.length - this.numAssumptions,
-				this.antecedents.length);
-		Formula parentConsequent = this.parent.consequents[this.parentConsequentId];
+		Formulas assumptions = this.antecedents.getCopy(this.antecedents.size() - this.numAssumptions,
+				this.antecedents.size());
+		Formula parentConsequent = this.parent.consequents.get(this.parentConsequentId);
 		return new ProofReportRule(this.parentConsequentRule, assumptions, this.consequentReports, parentConsequent);
 	}
 }

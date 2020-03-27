@@ -8,6 +8,7 @@ package com.choupom.forgik.proof.tree;
 import java.util.Map;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.operations.ApplyOperation;
 
 public class ProofReportIdentification implements ProofReport {
 
@@ -30,8 +31,7 @@ public class ProofReportIdentification implements ProofReport {
 
 	@Override
 	public ProofReportIdentification apply(Map<Integer, Formula> map) {
-		Formula antecedent = this.antecedent.apply(map);
-
+		Formula antecedent = this.antecedent.runOperation(new ApplyOperation(map));
 		return new ProofReportIdentification(antecedent, this.antecedentId);
 	}
 }

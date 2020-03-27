@@ -5,13 +5,14 @@
  */
 package com.choupom.forgik.identifier;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.choupom.forgik.formula.Formula;
+import com.choupom.forgik.operations.ApplyOperation;
+import com.choupom.forgik.operations.ContainsFreeFormulaOperation;
+import com.choupom.forgik.operations.IdentifyOperation;
 
 public class FormulaIdentifier {
 
@@ -20,44 +21,48 @@ public class FormulaIdentifier {
 	}
 
 	public static Identification identify(Formula formula1, Formula formula2) {
-		Map<Integer, Formula> identificationMap = new HashMap<>();
+		// create result map
+		Map<Integer, Formula> resultMap = new HashMap<>();
 
 		while (true) {
-			Map<Integer, List<Formula>> map = new HashMap<>();
-			if (!formula2.identify(formula1, map)) {
+			// identify formulas
+			Map<Integer, Formula> identificationMap = new HashMap<>();
+			if (!formula2.runOperation(new IdentifyOperation(false, identificationMap), formula1)) {
 				return null;
 			}
 
-			Integer latestFreeFormula = null;
-			for (Integer freeFormula : map.keySet()) {
-				if (latestFreeFormula == null || freeFormula.compareTo(latestFreeFormula) > 0) {
-					latestFreeFormula = freeFormula;
-				}
+			// check if there is no difference between the formulas
+			if (identificationMap.isEmpty()) {
+				break; // identification complete!
 			}
 
-			if (latestFreeFormula == null) {
-				return new Identification(formula1, identificationMap);
-			}
+			// create substitution map
+			Integer originalFormula = Collections.max(identificationMap.keySet());
+			Formula substituteFormula = identificationMap.get(originalFormula);
+			Map<Integer, Formula> substitutionMap = new HashMap<>();
+			substitutionMap.put(originalFormula, substituteFormula);
 
-			Formula substitute = map.get(latestFreeFormula).get(0);
-
-			Set<Integer> freeFormulas = new HashSet<>();
-			substitute.getFreeFormulas(freeFormulas);
-			if (freeFormulas.contains(latestFreeFormula)) {
+			// check infinite self substitution
+			if (substituteFormula.runOperation(new ContainsFreeFormulaOperation(originalFormula))) {
 				return null;
 			}
 
-			Map<Integer, Formula> newMap = new HashMap<>();
-			newMap.put(latestFreeFormula, substitute);
-
-			formula1 = formula1.apply(newMap);
-			formula2 = formula2.apply(newMap);
-			for (Map.Entry<Integer, Formula> entry : identificationMap.entrySet()) {
-				Integer freeFormula = entry.getKey();
-				Formula newFormula = entry.getValue().apply(newMap);
-				identificationMap.put(freeFormula, newFormula);
+			// apply substitution map
+			ApplyOperation applyOperation = new ApplyOperation(substitutionMap);
+			formula1 = formula1.runOperation(applyOperation);
+			formula2 = formula2.runOperation(applyOperation);
+			for (Map.Entry<Integer, Formula> entry : resultMap.entrySet()) {
+				entry.setValue(entry.getValue().runOperation(applyOperation));
 			}
-			identificationMap.put(latestFreeFormula, substitute);
+
+			// merge substitution map into result map
+			resultMap.putAll(substitutionMap);
 		}
+
+		// return identification result
+		if (!formula1.equals(formula2)) {
+			throw new IllegalStateException();
+		}
+		return new Identification(formula1, resultMap);
 	}
 }
