@@ -8,13 +8,20 @@ package com.choupom.forgik.android;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Spanned;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TableLayout;
+import android.widget.LinearLayout;
 import android.widget.TableRow;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import androidx.core.text.HtmlCompat;
@@ -43,6 +50,8 @@ import com.choupom.forgik.rulebook.RulebookParser;
 import com.google.android.gms.common.util.ArrayUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class MainActivity extends Activity {
@@ -57,7 +66,12 @@ public class MainActivity extends Activity {
 
     private static final int[] RULES_PER_ROW = new int[] {2, 3, 3, 3};
 
-    private Challenge[] challenges;
+    private final Challenge[] challenges;
+    private final LinearLayout[] ruleRows;
+    private final Map<Integer, View> antecedentViews;
+    private final Map<FormulaId, View> consequentViews;
+    private final Map<Rule, Button> ruleViews;
+    private final Map<Integer, View> statementViews;
 
     private int currentChallengeIndex;
     private Rule[] rules;
@@ -68,6 +82,11 @@ public class MainActivity extends Activity {
 
     public MainActivity() {
         this.challenges = loadChallenges();
+        this.ruleRows = new LinearLayout[RULES_PER_ROW.length];
+        this.antecedentViews = new HashMap<>();
+        this.consequentViews = new HashMap<>();
+        this.ruleViews = new HashMap<>();
+        this.statementViews = new HashMap<>();
         loadChallenge(0);
     }
 
@@ -86,6 +105,13 @@ public class MainActivity extends Activity {
             this.rules = rulebook.getRules();
             this.prover = new Prover(challenge.getAntecedents(), challenge.getConsequents());
             this.currentChallengeIndex = index;
+            for (int i = 0; i < this.ruleRows.length; i++) {
+                this.ruleRows[i] = null;
+            }
+            this.antecedentViews.clear();
+            this.consequentViews.clear();
+            this.statementViews.clear();
+            this.ruleViews.clear();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -113,113 +139,137 @@ public class MainActivity extends Activity {
             }
         });
 
-        resetProofState();
+        resetProofState(-1);
     }
 
     private void updateView() {
+        // start transition
+        ViewGroup mainView = (ViewGroup) findViewById(R.id.main_view);
+        AutoTransition autoTransition = new AutoTransition();
+        autoTransition.excludeTarget(R.id.consequent, true);
+        TransitionManager.beginDelayedTransition(mainView, autoTransition);
+
         // get proof info
         ProofInfo proofInfo = this.prover.getProofInfo();
-        Formulas antecedents = proofInfo.getAntecedents();
-        Formulas consequents = proofInfo.getConsequents();
-        boolean[] completedConsequents = proofInfo.getCompletedConsequents();
 
+        // get selected consequent
+        Formulas consequents = proofInfo.getConsequents();
         Formula selectedConsequent = null;
         if (this.selectedConsequentId != -1) {
             selectedConsequent = consequents.get(this.selectedConsequentId);
         }
 
         // update antecedents table
-        updateAntecedentsTable(antecedents, selectedConsequent);
+        updateAntecedentsTable(proofInfo, selectedConsequent);
 
         // update consequents table
-        updateConsequentsTable(consequents, completedConsequents);
-
-        // update information text
-        TextView informationText = (TextView) findViewById(R.id.information_text);
-        informationText.setVisibility(selectedConsequent == null ? View.VISIBLE : View.GONE);
-        if (this.prover.isMainProofComplete()) {
-            informationText.setText(R.string.congratulations);
-        } else {
-            informationText.setText(R.string.please_select_consequent);
-        }
-
-        // update rules text
-        View rulesView = findViewById(R.id.rules_text);
-        rulesView.setVisibility(selectedConsequent != null ? View.VISIBLE : View.GONE);
+        updateConsequentsTable(proofInfo);
 
         // update rules table
         updateRulesTable(selectedConsequent);
 
-        // update proof text
-        View proofView = findViewById(R.id.proof_text);
-        proofView.setVisibility(this.prover.isMainProofComplete() ? View.VISIBLE : View.GONE);
-
         // update proof table
-        updateProofTable(antecedents, proofInfo.getConsequentProofs());
+        updateProofTable(proofInfo);
 
         // update cancel subproof button
         Button cancelSubproofButton = (Button) findViewById(R.id.cancel_subproof_button);
-        cancelSubproofButton.setVisibility(!this.prover.isOnMainProof() ? View.VISIBLE : View.GONE);
+        cancelSubproofButton.setEnabled(!this.prover.isOnMainProof());
     }
 
-    private void updateAntecedentsTable(Formulas antecedents, Formula selectedConsequent) {
-        TableLayout antecedentsTable = (TableLayout) findViewById(R.id.antecedents_table);
+    private void updateAntecedentsTable(ProofInfo proofInfo, Formula selectedConsequent) {
+        LinearLayout antecedentsTable = (LinearLayout) findViewById(R.id.antecedents_table);
         antecedentsTable.removeAllViews();
 
         int index = 0;
-        for (Formula antecedent : antecedents) {
-            View view = createAntecedentView(index, antecedent, selectedConsequent);
-            antecedentsTable.addView(view);
+        for (Formula antecedent : proofInfo.getAntecedents()) {
+            Integer antecedentId = Integer.valueOf(index);
+            View row = this.antecedentViews.get(antecedentId);
+            if (row == null) {
+                row = getLayoutInflater().inflate(R.layout.antecedent_entry, null);
+                this.antecedentViews.put(antecedentId, row);
+            }
+            updateAntecedentView(row, index, antecedent, selectedConsequent);
+            antecedentsTable.addView(row);
             index++;
         }
     }
 
-    private void updateConsequentsTable(Formulas consequents, boolean[] completedConsequents) {
-        TableLayout consequentsTable = (TableLayout) findViewById(R.id.consequents_table);
+    private void updateConsequentsTable(ProofInfo proofInfo) {
+        LinearLayout consequentsTable = (LinearLayout) findViewById(R.id.consequents_table);
         consequentsTable.removeAllViews();
 
-        int index = 0;
-        for (Formula consequent : consequents) {
-            View view = createConsequentView(index, consequent, completedConsequents[index]);
-            consequentsTable.addView(view);
-            index++;
+        int maxDepth = computeMaxDepth(proofInfo);
+
+		int childConsequentId = -1;
+        Rule childConsequentRule = null;
+		int depth = 0;
+        while (proofInfo != null) {
+            int index = 0;
+            boolean[] completedConsequents = proofInfo.getCompletedConsequents();
+            for (Formula consequent : proofInfo.getConsequents()) {
+                FormulaId consequentId = new FormulaId(proofInfo.getPath(), index);
+                View row = this.consequentViews.get(consequentId);
+                if (row == null) {
+                    row = getLayoutInflater().inflate(R.layout.consequent_entry, null);
+                    this.consequentViews.put(consequentId, row);
+                }
+                boolean completed = completedConsequents[index];
+                boolean ongoing = (index == childConsequentId);
+                boolean selectable = (!completed && depth == 0);
+                updateConsequentView(row, index, consequent, completed, ongoing, selectable, maxDepth-depth, childConsequentRule);
+                consequentsTable.addView(row);
+                index++;
+            }
+            childConsequentId = proofInfo.getParentConsequentId();
+            childConsequentRule = proofInfo.getParentConsequentRule();
+            proofInfo = proofInfo.getParentProof();
+            depth++;
         }
     }
 
     private void updateRulesTable(Formula selectedConsequent) {
-        TableLayout rulesTable = (TableLayout) findViewById(R.id.rules_table);
+        LinearLayout rulesTable = (LinearLayout) findViewById(R.id.rules_table);
+        rulesTable.setVisibility(!this.prover.isMainProofComplete() ? View.VISIBLE : View.GONE);
         rulesTable.removeAllViews();
 
-        if (selectedConsequent != null) {
-            TableRow row = null;
-            int rowIndex = 0;
-            int rowCount = 0;
+        int rowIndex = 0;
+        int rowCount = 0;
 
-            for (int i = 0; i < this.rules.length; i++) {
-                if (row == null) {
-                    row = new TableRow(this);
-                    row.setGravity(Gravity.CENTER_HORIZONTAL);
-                    rulesTable.addView(row);
-                }
+        for (int i = 0; i < this.rules.length; i++) {
+            LinearLayout row = this.ruleRows[rowIndex];
+            if (row == null) {
+                row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setGravity(Gravity.CENTER_HORIZONTAL);
+                this.ruleRows[rowIndex] = row;
+            }
+            if (i == rowCount) {
+                rulesTable.addView(row);
+                row.removeAllViews();
+            }
 
-                View view = createRuleView(this.rules[i], selectedConsequent);
-                row.addView(view);
+            Rule rule = this.rules[i];
+            Button button = this.ruleViews.get(rule);
+            if (button == null) {
+                button = (Button) getLayoutInflater().inflate(R.layout.rule_entry, null);
+                this.ruleViews.put(rule, button);
+            }
+            updateRuleView(button, rule, selectedConsequent);
+            row.addView(button);
 
-                if (i+1 >= rowCount+RULES_PER_ROW[rowIndex]) {
-                    row = null;
-                    rowCount += RULES_PER_ROW[rowIndex];
-                    rowIndex++;
-                }
+            if (i+1 >= rowCount+RULES_PER_ROW[rowIndex]) {
+                rowCount += RULES_PER_ROW[rowIndex];
+                rowIndex++;
             }
         }
     }
 
-    private void updateProofTable(Formulas antecedents, ProofReport[] consequentProofs) {
-        TableLayout proofTable = (TableLayout) findViewById(R.id.proof_table);
+    private void updateProofTable(ProofInfo proofInfo) {
+        LinearLayout proofTable = (LinearLayout) findViewById(R.id.proof_table);
         proofTable.removeAllViews();
 
         if (this.prover.isMainProofComplete()) {
-            Statement[] statements = ProofConverter.generateLinearProof(antecedents, consequentProofs);
+            Statement[] statements = ProofConverter.generateLinearProof(proofInfo.getAntecedents(), proofInfo.getConsequentProofs());
             int[] selectedAntecedentStatements = new int[0];
             if (this.selectedStatementId != -1 && statements[this.selectedStatementId] instanceof RuleStatement) {
                 RuleStatement selectedStatement = (RuleStatement) statements[this.selectedStatementId];
@@ -227,57 +277,23 @@ public class MainActivity extends Activity {
             }
 
             for (int i = 0; i < statements.length; i++) {
-                final int statementId = i;
-                Statement statement = statements[statementId];
-
-                View row = getLayoutInflater().inflate(R.layout.proof_entry, null);
-                StatementConclusionView conclusionView = (StatementConclusionView) row.findViewById(R.id.proof_conclusion);
-                TextView sourceView = (TextView) row.findViewById(R.id.proof_source);
-
-                row.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        selectStatement(statementId);
-                    }
-                });
-
-                if (statementId == this.selectedStatementId) {
-                    row.setBackgroundColor(Color.parseColor("#DDDDFF"));
-                } else if (ArrayUtils.contains(selectedAntecedentStatements, statementId)) {
-                    row.setBackgroundColor(Color.parseColor("#F7DDDD"));
+                View row = this.statementViews.get(i);
+                if (row == null) {
+                    row = getLayoutInflater().inflate(R.layout.proof_entry, null);
+                    this.statementViews.put(i, row);
                 }
-
-                conclusionView.setPadding(statement.getDepth()*35, 0, 0, 0);
-                conclusionView.setDepth(statement.getDepth());
-
-                String conclusionString = replaceConnectiveSymbols(statement.getConclusion().toString());
-                conclusionView.setText(makeHtml(conclusionString));
-
-                String sourceString = "";
-                if (statement instanceof PremiseStatement) {
-                    sourceString = "premise";
-                } else if (statement instanceof AssumptionStatement) {
-                    sourceString = "assumption";
-                } else if (statement instanceof RuleStatement) {
-                    RuleStatement ruleStatement = (RuleStatement) statement;
-                    sourceString = formatRuleName(ruleStatement.getRule().getName());
-                }
-
-                sourceView.setText(makeHtml(sourceString));
-
+                updateStatementView(row, i, statements[i], selectedAntecedentStatements);
                 proofTable.addView(row);
             }
         }
     }
 
-    private View createAntecedentView(final int antecedentId, Formula antecedent, Formula selectedConsequent) {
+    private void updateAntecedentView(View row, final int antecedentId, Formula antecedent, Formula selectedConsequent) {
         boolean identifiable = false;
         if (selectedConsequent != null) {
             Identification identification = FormulaIdentifier.identify(antecedent, selectedConsequent);
             identifiable = (identification != null);
         }
-
-        View row = getLayoutInflater().inflate(R.layout.antecedent_entry, null);
 
         TextView leftFormulaView = (TextView) row.findViewById(R.id.antecedent);
         leftFormulaView.setText(createFormulaText(antecedent));
@@ -290,28 +306,47 @@ public class MainActivity extends Activity {
                 completeConsequent(antecedentId);
             }
         });
-
-        return row;
     }
 
-    private View createConsequentView(final int consequentId, Formula consequent, boolean completedConsequent) {
-        View row = getLayoutInflater().inflate(R.layout.consequent_entry, null);
-        row.setEnabled(!completedConsequent);
-        row.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectConsequent(consequentId);
-            }
-        });
-        if (consequentId == this.selectedConsequentId) {
+    private void updateConsequentView(View row, final int consequentId, Formula consequent, boolean completed, boolean ongoing, boolean selectable, int depth, Rule rule) {
+        row.setEnabled(selectable);
+        if (selectable) {
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectConsequent(consequentId);
+                }
+            });
+        }
+        if (selectable && consequentId == this.selectedConsequentId) {
             row.setBackgroundColor(Color.parseColor("#DDDDFF"));
+        } else {
+            row.setBackgroundColor(Color.parseColor("#EEEEEE"));
         }
 
-        TextView leftFormulaView = (TextView) row.findViewById(R.id.consequent);
-        leftFormulaView.setText(createFormulaText(consequent));
+        TextSwitcher leftFormulaView = (TextSwitcher) row.findViewById(R.id.consequent);
+
+        Animation inAnimation = new AlphaAnimation(0.0f, 1.0f);
+        inAnimation.setDuration(300);
+        leftFormulaView.setInAnimation(inAnimation);
+
+        Animation outAnimation = new AlphaAnimation(1.0f, 0.0f);
+        outAnimation.setDuration(300);
+        leftFormulaView.setOutAnimation(outAnimation);
+
+        CharSequence oldText = ((TextView) leftFormulaView.getCurrentView()).getText();
+        CharSequence newText = createFormulaText(consequent);
+        if (!newText.toString().equals(oldText.toString())) {
+            leftFormulaView.setText(newText);
+        }
+
+        StatementConclusionView currentView = (StatementConclusionView) leftFormulaView.getCurrentView();
+        currentView.setPadding(depth*StatementConclusionView.INDENT_WIDTH, 0, 0, 0);
+        currentView.setDepth(depth);
 
         ImageView stateImage = (ImageView) row.findViewById(R.id.consequent_state);
-        if (completedConsequent) {
+        stateImage.setVisibility(!ongoing ? View.VISIBLE : View.GONE);
+        if (completed) {
             stateImage.setImageResource(R.drawable.baseline_assignment_turned_in_black_24);
             stateImage.setColorFilter(Color.parseColor("#22BB55"));
         } else {
@@ -319,12 +354,15 @@ public class MainActivity extends Activity {
             stateImage.setColorFilter(Color.parseColor("#AA3355"));
         }
 
-        return row;
+        TextView ruleView = (TextView) row.findViewById(R.id.consequent_rule);
+        ruleView.setVisibility(ongoing ? View.VISIBLE : View.GONE);
+        if (ongoing) {
+            ruleView.setText(makeHtml(formatRuleName(rule.getName())));
+        }
     }
 
-    private View createRuleView(final Rule rule, Formula selectedConsequent) {
-        Button button = (Button) getLayoutInflater().inflate(R.layout.rule_entry, null);
-        button.setEnabled(RuleApplier.canApply(rule, selectedConsequent));
+    private void updateRuleView(Button button, final Rule rule, Formula selectedConsequent) {
+        button.setEnabled(selectedConsequent != null && RuleApplier.canApply(rule, selectedConsequent));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -332,7 +370,44 @@ public class MainActivity extends Activity {
             }
         });
         button.setText(makeHtml(formatRuleName(rule.getName())));
-        return button;
+    }
+
+    private void updateStatementView(View row, final int statementId, Statement statement, int[] selectedAntecedentStatements) {
+        StatementConclusionView conclusionView = (StatementConclusionView) row.findViewById(R.id.proof_conclusion);
+        TextView sourceView = (TextView) row.findViewById(R.id.proof_source);
+
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectStatement(statementId);
+            }
+        });
+
+        if (statementId == this.selectedStatementId) {
+            row.setBackgroundColor(Color.parseColor("#DDDDFF"));
+        } else if (ArrayUtils.contains(selectedAntecedentStatements, statementId)) {
+            row.setBackgroundColor(Color.parseColor("#F7DDDD"));
+        } else {
+            row.setBackgroundColor(Color.parseColor("#EEEEEE"));
+        }
+
+        conclusionView.setPadding(statement.getDepth()*StatementConclusionView.INDENT_WIDTH, 0, 0, 0);
+        conclusionView.setDepth(statement.getDepth());
+
+        String conclusionString = replaceConnectiveSymbols(statement.getConclusion().toString());
+        conclusionView.setText(makeHtml(conclusionString));
+
+        String sourceString = "";
+        if (statement instanceof PremiseStatement) {
+            sourceString = "premise";
+        } else if (statement instanceof AssumptionStatement) {
+            sourceString = "assumption";
+        } else if (statement instanceof RuleStatement) {
+            RuleStatement ruleStatement = (RuleStatement) statement;
+            sourceString = formatRuleName(ruleStatement.getRule().getName());
+        }
+
+        sourceView.setText(makeHtml(sourceString));
     }
 
     private void selectConsequent(int consequentId) {
@@ -353,7 +428,11 @@ public class MainActivity extends Activity {
                 LOGGER.severe(e.getMessage());
                 return;
             }
-            resetProofState();
+            resetProofState(-1);
+
+            if (this.prover.isProofComplete() && !this.prover.isOnMainProof()) {
+                startCompleteProofTask(300);
+            }
         }
     }
 
@@ -365,18 +444,40 @@ public class MainActivity extends Activity {
                 LOGGER.severe(e.getMessage());
                 return;
             }
-            resetProofState();
+            resetProofState(-1);
         }
     }
 
-    private void cancelSubproof() {
+    private void completeSubproof() {
         try {
-          this.prover.cancelProof();
+            this.prover.completeProof();
         } catch (ProverException e) {
             LOGGER.severe(e.getMessage());
             return;
         }
-        resetProofState();
+
+        // TODO: cleanup antecedentViews and consequentViews
+
+        resetProofState(-1);
+
+        if (this.prover.isProofComplete() && !this.prover.isOnMainProof()) {
+            startCompleteProofTask(1_000);
+        }
+    }
+
+    private void cancelSubproof() {
+        int parentConsequentId = this.prover.getProofInfo().getParentConsequentId();
+
+        try {
+            this.prover.cancelProof();
+        } catch (ProverException e) {
+            LOGGER.severe(e.getMessage());
+            return;
+        }
+
+        // TODO: cleanup antecedentViews and consequentViews
+
+        resetProofState(parentConsequentId);
     }
 
     private void nextChallenge() {
@@ -386,36 +487,52 @@ public class MainActivity extends Activity {
         }
 
         loadChallenge(newIndex);
-        resetProofState();
+        resetProofState(-1);
     }
 
-    private void resetProofState() {
-        this.selectedConsequentId = -1;
+    private void resetProofState(int selectedConsequentId) {
         this.selectedStatementId = -1;
 
-        ProofInfo proofInfo = this.prover.getProofInfo();
-        boolean[] completedConsequents = proofInfo.getCompletedConsequents();
+        if (selectedConsequentId == -1) {
+            ProofInfo proofInfo = this.prover.getProofInfo();
+            boolean[] completedConsequents = proofInfo.getCompletedConsequents();
 
-        int uncompletedConsequentId = -1;
-        int numUncompletedConsequents = 0;
-        for (int i = 0; i < completedConsequents.length; i++) {
-            if (!completedConsequents[i]) {
-                uncompletedConsequentId = i;
-                numUncompletedConsequents++;
+            for (int i = 0; i < completedConsequents.length; i++) {
+                if (!completedConsequents[i]) {
+                    selectedConsequentId = i;
+                    break;
+                }
             }
         }
-        if (numUncompletedConsequents == 1) {
-            this.selectedConsequentId = uncompletedConsequentId;
-        }
+
+        this.selectedConsequentId = selectedConsequentId;
 
         updateView();
+    }
+
+    private void startCompleteProofTask(int delay) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                completeSubproof();
+            }
+        }, delay);
+    }
+
+    private static int computeMaxDepth(ProofInfo proofInfo) {
+        int maxDepth = 0;
+        while (proofInfo != null) {
+            maxDepth++;
+            proofInfo = proofInfo.getParentProof();
+        }
+        return maxDepth-1;
     }
 
     private static Spanned createFormulaText(Formula formula) {
         String string = formula.toString();
         string = replaceConnectiveSymbols(string);
         string = replaceFreeFormulas(string);
-        return HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
+        return makeHtml(string);
     }
 
     private static String formatRuleName(String ruleName) {

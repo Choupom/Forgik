@@ -5,6 +5,7 @@
 	Copyright 2019 Andy Poudret. All rights reserved.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_view"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,19 +21,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Premises list -->
+            <!-- Premises title -->
             <TextView android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/premises"
                 android:textSize="24dp"
                 android:textStyle="bold"
                 android:layout_marginBottom="5dp"/>
+
+            <!-- Premises table -->
             <TableLayout android:id="@+id/antecedents_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#EEEEEE"/>
+                android:stretchColumns="0"/>
 
-            <!-- Conclusions list -->
+            <!-- Conclusions title -->
             <TextView android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/conclusions"
@@ -40,44 +43,31 @@
                 android:textStyle="bold"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="5dp"/>
+
+            <!-- Conclusions table -->
             <TableLayout android:id="@+id/consequents_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#EEEEEE"/>
+                android:stretchColumns="0"/>
 
-            <!-- Information text -->
-            <TextView android:id="@+id/information_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/please_select_consequent"
-                android:textSize="20dp"
-                android:gravity="center_horizontal"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"/>
-
-            <!-- Rules list -->
-            <TextView android:id="@+id/rules_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/rules"
-                android:textSize="24dp"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="5dp"/>
-            <TableLayout android:id="@+id/rules_table"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <!-- Proof -->
-            <TextView android:id="@+id/proof_text"
-                android:layout_width="wrap_content"
+            <!-- Proof title -->
+            <TextView android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/proof"
                 android:textSize="24dp"
                 android:textStyle="bold"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="5dp"/>
+
+            <!-- Rules list -->
+            <LinearLayout android:id="@+id/rules_table"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <!-- Proof table -->
             <TableLayout android:id="@+id/proof_table"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:stretchColumns="0"

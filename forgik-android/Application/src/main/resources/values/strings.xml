@@ -8,9 +8,7 @@
     <string name="app_name">Forgik</string>
     <string name="premises">Premises</string>
     <string name="conclusions">Conclusions</string>
-    <string name="please_select_consequent">Please select the conclusion that you want to prove first.</string>
     <string name="congratulations">Congratulations!\nYou have completed this challenge.</string>
-    <string name="rules">Rules</string>
     <string name="proof">Proof</string>
     <string name="identify">Identify</string>
     <string name="cancel_subproof">Cancel subproof</string>

@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 
 public class StatementConclusionView extends TextView {
 
+    public static final int INDENT_WIDTH = 35;
+
     private int depth;
 
     public StatementConclusionView(Context context, @Nullable AttributeSet attrs) {
@@ -34,7 +36,7 @@ public class StatementConclusionView extends TextView {
         getDrawingRect(rect);
 
         for (int i = 0; i < this.depth; i++) {
-            int x = rect.left + i*35 + 14;
+            int x = rect.left + i*INDENT_WIDTH + 14;
             canvas.drawLine(x, rect.top, x, rect.bottom, paint);
         }
     }
