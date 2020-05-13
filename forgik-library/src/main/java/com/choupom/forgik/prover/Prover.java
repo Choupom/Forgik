@@ -17,7 +17,7 @@ public class Prover {
 
 	public Prover(Formulas antecedents, Formulas consequents) {
 		this.freeFormulaFactory = new FreeFormulaFactory();
-		this.mainProof = new Proof(antecedents, consequents, null, -1, null, antecedents.size(),
+		this.mainProof = new Proof(new int[0], antecedents, consequents, null, -1, null, antecedents.size(),
 				this.freeFormulaFactory);
 
 		this.proof = this.mainProof;

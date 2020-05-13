@@ -5,6 +5,7 @@
  */
 package com.choupom.forgik.prover;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import com.choupom.forgik.rule.RuleApplier;
 
 /* package */ class Proof {
 
+	private final int[] path;
 	private final Proof parent;
 	private final int parentConsequentId;
 	private final Rule parentConsequentRule;
@@ -34,8 +36,9 @@ import com.choupom.forgik.rule.RuleApplier;
 	private final ProofReport[] consequentReports;
 	private final Map<Integer, Formula> map;
 
-	public Proof(Formulas antecedents, Formulas consequents, Proof parent, int parentConsequentId,
+	public Proof(int[] path, Formulas antecedents, Formulas consequents, Proof parent, int parentConsequentId,
 			Rule parentConsequentRule, int numAssumptions, FreeFormulaFactory freeFormulaFactory) {
+		this.path = path.clone();
 		this.parent = parent;
 		this.parentConsequentId = parentConsequentId;
 		this.parentConsequentRule = parentConsequentRule;
@@ -67,8 +70,8 @@ import com.choupom.forgik.rule.RuleApplier;
 	}
 
 	public ProofInfo getInfo() {
-		return new ProofInfo(this.antecedents, this.consequents, this.completedConsequents, this.consequentReports,
-				this.parent, this.parentConsequentId);
+		return new ProofInfo(this.path, this.antecedents, this.consequents, this.completedConsequents,
+				this.consequentReports, this.parent, this.parentConsequentId);
 	}
 
 	/**
@@ -166,7 +169,9 @@ import com.choupom.forgik.rule.RuleApplier;
 		}
 		applyMap(consequentMap); // TODO: is this ever reversed?
 
-		return new Proof(proofAntecedents, proofConsequents, this, consequentId, rule, ruleAssumptions.size(),
+		int[] subpath = Arrays.copyOf(this.path, this.path.length + 1);
+		subpath[this.path.length] = consequentId;
+		return new Proof(subpath, proofAntecedents, proofConsequents, this, consequentId, rule, ruleAssumptions.size(),
 				this.freeFormulaFactory);
 	}
 

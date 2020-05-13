@@ -10,6 +10,7 @@ import com.choupom.forgik.proof.tree.ProofReport;
 
 public class ProofInfo {
 
+	private final int[] path;
 	private final Formulas antecedents;
 	private final Formulas consequents;
 	private final boolean[] completedConsequents;
@@ -17,14 +18,19 @@ public class ProofInfo {
 	private final Proof parentProof;
 	private final int parentConsequentId;
 
-	public ProofInfo(Formulas antecedents, Formulas consequents, boolean[] completedConsequents,
+	public ProofInfo(int[] path, Formulas antecedents, Formulas consequents, boolean[] completedConsequents,
 			ProofReport[] consequentProofs, Proof parentProof, int parentConsequentId) {
+		this.path = path.clone();
 		this.antecedents = antecedents.getCopy();
 		this.consequents = consequents.getCopy();
 		this.completedConsequents = completedConsequents.clone();
 		this.consequentProofs = consequentProofs.clone();
 		this.parentProof = parentProof;
 		this.parentConsequentId = parentConsequentId;
+	}
+
+	public int[] getPath() {
+		return this.path;
 	}
 
 	public Formulas getAntecedents() {
