@@ -14,13 +14,17 @@ public class ProofInfo {
 	private final Formulas consequents;
 	private final boolean[] completedConsequents;
 	private final ProofReport[] consequentProofs;
+	private final Proof parentProof;
+	private final int parentConsequentId;
 
 	public ProofInfo(Formulas antecedents, Formulas consequents, boolean[] completedConsequents,
-			ProofReport[] consequentProofs) {
+			ProofReport[] consequentProofs, Proof parentProof, int parentConsequentId) {
 		this.antecedents = antecedents.getCopy();
 		this.consequents = consequents.getCopy();
 		this.completedConsequents = completedConsequents.clone();
 		this.consequentProofs = consequentProofs.clone();
+		this.parentProof = parentProof;
+		this.parentConsequentId = parentConsequentId;
 	}
 
 	public Formulas getAntecedents() {
@@ -37,5 +41,13 @@ public class ProofInfo {
 
 	public ProofReport[] getConsequentProofs() {
 		return this.consequentProofs;
+	}
+
+	public ProofInfo getParentProof() {
+		return (this.parentProof == null ? null : this.parentProof.getInfo());
+	}
+
+	public int getParentConsequentId() {
+		return this.parentConsequentId;
 	}
 }
