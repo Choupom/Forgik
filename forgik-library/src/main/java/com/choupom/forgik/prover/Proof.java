@@ -71,7 +71,7 @@ import com.choupom.forgik.rule.RuleApplier;
 
 	public ProofInfo getInfo() {
 		return new ProofInfo(this.path, this.antecedents, this.consequents, this.completedConsequents,
-				this.consequentReports, this.parent, this.parentConsequentId);
+				this.consequentReports, this.parent, this.parentConsequentId, this.parentConsequentRule);
 	}
 
 	/**

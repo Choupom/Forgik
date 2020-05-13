@@ -7,6 +7,7 @@ package com.choupom.forgik.prover;
 
 import com.choupom.forgik.formula.Formulas;
 import com.choupom.forgik.proof.tree.ProofReport;
+import com.choupom.forgik.rule.Rule;
 
 public class ProofInfo {
 
@@ -17,9 +18,10 @@ public class ProofInfo {
 	private final ProofReport[] consequentProofs;
 	private final Proof parentProof;
 	private final int parentConsequentId;
+	private final Rule parentConsequentRule;
 
 	public ProofInfo(int[] path, Formulas antecedents, Formulas consequents, boolean[] completedConsequents,
-			ProofReport[] consequentProofs, Proof parentProof, int parentConsequentId) {
+			ProofReport[] consequentProofs, Proof parentProof, int parentConsequentId, Rule parentConsequentRule) {
 		this.path = path.clone();
 		this.antecedents = antecedents.getCopy();
 		this.consequents = consequents.getCopy();
@@ -27,6 +29,7 @@ public class ProofInfo {
 		this.consequentProofs = consequentProofs.clone();
 		this.parentProof = parentProof;
 		this.parentConsequentId = parentConsequentId;
+		this.parentConsequentRule = parentConsequentRule;
 	}
 
 	public int[] getPath() {
@@ -55,5 +58,9 @@ public class ProofInfo {
 
 	public int getParentConsequentId() {
 		return this.parentConsequentId;
+	}
+
+	public Rule getParentConsequentRule() {
+		return this.parentConsequentRule;
 	}
 }
