@@ -42,7 +42,7 @@ public class Prover {
 	public void cancelProof() throws ProverException {
 		Proof parentProof = this.proof.getParent();
 		if (parentProof == null) {
-			throw new ProverException("Main proof can not be canceled");
+			throw new ProverException("Main proof may not be canceled");
 		}
 
 		this.proof = parentProof;
@@ -50,16 +50,20 @@ public class Prover {
 
 	public void completeConsequent(int consequentId, int antecedentId) throws ProverException {
 		this.proof.completeConsequentByIdentification(consequentId, antecedentId);
-
-		while (this.proof.isComplete() && this.proof != this.mainProof) {
-			Proof parentProof = this.proof.getParent();
-			int parentConsequentId = this.proof.getParentConsequentId();
-			parentProof.completeConsequentBySubproof(parentConsequentId, this.proof);
-			this.proof = parentProof;
-		}
 	}
 
 	public void proveByRule(int consequentId, Rule rule) throws ProverException {
 		this.proof = this.proof.createProofForConsequent(consequentId, rule);
+	}
+
+	public void completeProof() throws ProverException {
+		Proof parentProof = this.proof.getParent();
+		if (parentProof == null) {
+			throw new ProverException("Main proof may not be completed");
+		}
+
+		int parentConsequentId = this.proof.getParentConsequentId();
+		parentProof.completeConsequentBySubproof(parentConsequentId, this.proof);
+		this.proof = parentProof;
 	}
 }

@@ -69,6 +69,9 @@ public class ConsoleProver {
 			int antecedentId = io.requestIdentification(identifications);
 			if (antecedentId != -1) {
 				prover.completeConsequent(consequentId, antecedentId);
+				while (prover.isProofComplete() && !prover.isOnMainProof()) {
+					prover.completeProof();
+				}
 			}
 		} else if (decision == Decision.SUGGEST_RULE) {
 			int ruleId = io.requestRule(rules);

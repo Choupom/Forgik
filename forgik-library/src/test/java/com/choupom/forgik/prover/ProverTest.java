@@ -55,11 +55,17 @@ public class ProverTest {
 		prover.proveByRule(0, RULE_EFQ);
 		prover.completeConsequent(0, 2);
 		prover.completeConsequent(1, 1);
+		prover.completeProof();
+		prover.completeProof();
+		prover.completeProof();
+		prover.completeProof();
 
 		prover.proveByRule(1, RULE_RAA);
 		prover.completeConsequent(1, 0);
 		prover.proveByRule(0, RULE_IMPLICATION_INTRO);
 		prover.completeConsequent(0, 1);
+		prover.completeProof();
+		prover.completeProof();
 
 		checkProof(prover);
 	}
@@ -74,12 +80,18 @@ public class ProverTest {
 		prover.proveByRule(0, RULE_EFQ);
 		prover.completeConsequent(0, 2);
 		prover.completeConsequent(1, 1);
+		prover.completeProof();
+		prover.completeProof();
 		prover.completeConsequent(1, 0);
+		prover.completeProof();
+		prover.completeProof();
 
 		prover.proveByRule(1, RULE_RAA);
 		prover.proveByRule(0, RULE_IMPLICATION_INTRO);
 		prover.completeConsequent(0, 1);
+		prover.completeProof();
 		prover.completeConsequent(1, 0);
+		prover.completeProof();
 
 		checkProof(prover);
 	}
