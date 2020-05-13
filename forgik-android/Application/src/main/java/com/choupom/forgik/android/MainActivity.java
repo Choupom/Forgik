@@ -20,7 +20,7 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TableRow;
+import android.widget.TableLayout;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
@@ -39,7 +39,6 @@ import com.choupom.forgik.proof.linear.AssumptionStatement;
 import com.choupom.forgik.proof.linear.PremiseStatement;
 import com.choupom.forgik.proof.linear.RuleStatement;
 import com.choupom.forgik.proof.linear.Statement;
-import com.choupom.forgik.proof.tree.ProofReport;
 import com.choupom.forgik.prover.ProofInfo;
 import com.choupom.forgik.prover.Prover;
 import com.choupom.forgik.prover.ProverException;
@@ -72,6 +71,7 @@ public class MainActivity extends Activity {
     private final Map<FormulaId, View> consequentViews;
     private final Map<Rule, Button> ruleViews;
     private final Map<Integer, View> statementViews;
+    private final Map<Integer, View> separators;
 
     private int currentChallengeIndex;
     private Rule[] rules;
@@ -87,6 +87,7 @@ public class MainActivity extends Activity {
         this.consequentViews = new HashMap<>();
         this.ruleViews = new HashMap<>();
         this.statementViews = new HashMap<>();
+        this.separators = new HashMap<>();
         loadChallenge(0);
     }
 
@@ -112,6 +113,7 @@ public class MainActivity extends Activity {
             this.consequentViews.clear();
             this.statementViews.clear();
             this.ruleViews.clear();
+            this.separators.clear();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -177,7 +179,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateAntecedentsTable(ProofInfo proofInfo, Formula selectedConsequent) {
-        LinearLayout antecedentsTable = (LinearLayout) findViewById(R.id.antecedents_table);
+        TableLayout antecedentsTable = (TableLayout) findViewById(R.id.antecedents_table);
         antecedentsTable.removeAllViews();
 
         int index = 0;
@@ -195,7 +197,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateConsequentsTable(ProofInfo proofInfo) {
-        LinearLayout consequentsTable = (LinearLayout) findViewById(R.id.consequents_table);
+        TableLayout consequentsTable = (TableLayout) findViewById(R.id.consequents_table);
         consequentsTable.removeAllViews();
 
         int maxDepth = computeMaxDepth(proofInfo);
@@ -204,6 +206,15 @@ public class MainActivity extends Activity {
         Rule childConsequentRule = null;
 		int depth = 0;
         while (proofInfo != null) {
+            if (depth != 0) {
+                View separator = this.separators.get(maxDepth-depth);
+                if (separator == null) {
+                    separator = getLayoutInflater().inflate(R.layout.separator, null);
+                    this.separators.put(maxDepth-depth, separator);
+                }
+                consequentsTable.addView(separator);
+            }
+
             int index = 0;
             boolean[] completedConsequents = proofInfo.getCompletedConsequents();
             for (Formula consequent : proofInfo.getConsequents()) {
@@ -220,6 +231,7 @@ public class MainActivity extends Activity {
                 consequentsTable.addView(row);
                 index++;
             }
+
             childConsequentId = proofInfo.getParentConsequentId();
             childConsequentRule = proofInfo.getParentConsequentRule();
             proofInfo = proofInfo.getParentProof();
@@ -239,7 +251,7 @@ public class MainActivity extends Activity {
             LinearLayout row = this.ruleRows[rowIndex];
             if (row == null) {
                 row = new LinearLayout(this);
-                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setOrientation(TableLayout.HORIZONTAL);
                 row.setGravity(Gravity.CENTER_HORIZONTAL);
                 this.ruleRows[rowIndex] = row;
             }
@@ -265,7 +277,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateProofTable(ProofInfo proofInfo) {
-        LinearLayout proofTable = (LinearLayout) findViewById(R.id.proof_table);
+        TableLayout proofTable = (TableLayout) findViewById(R.id.proof_table);
         proofTable.removeAllViews();
 
         if (this.prover.isMainProofComplete()) {
@@ -339,10 +351,6 @@ public class MainActivity extends Activity {
         if (!newText.toString().equals(oldText.toString())) {
             leftFormulaView.setText(newText);
         }
-
-        StatementConclusionView currentView = (StatementConclusionView) leftFormulaView.getCurrentView();
-        currentView.setPadding(depth*StatementConclusionView.INDENT_WIDTH, 0, 0, 0);
-        currentView.setDepth(depth);
 
         ImageView stateImage = (ImageView) row.findViewById(R.id.consequent_state);
         stateImage.setVisibility(!ongoing ? View.VISIBLE : View.GONE);
@@ -461,7 +469,7 @@ public class MainActivity extends Activity {
         resetProofState(-1);
 
         if (this.prover.isProofComplete() && !this.prover.isOnMainProof()) {
-            startCompleteProofTask(1_000);
+            startCompleteProofTask(1_200);
         }
     }
 

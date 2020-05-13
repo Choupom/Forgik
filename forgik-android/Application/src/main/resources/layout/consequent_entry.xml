@@ -12,14 +12,14 @@
     <TextSwitcher android:id="@+id/consequent"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        <com.choupom.forgik.android.StatementConclusionView
+        <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:layout_marginLeft="7dp"
             android:textSize="24dp"
             android:minHeight="44dp"/>
-        <com.choupom.forgik.android.StatementConclusionView
+        <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"

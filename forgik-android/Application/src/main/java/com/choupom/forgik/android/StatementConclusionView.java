@@ -13,15 +13,13 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-
 public class StatementConclusionView extends TextView {
 
     public static final int INDENT_WIDTH = 35;
 
     private int depth;
 
-    public StatementConclusionView(Context context, @Nullable AttributeSet attrs) {
+    public StatementConclusionView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -30,7 +28,8 @@ public class StatementConclusionView extends TextView {
         super.onDraw(canvas);
 
         Paint paint = getPaint();
-        paint.setColor(Color.parseColor("#000000"));
+        paint.setStrokeWidth(getResources().getDisplayMetrics().density);
+        paint.setColor(Color.parseColor("#6F6F6F"));
 
         Rect rect = new Rect();
         getDrawingRect(rect);

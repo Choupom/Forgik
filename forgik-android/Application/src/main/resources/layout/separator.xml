@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	XML
+
+	Copyright 2020 Andy Poudret. All rights reserved.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+	android:background="#EEEEEE"
+	android:paddingHorizontal="20dp">
+		<View xmlns:android="http://schemas.android.com/apk/res/android"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="#909090"
+			android:minHeight="1dp"/>
+</FrameLayout>
