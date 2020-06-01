@@ -1,12 +1,15 @@
 <!--
 	Markdown
 
-	Copyright 2019 Andy Poudret. All rights reserved.
+	Copyright 2019-2020 Andy Poudret. All rights reserved.
 -->
 
-# 1.0.5-RC
-  - Add README with app description.
-  - Always enable next challenge button.
+# 1.1.0 (2020-06-01)
+  - Show the goals of each ongoing subproof.
+  - Add proof report.
+  - Add visual animations.
+  - Simplify UI.
+  - Add new challenge.
 
 # 1.0.4 (2019-10-19)
   - Sort challenges by difficulty.
