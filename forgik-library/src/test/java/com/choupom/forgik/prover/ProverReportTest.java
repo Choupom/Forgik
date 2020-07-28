@@ -1,7 +1,7 @@
 /*
  * Java
  *
- * Copyright 2019 Andy Poudret. All rights reserved.
+ * Copyright 2019-2020 Andy Poudret. All rights reserved.
  */
 package com.choupom.forgik.prover;
 
@@ -21,7 +21,7 @@ import com.choupom.forgik.proof.linear.Statement;
 import com.choupom.forgik.rule.Rule;
 import com.choupom.forgik.rule.RuleParser;
 
-public class ProverTest {
+public class ProverReportTest {
 
 	private static final Formulas ANTECEDENTS;
 	private static final Formulas CONSEQUENTS;
@@ -146,25 +146,5 @@ public class ProverTest {
 		Assert.assertEquals(expectedConclusion, statement.getConclusion());
 		Assert.assertEquals(expectedRuleName, statement.getRule().getName());
 		Assert.assertArrayEquals(expectedAntecedentStatements, statement.getAntecedentStatements());
-	}
-
-	@SuppressWarnings("unused")
-	private static void printProofInfo(ProofInfo proofInfo) {
-		int index = 0;
-		for (Formula antecedent : proofInfo.getAntecedents()) {
-			System.out.println("[" + index + "] " + antecedent);
-			index++;
-		}
-
-		System.out.println("...");
-
-		boolean[] completedConsequents = proofInfo.getCompletedConsequents();
-		index = 0;
-		for (Formula consequent : proofInfo.getConsequents()) {
-			if (!completedConsequents[index]) {
-				System.out.println("[G" + index + "] " + consequent + "?");
-			}
-			index++;
-		}
 	}
 }

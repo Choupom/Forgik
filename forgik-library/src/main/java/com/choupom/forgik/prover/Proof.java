@@ -1,7 +1,7 @@
 /*
  * Java
  *
- * Copyright 2019 Andy Poudret. All rights reserved.
+ * Copyright 2019-2020 Andy Poudret. All rights reserved.
  */
 package com.choupom.forgik.prover;
 
@@ -176,9 +176,12 @@ import com.choupom.forgik.rule.RuleApplier;
 	}
 
 	private void applyMap(Map<Integer, Formula> map) {
+		ApplyOperation applyOperation = new ApplyOperation(map);
+		for (Map.Entry<Integer, Formula> entry : this.map.entrySet()) {
+			entry.setValue(entry.getValue().runOperation(applyOperation));
+		}
 		this.map.putAll(map);
 
-		ApplyOperation applyOperation = new ApplyOperation(map);
 		this.antecedents = this.antecedents.runOperation(applyOperation);
 		this.consequents = this.consequents.runOperation(applyOperation);
 

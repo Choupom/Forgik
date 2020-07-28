@@ -4,6 +4,9 @@
 	Copyright 2019-2020 Andy Poudret. All rights reserved.
 -->
 
+# 1.1.1 (RC)
+  - Fix bug related to the propagation of identified free formulas.
+
 # 1.1.0 (2020-06-01)
   - Show the goals of each ongoing subproof.
   - Add proof report.
