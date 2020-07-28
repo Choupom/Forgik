@@ -40,11 +40,7 @@ public class Formulas implements Iterable<Formula> {
 		return new Formulas(array);
 	}
 
-	public Formulas getCopy() {
-		return new Formulas(this.array.clone());
-	}
-
-	public Formulas getCopy(int from, int to) {
+	public Formulas getCopyOfRange(int from, int to) {
 		return new Formulas(Arrays.copyOfRange(this.array, from, to));
 	}
 

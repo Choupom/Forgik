@@ -45,8 +45,8 @@ import com.choupom.forgik.rule.RuleApplier;
 		this.numAssumptions = numAssumptions;
 		this.freeFormulaFactory = freeFormulaFactory;
 
-		this.antecedents = antecedents.getCopy();
-		this.consequents = consequents.getCopy();
+		this.antecedents = antecedents;
+		this.consequents = consequents;
 		this.completedConsequents = new boolean[consequents.size()];
 		this.consequentReports = new ProofReport[consequents.size()];
 		this.map = new HashMap<>();
@@ -194,7 +194,7 @@ import com.choupom.forgik.rule.RuleApplier;
 	}
 
 	private ProofReport createReport() {
-		Formulas assumptions = this.antecedents.getCopy(this.antecedents.size() - this.numAssumptions,
+		Formulas assumptions = this.antecedents.getCopyOfRange(this.antecedents.size() - this.numAssumptions,
 				this.antecedents.size());
 		Formula parentConsequent = this.parent.consequents.get(this.parentConsequentId);
 		return new ProofReportRule(this.parentConsequentRule, assumptions, this.consequentReports, parentConsequent);

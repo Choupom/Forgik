@@ -17,8 +17,8 @@ public class Rule {
 
 	public Rule(String name, Formulas assumptions, Formulas antecedents, Formula consequent) {
 		this.name = name;
-		this.assumptions = assumptions.getCopy();
-		this.antecedents = antecedents.getCopy();
+		this.assumptions = assumptions;
+		this.antecedents = antecedents;
 		this.consequent = consequent;
 	}
 
@@ -27,11 +27,11 @@ public class Rule {
 	}
 
 	public Formulas getAssumptions() {
-		return this.assumptions.getCopy();
+		return this.assumptions;
 	}
 
 	public Formulas getAntecedents() {
-		return this.antecedents.getCopy();
+		return this.antecedents;
 	}
 
 	public Formula getConsequent() {

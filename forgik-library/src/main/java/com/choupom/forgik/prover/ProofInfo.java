@@ -23,8 +23,8 @@ public class ProofInfo {
 	public ProofInfo(int[] path, Formulas antecedents, Formulas consequents, boolean[] completedConsequents,
 			ProofReport[] consequentProofs, Proof parentProof, int parentConsequentId, Rule parentConsequentRule) {
 		this.path = path.clone();
-		this.antecedents = antecedents.getCopy();
-		this.consequents = consequents.getCopy();
+		this.antecedents = antecedents;
+		this.consequents = consequents;
 		this.completedConsequents = completedConsequents.clone();
 		this.consequentProofs = consequentProofs.clone();
 		this.parentProof = parentProof;

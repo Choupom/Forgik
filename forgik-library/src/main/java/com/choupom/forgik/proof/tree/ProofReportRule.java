@@ -21,7 +21,7 @@ public class ProofReportRule implements ProofReport {
 
 	public ProofReportRule(Rule rule, Formulas assumptions, ProofReport[] subproofs, Formula conclusion) {
 		this.rule = rule;
-		this.assumptions = assumptions.getCopy();
+		this.assumptions = assumptions;
 		this.subproofs = subproofs.clone();
 		this.conclusion = conclusion;
 	}
@@ -31,7 +31,7 @@ public class ProofReportRule implements ProofReport {
 	}
 
 	public Formulas getAssumptions() {
-		return this.assumptions.getCopy();
+		return this.assumptions;
 	}
 
 	public ProofReport[] getSubproofs() {

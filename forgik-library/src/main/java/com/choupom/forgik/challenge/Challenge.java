@@ -19,8 +19,8 @@ public class Challenge {
 		this.name = name;
 		this.difficulty = difficulty;
 		this.rulebook = rulebook;
-		this.antecedents = antecedents.getCopy();
-		this.consequents = consequents.getCopy();
+		this.antecedents = antecedents;
+		this.consequents = consequents;
 	}
 
 	public String getName() {
@@ -36,10 +36,10 @@ public class Challenge {
 	}
 
 	public Formulas getAntecedents() {
-		return this.antecedents.getCopy();
+		return this.antecedents;
 	}
 
 	public Formulas getConsequents() {
-		return this.consequents.getCopy();
+		return this.consequents;
 	}
 }

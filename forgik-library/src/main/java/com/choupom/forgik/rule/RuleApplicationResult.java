@@ -27,11 +27,11 @@ public class RuleApplicationResult {
 	}
 
 	public Formulas getAssumptions() {
-		return this.assumptions.getCopy();
+		return this.assumptions;
 	}
 
 	public Formulas getAntecedents() {
-		return this.antecedents.getCopy();
+		return this.antecedents;
 	}
 
 	public Set<Integer> getLeftover() {
