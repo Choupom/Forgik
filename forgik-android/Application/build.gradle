@@ -26,13 +26,13 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion "28.0.3"
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 28
-        versionCode 10100
-        versionName "1.1.0"
+        targetSdkVersion 29
+        versionCode 10101
+        versionName "1.1.1"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
